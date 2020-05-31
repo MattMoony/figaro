@@ -1,3 +1,5 @@
+"""The main entry point"""
+
 import pyaudio, struct
 import numpy as np
 from argparse import ArgumentParser
