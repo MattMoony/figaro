@@ -22,6 +22,8 @@ class Channel(Thread):
         The input device.
     ost : List[Device]
         The output devices.
+    buff : np.ndarray
+        The current buffer.
     _running : bool
         Is the channel active?
     _ist_mut : Lock
@@ -36,6 +38,7 @@ class Channel(Thread):
         self.transf: Transformer = transf or Transformer()
         self.ist: Optional[Device] = ist
         self.ost: List[Device] = ost
+        self.buff: np.ndarray = np.array([])
         self._running: bool = False
         self._ist_mut: Lock = Lock()
         self._ost_mut: Lock = Lock()
@@ -50,10 +53,10 @@ class Channel(Thread):
         self._running = True
         while self._running:
             self._ist_mut.acquire()
-            data = np.asarray(struct.unpack('f'*params.BUF, self.ist.read(params.BUF)))
+            self.buff = np.asarray(struct.unpack('f'*params.BUF, self.ist.read(params.BUF)))
             self._ist_mut.release()
-            data = self.transf.apply_all(data)
-            raw = struct.pack('f'*len(data), *data)
+            self.buff = self.transf.apply_all(self.buff)
+            raw = struct.pack('f'*len(self.buff), *self.buff)
             self._ost_mut.acquire()
             for o in self.ost:
                 o.write(raw)
@@ -83,8 +86,9 @@ class Channel(Thread):
 
     def kill_all(self) -> None:
         """Stop all audio channels"""
-        self.ist.stop_stream()
-        self.ist.close()
+        if self.ist:
+            self.ist.stop_stream()
+            self.ist.close()
         for o in self.ost:
             o.stop_stream()
             o.close()

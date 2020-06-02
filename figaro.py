@@ -17,6 +17,7 @@ d88'      d88' `?88P'`88b`?88P'`88bd88'     `?8888P'
                  `?8888P                             
 """)
     cmd.start()
+    pash.cmds.clear(None, [])
 
 if __name__ == '__main__':
     main()

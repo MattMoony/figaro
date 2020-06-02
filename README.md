@@ -29,7 +29,81 @@ The following steps will explain how to use this program with the commonly used 
 
 ## Usage
 
-_Coming soon ..._
+### CLI
+
+All you need to do is to run the following ...
+
+```bash
+$ python figaro.py
+```
+
+... and whenever you feel lost, just type `help` or `?` and hit enter.
+
+Still, I want you to present with some of the very basic features, to make life a little easier for you and to make this readme more complete. So... here we go!
+
+#### Display all available audio devices
+
+To see which devices are available, use this very simple command ...
+
+```bash
+figaro$ show devices
+```
+
+#### Configure input/output
+
+Use the `set` command to configure your basic input / output settings. In order to change your microphone, use ...
+
+```bash
+figaro$ set input <device-index>
+```
+
+... you can use the same syntax for configuring one output device. Keep in mind however that audio will only be forwared to this device then (previously added devices will be stopped, unless added again) ...
+
+```bash
+figaro$ set output <device-index>
+```
+
+#### Inspect current configuration
+
+To display the audio channel's current setup, use the `show` command ...
+
+```bash
+figaro$ show status
+```
+
+... this will tell you, which microphone is currently being used and where the audio is being written to (possibly multiple output devices). It will also tell you, whether the channel is active or not.
+
+#### Show live audio feed
+
+To get a CLI preview of the audio feed in real-time, you have to use the `show` command once again ...
+
+```bash
+figaro$ show audio
+```
+
+... this will present you with a live console preview of the audio that is being processed and forwarded.
+
+<p align="center">
+  <img width="975" height="475" src="media/audio.png">
+</p>
+
+#### Start/stop the audio channeling
+
+This part is very easy, you can probably guess what the commands will be. To start the channeling process, use ...
+
+```bash
+figaro$ start
+```
+
+... and to stop reading, processing and writing audio, simply enter ...
+
+```bash
+figaro$ stop
+```
+
+... very difficult and hard to remember... I know!
+
+_More docs coming soon!_
 
 ## Roadmap
 
@@ -37,6 +111,7 @@ Just a small preview of what is about to come. It's very likely that this roadma
 
 - [ ] CLI
   - [x] I/O device selection
+  - [x] Live status
   - [ ] Filter control
 - [ ] GUI
   - [ ] Functionality

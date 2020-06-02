@@ -1,7 +1,9 @@
 """Handles the interactive shell for the user"""
 
-import pyaudio, pash.shell, pash.cmds, pash.command as pcmd, colorama as cr
+import pyaudio, shutil, numpy as np, time
+import pash.shell, pash.cmds, pash.command as pcmd, colorama as cr
 cr.init()
+from asciimatics.screen import Screen
 from typing import List
 
 from lib.device import Device
@@ -32,6 +34,28 @@ def on_show_devices(cmd: pcmd.Command, args: List[str]) -> None:
 def on_show_status(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `show status` - shows the audio channel's status"""
     print(ch)
+
+def on_show_audio(cmd: pcmd.Command, args: List[str], scale: float) -> None:
+    """Callback for `show audio` - shows the detected input"""
+    if not ch.is_alive():
+        return
+    w, h = shutil.get_terminal_size()
+    bw, bh = w//2, h
+    def disp_audio(screen: Screen) -> None:
+        while True:
+            screen.clear()
+            b = ch.buff
+            sw = len(b)//bw
+            b = np.asarray([np.average(b[i:i+sw]) for i in range(0, len(b), sw)])
+            for i, v in enumerate(b):
+                screen.move((w-bw)//2+i, int(h//2-bh*v*scale))
+                screen.draw((w-bw)//2+i, h//2, char='▬', colour=1 if np.max(b) > .2 else 7)
+            e = screen.get_key()
+            if e in (ord('Q'), ord('q')):
+                break
+            screen.refresh()
+            time.sleep(.01)
+    Screen.wrapper(disp_audio)
 
 def on_set_input(cmd: pcmd.Command, args: List[str], indi: int) -> None:
     """Callback for `set input` - sets the input device"""
@@ -67,12 +91,15 @@ def start() -> None:
     """Start prompting the user for input."""
     # ---------------------------------------------------------------------------------------------------------------------- #
     sh.add_cmd(pcmd.Command('clear', 'cls', callback=pash.cmds.clear, hint='Clear the console ... '))
-    # ---------------------------------------------------------------------------------------------------------------------- #
+    # ---------------------------------------------------------------------------------------------------------------------- # 
     sh.add_cmd(pcmd.Command('exit', 'quit', 'exit()', callback=on_exit, hint='Quit the shell ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
+    show_audio = pcmd.Command('audio', callback=on_show_audio, hint='Show what audio input is detected ... ')
+    show_audio.add_arg('-s', '--scale', type=float, dest='scale', default=5., help='Specify output scale ... ')
     sh.add_cmd(pcmd.CascCommand('show', 'sh', cmds=[
         pcmd.Command('devices', 'dev', callback=on_show_devices, hint='List all devices ... '),
         pcmd.Command('status', callback=on_show_status, hint='Show the audio channel\'s status ... '),
+        show_audio,
     ], hint='Show info ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     set_input = pcmd.Command('input', 'ist', callback=on_set_input, hint='Set the input device ... ')
