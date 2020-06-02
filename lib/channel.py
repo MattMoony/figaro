@@ -5,6 +5,7 @@ from threading import Thread, Lock
 from typing import Any, List, Dict, Optional
 
 from lib import params
+from lib.sound import Sound
 from lib.device import Device
 from lib.transformer import Transformer
 
@@ -24,12 +25,16 @@ class Channel(Thread):
         The output devices.
     buff : np.ndarray
         The current buffer.
+    sounds : List[Sound]
+        Sounds to be played.
     _running : bool
         Is the channel active?
     _ist_mut : Lock
         Mutex for the input stream.
     _ost_mut : Lock
         Mutex for the output streams.
+    _sou_mut : Lock
+        Mutex for the sounds list.
     """
 
     def __init__(self, transf: Optional[Transformer] = None, ist: Optional[Device] = None, ost: List[Device] = [], 
@@ -39,9 +44,11 @@ class Channel(Thread):
         self.ist: Optional[Device] = ist
         self.ost: List[Device] = ost
         self.buff: np.ndarray = np.array([])
+        self.sounds: List[Sound] = []
         self._running: bool = False
         self._ist_mut: Lock = Lock()
         self._ost_mut: Lock = Lock()
+        self._sou_mut: Lock = Lock()
 
     def start(self):
         if not self.ist or not self.ost:
@@ -56,6 +63,21 @@ class Channel(Thread):
             self.buff = np.asarray(struct.unpack('f'*params.BUF, self.ist.read(params.BUF)))
             self._ist_mut.release()
             self.buff = self.transf.apply_all(self.buff)
+            self._sou_mut.acquire()
+            dels = []
+            for i, s in enumerate(self.sounds):
+                raw_so = s.read(params.BUF//4)
+                if raw_so == b'':
+                    dels.append(i)
+                    continue
+                so = np.asarray(struct.unpack(s.format*(len(raw_so)//s.f_size), raw_so)).astype(np.float32)
+                m = np.max(np.abs(so))
+                so /= m if m > 1. else 1.
+                so = np.hstack((so, self.buff[-len(self.buff)+len(so):]))
+                self.buff = np.average([self.buff, so], axis=0, weights=[.8,.2])
+            for d in reversed(dels):
+                del self.sounds[d]
+            self._sou_mut.release()
             raw = struct.pack('f'*len(self.buff), *self.buff)
             self._ost_mut.acquire()
             for o in self.ost:
@@ -92,6 +114,16 @@ class Channel(Thread):
         for o in self.ost:
             o.stop_stream()
             o.close()
+
+    def add_sound(self, sound: Sound) -> None:
+        self._sou_mut.acquire()
+        self.sounds.append(sound)
+        self._sou_mut.release()
+
+    def del_sound(self, i: int) -> None:
+        self._sou_mut.acquire()
+        del self.sounds[i]
+        self._sou_mut.release()
 
     def __str__(self):
         """Returns a string representation of the channel"""

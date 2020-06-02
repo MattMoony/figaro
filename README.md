@@ -113,6 +113,7 @@ Just a small preview of what is about to come. It's very likely that this roadma
   - [x] I/O device selection
   - [x] Live status
   - [ ] Filter control
+  - [ ] Sound effects
 - [ ] GUI
   - [ ] Functionality
   - [ ] Design

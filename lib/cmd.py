@@ -1,11 +1,12 @@
 """Handles the interactive shell for the user"""
 
-import pyaudio, shutil, numpy as np, time
+import os, pyaudio, wave, shutil, numpy as np, time
 import pash.shell, pash.cmds, pash.command as pcmd, colorama as cr
 cr.init()
 from asciimatics.screen import Screen
 from typing import List
 
+from lib.sound import Sound
 from lib.device import Device
 from lib.channel import Channel
 
@@ -75,6 +76,16 @@ def on_set_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
     if r:
         ch.start()
 
+def on_add_sound(cmd: pcmd.Command, args: List[str], fname: str) -> None:
+    """Callback for `add sound` - adds a sound effect"""
+    if not os.path.isfile(fname):
+        return
+    try:
+        wf = wave.open(fname, 'rb')
+        ch.add_sound(Sound(wf, pa.get_format_from_width(wf.getsampwidth())))
+    except Exception as e:
+        print(e)
+
 def on_start(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `start` - starts the channel"""
     global ch
@@ -110,6 +121,12 @@ def start() -> None:
         set_input,
         set_output,
     ], hint='Set attributes ... '))
+    # ---------------------------------------------------------------------------------------------------------------------- #
+    add_sound = pcmd.Command('sound', callback=on_add_sound, hint='Play a soundeffect ... ')
+    add_sound.add_arg('fname', type=str, help='Specify the sound effect\'s filename ... ')
+    sh.add_cmd(pcmd.CascCommand('add', cmds=[
+        add_sound,
+    ], hint='Add attributes ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     sh.add_cmd(pcmd.Command('start', callback=on_start, hint='Start channeling audio ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
