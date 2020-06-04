@@ -17,6 +17,8 @@ class Sound(object):
         The wave file's format string.
     f_size : str
         The format's size in bytes.
+    srate : int
+        The sampling rate.
 
     Methods
     -------
@@ -26,10 +28,11 @@ class Sound(object):
         Reads from the wave object.
     """
 
-    def __init__(self, wf: Wave_read, fcode: int):
+    def __init__(self, wf: Wave_read, fcode: int, srate: int):
         self.wf: Wave_read = wf
         self.format: str; self.f_size: int
         self.format, self.f_size = self.get_format(fcode)
+        self.srate: int = srate
         if not self.format:
             raise Exception('Unknown format code!')
 

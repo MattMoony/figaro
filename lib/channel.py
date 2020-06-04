@@ -1,6 +1,7 @@
 """Channels the altered input data to the output devices"""
 
 import struct, time, numpy as np
+import scipy.signal as sps
 from threading import Thread, Lock
 from typing import Any, List, Dict, Optional
 
@@ -73,8 +74,10 @@ class Channel(Thread):
                 so = np.asarray(struct.unpack(s.format*(len(raw_so)//s.f_size), raw_so)).astype(np.float32)
                 m = np.max(np.abs(so))
                 so /= m if m > 1. else 1.
+                so = sps.resample(so, round(len(so)*float(params.SMPRATE)/float(s.srate)))
                 so = np.hstack((so, self.buff[-len(self.buff)+len(so):]))
-                self.buff = np.average([self.buff, so], axis=0, weights=[.8,.2])
+                # self.buff = np.average([self.buff, so], axis=0, weights=[.8,.2])
+                self.buff = so
             for d in reversed(dels):
                 del self.sounds[d]
             self._sou_mut.release()

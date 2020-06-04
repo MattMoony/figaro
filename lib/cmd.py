@@ -6,6 +6,7 @@ cr.init()
 from asciimatics.screen import Screen
 from typing import List
 
+from lib import params
 from lib.sound import Sound
 from lib.device import Device
 from lib.channel import Channel
@@ -60,7 +61,7 @@ def on_show_audio(cmd: pcmd.Command, args: List[str], scale: float) -> None:
 
 def on_set_input(cmd: pcmd.Command, args: List[str], indi: int) -> None:
     """Callback for `set input` - sets the input device"""
-    ch.set_ist(Device(pa, format=pyaudio.paFloat32, channels=1, rate=44100, input=True, input_device_index=indi))
+    ch.set_ist(Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, input=True, input_device_index=indi))
 
 def on_set_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
     """Callback for `set output` - sets the output device"""
@@ -69,7 +70,7 @@ def on_set_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
     if r:
         ch.kill()
     try:
-        ch = Channel(transf=ch.transf, ist=ch.ist, ost=[Device(pa, format=pyaudio.paFloat32, channels=1, rate=44100, output=True, output_device_index=indo)])
+        ch = Channel(transf=ch.transf, ist=ch.ist, ost=[Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, output=True, output_device_index=indo)])
     except Exception as e:
         print(e)
         ch = Channel(transf=ch.transf, ist=ch.ist, ost=ch.ost)
@@ -82,7 +83,7 @@ def on_add_sound(cmd: pcmd.Command, args: List[str], fname: str) -> None:
         return
     try:
         wf = wave.open(fname, 'rb')
-        ch.add_sound(Sound(wf, pa.get_format_from_width(wf.getsampwidth())))
+        ch.add_sound(Sound(wf, pa.get_format_from_width(wf.getsampwidth()), wf.getsampwidth()))
     except Exception as e:
         print(e)
 
