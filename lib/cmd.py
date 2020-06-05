@@ -59,6 +59,15 @@ def on_show_audio(cmd: pcmd.Command, args: List[str], scale: float) -> None:
             time.sleep(.01)
     Screen.wrapper(disp_audio)
 
+def on_show_sounds(cmd: pcmd.Command, args: List[str]) -> None:
+    """Callback for `show sounds` - shows all currently playing sounds"""
+    if not ch.sounds:
+        print('No sounds are playing at the moment ... ')
+        return
+    print('Sounds: ')
+    for i, s in enumerate(ch.get_sounds()):
+        print(' - {} | {}'.format(s.name, s.get_playtime()))
+
 def on_set_input(cmd: pcmd.Command, args: List[str], indi: int) -> None:
     """Callback for `set input` - sets the input device"""
     ch.set_ist(Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, input=True, input_device_index=indi))
@@ -79,11 +88,10 @@ def on_set_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
 
 def on_add_sound(cmd: pcmd.Command, args: List[str], fname: str) -> None:
     """Callback for `add sound` - adds a sound effect"""
-    if not os.path.isfile(fname):
+    if not os.path.isfile(fname) or not ch.is_alive():
         return
     try:
-        wf = wave.open(fname, 'rb')
-        ch.add_sound(Sound(wf, pa.get_format_from_width(wf.getsampwidth()), wf.getsampwidth()))
+        ch.add_sound(Sound(fname))
     except Exception as e:
         print(e)
 
@@ -112,6 +120,7 @@ def start() -> None:
         pcmd.Command('devices', 'dev', callback=on_show_devices, hint='List all devices ... '),
         pcmd.Command('status', callback=on_show_status, hint='Show the audio channel\'s status ... '),
         show_audio,
+        pcmd.Command('sounds', callback=on_show_sounds, hint='List all currently playing sounds ... '),
     ], hint='Show info ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     set_input = pcmd.Command('input', 'ist', callback=on_set_input, hint='Set the input device ... ')

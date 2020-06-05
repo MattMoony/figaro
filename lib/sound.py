@@ -1,7 +1,7 @@
 """Wrapper class for a playable wave file"""
 
-from wave import Wave_read
-from typing import Tuple
+import wave, os, pyaudio
+from typing import Tuple, Optional
 
 class Sound(object):
     """
@@ -15,10 +15,14 @@ class Sound(object):
         The raw wave object.
     format : str
         The wave file's format string.
-    f_size : str
+    f_size : int
         The format's size in bytes.
     srate : int
         The sampling rate.
+    name : str
+        An optional name for the sound.
+    nframes : int
+        The number of frames in the file.
 
     Methods
     -------
@@ -26,15 +30,17 @@ class Sound(object):
         Returns the format string and size for a pyaudio format code.
     read(buff_s)
         Reads from the wave object.
+    get_playtime()
+        Gets the remaining playtime as a string.
     """
 
-    def __init__(self, wf: Wave_read, fcode: int, srate: int):
-        self.wf: Wave_read = wf
+    def __init__(self, fname: str):
+        self.wf: wave.Wave_read = wave.open(fname, 'rb')
         self.format: str; self.f_size: int
-        self.format, self.f_size = self.get_format(fcode)
-        self.srate: int = srate
-        if not self.format:
-            raise Exception('Unknown format code!')
+        self.format, self.f_size = self.get_format(pyaudio.PyAudio().get_format_from_width(self.wf.getsampwidth()))
+        self.srate: int = self.wf.getframerate()
+        self.name: str = os.path.basename(fname)
+        self.nframes: int = self.wf.getnframes()
 
     def get_format(self, fcode: int) -> Tuple[str, int]:
         """Get the struct letter for a given pyaudio format code"""
@@ -43,4 +49,11 @@ class Sound(object):
 
     def read(self, buff_s: int) -> bytes:
         """Reads from the wave object"""
+        self.nframes -= buff_s
         return self.wf.readframes(buff_s)
+
+    def get_playtime(self) -> str:
+        s = self.nframes/self.srate
+        m = int(s/60)
+        s %= 60
+        return '{:02d}:{:05.2f}'.format(m, s)

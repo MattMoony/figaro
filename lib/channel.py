@@ -67,17 +67,14 @@ class Channel(Thread):
             self._sou_mut.acquire()
             dels = []
             for i, s in enumerate(self.sounds):
-                raw_so = s.read(params.BUF//4)
-                if raw_so == b'':
+                so_raw = s.read(params.BUF)
+                if so_raw == b'':
                     dels.append(i)
                     continue
-                so = np.asarray(struct.unpack(s.format*(len(raw_so)//s.f_size), raw_so)).astype(np.float32)
-                m = np.max(np.abs(so))
-                so /= m if m > 1. else 1.
-                so = sps.resample(so, round(len(so)*float(params.SMPRATE)/float(s.srate)))
-                so = np.hstack((so, self.buff[-len(self.buff)+len(so):]))
-                # self.buff = np.average([self.buff, so], axis=0, weights=[.8,.2])
-                self.buff = so
+                so = np.asarray(struct.unpack(s.format*(len(so_raw)//s.f_size), so_raw)).astype(np.float32)
+                so /= np.max(so)
+                so = np.hstack((so, np.zeros(params.BUF-len(so))))
+                self.buff = np.average([self.buff, so], axis=0, weights=[.8,.2])
             for d in reversed(dels):
                 del self.sounds[d]
             self._sou_mut.release()
@@ -122,6 +119,12 @@ class Channel(Thread):
         self._sou_mut.acquire()
         self.sounds.append(sound)
         self._sou_mut.release()
+
+    def get_sounds(self) -> List[Sound]:
+        self._sou_mut.acquire()
+        cp = list(self.sounds)
+        self._sou_mut.release()
+        return cp
 
     def del_sound(self, i: int) -> None:
         self._sou_mut.acquire()
