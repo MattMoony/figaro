@@ -94,7 +94,7 @@ def on_set_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
     if r:
         ch.start()
 
-def on_add_sound(cmd: pcmd.Command, args: List[str], fname: str) -> None:
+def on_start_sound(cmd: pcmd.Command, args: List[str], fname: str) -> None:
     """Callback for `add sound` - adds a sound effect"""
     if not os.path.isfile(fname):
         utils.printerr('File "{}" doesn\'t exist ... '.format(fname))
@@ -104,14 +104,14 @@ def on_add_sound(cmd: pcmd.Command, args: List[str], fname: str) -> None:
     except Exception as e:
         utils.printerr(str(e))
 
-def on_add_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
+def on_start_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
     """Callback for `add output` - adds an output device"""
     try:
         ch.add_ost(Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, output=True, output_device_index=indo))
     except Exception as e:
         utils.printerr(str(e))
 
-def on_del_sound(cmd: pcmd.Command, args: List[str], ind: str) -> None:
+def on_stop_sound(cmd: pcmd.Command, args: List[str], ind: str) -> None:
     """Callback for `del sound` - removes a sound effect"""
     if ind.lower() in ('a', 'all'):
         ch.del_all_sounds()
@@ -127,7 +127,7 @@ def on_del_sound(cmd: pcmd.Command, args: List[str], ind: str) -> None:
         return
     ch.del_sound(ind)
 
-def on_del_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
+def on_stop_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
     """Callback for `del output` - removes an output device"""
     if not indo in [d.indo for d in ch.get_osts()]:
         utils.printwrn('Device isn\'t currently being used ... ')
@@ -179,26 +179,22 @@ def start() -> None:
         set_output,
     ], hint='Set attributes ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
-    add_sound = pcmd.Command('sound', callback=on_add_sound, hint='Play a soundeffect ... ')
-    add_sound.add_arg('fname', type=str, help='Specify the sound effect\'s filename ... ')
-    add_output = pcmd.Command('output', 'ost', callback=on_add_output, hint='Add an output device ... ')
-    add_output.add_arg('indo', type=int, help='Specify the output device\'s index ... ')
-    sh.add_cmd(pcmd.CascCommand('add', cmds=[
-        add_sound,
-        add_output,
-    ], hint='Add attributes ... '))
+    start_sound = pcmd.Command('sound', callback=on_start_sound, hint='Play a soundeffect ... ')
+    start_sound.add_arg('fname', type=str, help='Specify the sound effect\'s filename ... ')
+    start_output = pcmd.Command('output', 'ost', callback=on_start_output, hint='Add an output device ... ')
+    start_output.add_arg('indo', type=int, help='Specify the output device\'s index ... ')
+    sh.add_cmd(pcmd.CascCommand('start', cmds=[
+        start_sound,
+        start_output,
+    ], callback=on_start, hint='Start channeling audio / other things ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
-    del_sound = pcmd.Command('sound', callback=on_del_sound, hint='Remove a soundeffect ... ')
-    del_sound.add_arg('ind', type=str, help='Specify the sound effect\'s index ... ')
-    del_output = pcmd.Command('output', 'ost', callback=on_del_output, hint='Remove an output device ... ')
-    del_output.add_arg('indo', type=int, help='Specify the output device\#s index ... ')
-    sh.add_cmd(pcmd.CascCommand('del', 'rm', cmds=[
-        del_sound, 
-        del_output,
-    ], hint='Remove attributes ... '))
-    # ---------------------------------------------------------------------------------------------------------------------- #
-    sh.add_cmd(pcmd.Command('start', callback=on_start, hint='Start channeling audio ... '))
-    # ---------------------------------------------------------------------------------------------------------------------- #
-    sh.add_cmd(pcmd.Command('stop', 'kill', callback=on_stop, hint='Stop channeling audio ... '))
+    stop_sound = pcmd.Command('sound', callback=on_stop_sound, hint='Remove a soundeffect ... ')
+    stop_sound.add_arg('ind', type=str, help='Specify the sound effect\'s index ... ')
+    stop_output = pcmd.Command('output', 'ost', callback=on_stop_output, hint='Remove an output device ... ')
+    stop_output.add_arg('indo', type=int, help='Specify the output device\#s index ... ')
+    sh.add_cmd(pcmd.CascCommand('stop', 'kill', cmds=[
+        stop_sound,
+        stop_output,
+    ], callback=on_stop, hint='Stop channeling audio / other things ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     sh.prompt_until_exit()

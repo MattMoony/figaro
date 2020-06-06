@@ -123,7 +123,7 @@ figaro$ stop
 You can also use `Figaro` for soundboard-like functionality now. To play any sound file (`wav`, `mp3`, `ogg`, ...) in real-time, simply use ...
 
 ```bash
-figaro$ add sound <path-to-sound-effect>
+figaro$ start sound <path-to-sound-effect>
 ```
 
 ... if you want to stop a sound effect, what you have to do first is find its `index` ...
@@ -135,7 +135,7 @@ figaro$ show sounds
 ... this command will provide you with everything you need. It shows you a list of the currently playing sound effects and their respective filenames and `indices`. After that, use ...
 
 ```bash
-figaro$ del sound <sound-index>
+figaro$ stop sound <sound-index>
 ```
 
 ... to stop the sound effect.

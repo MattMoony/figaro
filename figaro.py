@@ -1,9 +1,21 @@
 """The main entry point"""
 
-import pash.misc, pash.cmds
+import pash.misc, pash.cmds, os, sys
+from argparse import ArgumentParser
+
 from lib import cmd
 
 def main():
+    parser = ArgumentParser()
+    parser.add_argument('-g', '--gui', action='store_true', help='Use GUI?')
+    args = parser.parse_args()
+    sys.argv = sys.argv[:1]
+
+    if args.gui:
+        from lib import gui
+        gui.start()
+        os._exit(0)
+    
     pash.cmds.clear(None, [])
     pash.misc.fancy_print("""   ,d8888b  d8,                                     
    88P'    `8P                                      
