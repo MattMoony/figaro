@@ -10,14 +10,14 @@ Real-time open-source voice modification program. Can be useful for many things,
 
 ## Table of Contents
 
-* [About](##About)
-* [Table of Contents](##Table-of-Contents)
-* [Setup](##Setup)
-  * [Advanced setup](###Advanced-setup)
-* [Usage](##Usage)
-  * [CLI](###CLI)
-* [Roadmap](##Roadmap)
-* [References](##References)
+* [About](#About)
+* [Table of Contents](#Table-of-Contents)
+* [Setup](#Setup)
+  * [Advanced setup](#Advanced-setup)
+* [Usage](#Usage)
+  * [CLI](#CLI)
+* [Roadmap](#Roadmap)
+* [References](#References)
 
 ## Setup
 
