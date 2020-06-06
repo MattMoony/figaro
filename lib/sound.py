@@ -1,59 +1,73 @@
-"""Wrapper class for a playable wave file"""
+"""Wrapper class for a playable audio file"""
 
-import wave, os, pyaudio
-from typing import Tuple, Optional
+import os, pydub as pyd
+from typing import Optional
+
+from lib import params
 
 class Sound(object):
     """
-    Wrapper for a playable wave file
+    Wrapper for a playable audio file
     
     ...
 
     Attributes
     ----------
-    wf : Wave_read
-        The raw wave object.
+    audio : pydub.AudioSegment
+        The actual audio source.
     format : str
-        The wave file's format string.
+        The audio file's format string (16 bit int. = 'h', etc.).
     f_size : int
         The format's size in bytes.
     srate : int
         The sampling rate.
     name : str
-        An optional name for the sound.
+        A name for the sound.
     nframes : int
         The number of frames in the file.
+    _pos : int
+        The position in the audio file (the reading position).
 
     Methods
     -------
     get_format(fcode)
-        Returns the format string and size for a pyaudio format code.
+        Returns the format string.
     read(buff_s)
-        Reads from the wave object.
+        Reads from the audio object.
     get_playtime()
         Gets the remaining playtime as a string.
     """
 
     def __init__(self, fname: str):
-        self.wf: wave.Wave_read = wave.open(fname, 'rb')
-        self.format: str; self.f_size: int
-        self.format, self.f_size = self.get_format(pyaudio.PyAudio().get_format_from_width(self.wf.getsampwidth()))
-        self.srate: int = self.wf.getframerate()
+        with open(fname, 'rb') as f:
+            self.audio: pydub.AudioSegment = pyd.AudioSegment.from_file(f)
+        self.audio = self.audio.set_frame_rate(params.SMPRATE).set_channels(params.CHNNLS)
+        self.f_size: int = self.audio.sample_width
+        self.format: str = self.get_format(self.f_size)
+        self.srate: int = self.audio.frame_rate
         self.name: str = os.path.basename(fname)
-        self.nframes: int = self.wf.getnframes()
+        self.nframes: int = self.audio.frame_count()
+        self._pos: int = 0
+        # print(self.f_size, self.format, self.srate, str(self))
 
-    def get_format(self, fcode: int) -> Tuple[str, int]:
+    def get_format(self, sampwidth: int) -> str:
         """Get the struct letter for a given pyaudio format code"""
-        codes = { 1: ('f', 4), 8: ('h', 2), 2: ('d', 4), }
-        return codes[fcode] if fcode in codes.keys() else ''
+        codes = { 1: 'b', 2: 'h', 4: 'i', }
+        return codes[sampwidth] if sampwidth in codes.keys() else ''
 
     def read(self, buff_s: int) -> bytes:
-        """Reads from the wave object"""
+        """Reads `buff_s` frames from the wave object"""
         self.nframes -= buff_s
-        return self.wf.readframes(buff_s)
+        data = self.audio.raw_data[self._pos:self._pos+buff_s*self.f_size]
+        self._pos += buff_s*self.f_size
+        return data
 
     def get_playtime(self) -> str:
+        """Gets the remaining playtime as a string"""
         s = self.nframes/self.srate
         m = int(s/60)
         s %= 60
         return '{:02d}:{:05.2f}'.format(m, s)
+
+    def __str__(self) -> str:
+        return self.name + ' [' + self.get_playtime() + ']'

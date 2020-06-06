@@ -3,3 +3,4 @@
 """The buffer size"""
 BUF: int = 4096
 SMPRATE: int = 44100
+CHNNLS: int = 1

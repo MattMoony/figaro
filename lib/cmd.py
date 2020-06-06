@@ -6,7 +6,7 @@ cr.init()
 from asciimatics.screen import Screen
 from typing import List
 
-from lib import params
+from lib import params, utils
 from lib.sound import Sound
 from lib.device import Device
 from lib.channel import Channel
@@ -31,15 +31,20 @@ def on_exit(cmd: pcmd.Command, args: List[str]) -> None:
 def on_show_devices(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `show devices` - lists all audio devices"""
     print('Devices:\n ', end='')
-    print('\n '.join(['{:02}: {}'.format(i, pa.get_device_info_by_host_api_device_index(0, i)['name']) for i in range(pa.get_host_api_info_by_index(0).get('deviceCount'))]))
+    devs = [pa.get_device_info_by_host_api_device_index(0, i) for i in range(pa.get_host_api_info_by_index(0).get('deviceCount'))]
+    print('\r Input:\n   ', end='')
+    print('\n   '.join(['{:02d}: {}'.format(i, d['name']) for i, d in enumerate(devs) if d['maxInputChannels'] > 0]))
+    print('\r Output:\n   ', end='')
+    print('\n   '.join(['{:02d}: {}'.format(i, d['name']) for i, d in enumerate(devs) if d['maxOutputChannels'] > 0]))
 
 def on_show_status(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `show status` - shows the audio channel's status"""
     print(ch)
 
-def on_show_audio(cmd: pcmd.Command, args: List[str], scale: float) -> None:
+def on_show_audio(cmd: pcmd.Command, args: List[str], scale: float, char: str) -> None:
     """Callback for `show audio` - shows the detected input"""
     if not ch.is_alive():
+        utils.printerr('The audio channel isn\'t running at the moment ... ')
         return
     w, h = shutil.get_terminal_size()
     bw, bh = w//2, h
@@ -51,7 +56,7 @@ def on_show_audio(cmd: pcmd.Command, args: List[str], scale: float) -> None:
             b = np.asarray([np.average(b[i:i+sw]) for i in range(0, len(b), sw)])
             for i, v in enumerate(b):
                 screen.move((w-bw)//2+i, int(h//2-bh*v*scale))
-                screen.draw((w-bw)//2+i, h//2, char='▬', colour=1 if np.max(b) > .2 else 7)
+                screen.draw((w-bw)//2+i, h//2, char=char, colour=1 if np.max(b) > .2 else 7)
             e = screen.get_key()
             if e in (ord('Q'), ord('q')):
                 break
@@ -62,15 +67,18 @@ def on_show_audio(cmd: pcmd.Command, args: List[str], scale: float) -> None:
 def on_show_sounds(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `show sounds` - shows all currently playing sounds"""
     if not ch.sounds:
-        print('No sounds are playing at the moment ... ')
+        utils.printwrn('No sounds are playing at the moment ... ')
         return
     print('Sounds: ')
     for i, s in enumerate(ch.get_sounds()):
-        print(' - {} | {}'.format(s.name, s.get_playtime()))
+        print(' #{:02d} | {}'.format(i, str(s)))
 
 def on_set_input(cmd: pcmd.Command, args: List[str], indi: int) -> None:
     """Callback for `set input` - sets the input device"""
-    ch.set_ist(Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, input=True, input_device_index=indi))
+    try:
+        ch.set_ist(Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, input=True, input_device_index=indi))
+    except Exception as e:
+        utils.printerr(str(e))
 
 def on_set_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
     """Callback for `set output` - sets the output device"""
@@ -79,33 +87,71 @@ def on_set_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
     if r:
         ch.kill()
     try:
-        ch = Channel(transf=ch.transf, ist=ch.ist, ost=[Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, output=True, output_device_index=indo)])
+        ch = Channel(transf=ch.transf, ist=ch.ist, ost=[Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, output=True, output_device_index=indo)], sounds=ch.sounds)
     except Exception as e:
-        print(e)
-        ch = Channel(transf=ch.transf, ist=ch.ist, ost=ch.ost)
+        utils.printerr(str(e))
+        ch = Channel(transf=ch.transf, ist=ch.ist, ost=ch.ost, sounds=ch.sounds)
     if r:
         ch.start()
 
 def on_add_sound(cmd: pcmd.Command, args: List[str], fname: str) -> None:
     """Callback for `add sound` - adds a sound effect"""
-    if not os.path.isfile(fname) or not ch.is_alive():
+    if not os.path.isfile(fname):
+        utils.printerr('File "{}" doesn\'t exist ... '.format(fname))
         return
     try:
         ch.add_sound(Sound(fname))
     except Exception as e:
-        print(e)
+        utils.printerr(str(e))
+
+def on_add_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
+    """Callback for `add output` - adds an output device"""
+    try:
+        ch.add_ost(Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, output=True, output_device_index=indo))
+    except Exception as e:
+        utils.printerr(str(e))
+
+def on_del_sound(cmd: pcmd.Command, args: List[str], ind: str) -> None:
+    """Callback for `del sound` - removes a sound effect"""
+    if ind.lower() in ('a', 'all'):
+        ch.del_all_sounds()
+        return
+    try:
+        ind = int(ind)
+    except ValueError:
+        utils.printerr('"{}" is not a valid index!'.format(ind))
+        return
+    mxind = len(ch.get_sounds())-1
+    if ind > mxind:
+        utils.printerr('Index {} is out of bounds (max: {})!'.format(ind, mxind))
+        return
+    ch.del_sound(ind)
+
+def on_del_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
+    """Callback for `del output` - removes an output device"""
+    if not indo in [d.indo for d in ch.get_osts()]:
+        utils.printwrn('Device isn\'t currently being used ... ')
+        return
+    ch.del_ost(indo)
 
 def on_start(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `start` - starts the channel"""
     global ch
-    if not ch.is_alive():
-        ch = Channel(ch.transf, ch.ist, ch.ost)
+    if ch.is_alive():
+        utils.printwrn('Already running ... ')
+        return
+    ch = Channel(ch.transf, ch.ist, ch.ost)
+    try:
         ch.start()
+    except IOError as e:
+        utils.printerr(e)
 
 def on_stop(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `stop` - stops the channel"""
-    if ch.is_alive():
-        ch.kill()
+    if not ch.is_alive():
+        utils.printwrn('Not running ... ')
+        return
+    ch.kill()
 
 def start() -> None:
     """Start prompting the user for input."""
@@ -116,9 +162,10 @@ def start() -> None:
     # ---------------------------------------------------------------------------------------------------------------------- #
     show_audio = pcmd.Command('audio', callback=on_show_audio, hint='Show what audio input is detected ... ')
     show_audio.add_arg('-s', '--scale', type=float, dest='scale', default=5., help='Specify output scale ... ')
+    show_audio.add_arg('-c', '--char', type=str, dest='char', default='▬', help='Specify the character to be used for the graph ... ')
     sh.add_cmd(pcmd.CascCommand('show', 'sh', cmds=[
         pcmd.Command('devices', 'dev', callback=on_show_devices, hint='List all devices ... '),
-        pcmd.Command('status', callback=on_show_status, hint='Show the audio channel\'s status ... '),
+        pcmd.Command('status', 'stat', callback=on_show_status, hint='Show the audio channel\'s status ... '),
         show_audio,
         pcmd.Command('sounds', callback=on_show_sounds, hint='List all currently playing sounds ... '),
     ], hint='Show info ... '))
@@ -134,9 +181,21 @@ def start() -> None:
     # ---------------------------------------------------------------------------------------------------------------------- #
     add_sound = pcmd.Command('sound', callback=on_add_sound, hint='Play a soundeffect ... ')
     add_sound.add_arg('fname', type=str, help='Specify the sound effect\'s filename ... ')
+    add_output = pcmd.Command('output', 'ost', callback=on_add_output, hint='Add an output device ... ')
+    add_output.add_arg('indo', type=int, help='Specify the output device\'s index ... ')
     sh.add_cmd(pcmd.CascCommand('add', cmds=[
         add_sound,
+        add_output,
     ], hint='Add attributes ... '))
+    # ---------------------------------------------------------------------------------------------------------------------- #
+    del_sound = pcmd.Command('sound', callback=on_del_sound, hint='Remove a soundeffect ... ')
+    del_sound.add_arg('ind', type=str, help='Specify the sound effect\'s index ... ')
+    del_output = pcmd.Command('output', 'ost', callback=on_del_output, hint='Remove an output device ... ')
+    del_output.add_arg('indo', type=int, help='Specify the output device\#s index ... ')
+    sh.add_cmd(pcmd.CascCommand('del', 'rm', cmds=[
+        del_sound, 
+        del_output,
+    ], hint='Remove attributes ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     sh.add_cmd(pcmd.Command('start', callback=on_start, hint='Start channeling audio ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #

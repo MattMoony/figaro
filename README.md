@@ -1,3 +1,5 @@
+<img align="right" src="media/figaro.png" width="125" height="125" />
+
 # Figaro
 
 ---
@@ -6,7 +8,20 @@
 
 Real-time open-source voice modification program. Can be useful for many things, especially when used in combination with virtual sound i/o devices.
 
+## Table of Contents
+
+* [About](##About)
+* [Table of Contents](##Table-of-Contents)
+* [Setup](##Setup)
+  * [Advanced setup](###Advanced-setup)
+* [Usage](##Usage)
+  * [CLI](###CLI)
+* [Roadmap](##Roadmap)
+* [References](##References)
+
 ## Setup
+
+First of all, for `Figaro` to be able to work with audio files other than `wav`, you need to download and install `ffmpeg` (see [References](##References) for the link to the official download page).
 
 If you have Python 3.x installed, try installing the requirements:
 
@@ -103,24 +118,46 @@ figaro$ stop
 
 ... very difficult and hard to remember... I know!
 
-_More docs coming soon!_
+#### Using sound effects
+
+You can also use `Figaro` for soundboard-like functionality now. To play any sound file (`wav`, `mp3`, `ogg`, ...) in real-time, simply use ...
+
+```bash
+figaro$ add sound <path-to-sound-effect>
+```
+
+... if you want to stop a sound effect, what you have to do first is find its `index` ...
+
+```bash
+figaro$ show sounds
+```
+
+... this command will provide you with everything you need. It shows you a list of the currently playing sound effects and their respective filenames and `indices`. After that, use ...
+
+```bash
+figaro$ del sound <sound-index>
+```
+
+... to stop the sound effect.
+
+_More docs coming soon! Disclaimer: Some of the commands described above might still be removed or altered..._
 
 ## Roadmap
 
 Just a small preview of what is about to come. It's very likely that this roadmap will continue to grow in the future, as I get more ideas or if somebody wants to contribute.
 
-- [ ] CLI
-  - [x] I/O device selection
-  - [x] Live status
-  - [ ] Filter control
-  - [ ] Sound effects
-- [ ] GUI
-  - [ ] Functionality
-  - [ ] Design
-- [ ] Filters
-  - [x] Volume
-  - [ ] Pitch-Shift
-  - [ ] Randomized
+* [ ] CLI
+  * [x] I/O device selection
+  * [x] Live status (live audio graph in console)
+  * [ ] Filter control
+  * [x] Sound effects (soundboard-like abilities)
+* [ ] GUI
+  * [ ] Functionality
+  * [ ] Design
+* [ ] Filters
+  * [x] Volume
+  * [ ] Pitch-Shift
+  * [ ] Randomized
 
 ## References
 
@@ -128,6 +165,8 @@ Windows Virtual Sound I/O ... [vb-audio](https://www.vb-audio.com/Cable/)
 
 PyAudio Windows Wheel ... [uci](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyaudio)
 
+FFmpeg download ... [ffmpeg.org](https://ffmpeg.org/download.html)
+
 ---
 
-... MattMoony (May 2020)
+... MattMoony (June 2020)

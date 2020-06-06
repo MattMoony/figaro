@@ -1,7 +1,6 @@
 """Channels the altered input data to the output devices"""
 
 import struct, time, numpy as np
-import scipy.signal as sps
 from threading import Thread, Lock
 from typing import Any, List, Dict, Optional
 
@@ -36,24 +35,29 @@ class Channel(Thread):
         Mutex for the output streams.
     _sou_mut : Lock
         Mutex for the sounds list.
+
+    Methods
+    -------
+    ...
     """
 
     def __init__(self, transf: Optional[Transformer] = None, ist: Optional[Device] = None, ost: List[Device] = [], 
-                 *args: List[Any], **kwargs: Dict[str, Any]):
+                 sounds: List[Sound] = [], *args: List[Any], **kwargs: Dict[str, Any]):
         super(Channel, self).__init__(*args, **kwargs)
         self.transf: Transformer = transf or Transformer()
         self.ist: Optional[Device] = ist
         self.ost: List[Device] = ost
         self.buff: np.ndarray = np.array([])
-        self.sounds: List[Sound] = []
+        self.sounds: List[Sound] = sounds
         self._running: bool = False
         self._ist_mut: Lock = Lock()
         self._ost_mut: Lock = Lock()
         self._sou_mut: Lock = Lock()
 
     def start(self):
+        """Start the audio channeling process"""
         if not self.ist or not self.ost:
-            return
+            raise IOError('Missing I/O devices!')
         return super().start()
 
     def run(self) -> None:
@@ -72,7 +76,7 @@ class Channel(Thread):
                     dels.append(i)
                     continue
                 so = np.asarray(struct.unpack(s.format*(len(so_raw)//s.f_size), so_raw)).astype(np.float32)
-                so /= np.max(so)
+                so /= 2**(8*s.f_size-1)
                 so = np.hstack((so, np.zeros(params.BUF-len(so))))
                 self.buff = np.average([self.buff, so], axis=0, weights=[.8,.2])
             for d in reversed(dels):
@@ -90,10 +94,19 @@ class Channel(Thread):
         self.ost.append(o)
         self._ost_mut.release()
 
+    def get_osts(self) -> List[Device]:
+        """Get all output devices"""
+        self._ost_mut.acquire()
+        cp = list(self.ost)
+        self._ost_mut.release()
+        return cp
+
     def del_ost(self, dev_ind: int) -> None:
         """Remove an output device"""
         self._ost_mut.acquire()
         self.ost = list(filter(lambda o: o.indo != dev_ind, self.ost))
+        if not self.ost:
+            self.kill()
         self._ost_mut.release()
 
     def set_ist(self, i: Device) -> None:
@@ -104,6 +117,9 @@ class Channel(Thread):
 
     def kill(self) -> None:
         """Stop channeling audio"""
+        self._sou_mut.acquire()
+        self.sounds = []
+        self._sou_mut.release()
         self._running = False
 
     def kill_all(self) -> None:
@@ -116,21 +132,30 @@ class Channel(Thread):
             o.close()
 
     def add_sound(self, sound: Sound) -> None:
+        """Add a sound effect to the channel"""
         self._sou_mut.acquire()
         self.sounds.append(sound)
         self._sou_mut.release()
 
     def get_sounds(self) -> List[Sound]:
+        """Get all currently playing soundeffects"""
         self._sou_mut.acquire()
         cp = list(self.sounds)
         self._sou_mut.release()
         return cp
 
     def del_sound(self, i: int) -> None:
+        """Stop a sound effect that's currently running"""
         self._sou_mut.acquire()
         del self.sounds[i]
         self._sou_mut.release()
 
+    def del_all_sounds(self) -> None:
+        """Stop all currently running sound effects"""
+        self._sou_mut.acquire()
+        self.sounds = []
+        self._sou_mut.release()
+
     def __str__(self):
         """Returns a string representation of the channel"""
-        return 'Channel: {{{}}} --> {{{}}} | {} ... '.format(self.ist.indi if self.ist else '-', ', '.join([str(o.indo) for o in self.ost]) if self.ost else '-', 'running' if self._running else 'stopped')
+        return 'Channel: {{{}}} --> {{{}}} | {} ... '.format(self.ist.indi if self.ist else '-', ', '.join(sorted([str(o.indo) for o in self.ost])) if self.ost else '-', 'running' if self._running else 'stopped')
