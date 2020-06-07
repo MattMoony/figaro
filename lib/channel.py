@@ -19,8 +19,8 @@ class Channel(Thread):
     ----------
     transf : Transformer
         The transformer applied to the input.
-    ist : Optional[Device]
-        The input device.
+    ist : List[Device]
+        The input devices.
     ost : List[Device]
         The output devices.
     buff : np.ndarray
@@ -41,11 +41,11 @@ class Channel(Thread):
     ...
     """
 
-    def __init__(self, transf: Optional[Transformer] = None, ist: Optional[Device] = None, ost: List[Device] = [], 
+    def __init__(self, transf: Optional[Transformer] = None, ist: List[Device] = [], ost: List[Device] = [], 
                  sounds: List[Sound] = [], *args: List[Any], **kwargs: Dict[str, Any]):
         super(Channel, self).__init__(*args, **kwargs)
         self.transf: Transformer = transf or Transformer()
-        self.ist: Optional[Device] = ist
+        self.ist: List[Device] = ist
         self.ost: List[Device] = ost
         self.buff: np.ndarray = np.array([])
         self.sounds: List[Sound] = sounds
@@ -65,7 +65,10 @@ class Channel(Thread):
         self._running = True
         while self._running:
             self._ist_mut.acquire()
-            self.buff = np.asarray(struct.unpack('f'*params.BUF, self.ist.read(params.BUF)))
+            self.buff = np.zeros(params.BUF)
+            for i in self.ist:
+                self.buff += np.asarray(struct.unpack('f'*params.BUF, i.read(params.BUF)))
+            self.buff /= len(self.ist)
             self._ist_mut.release()
             self.buff = self.transf.apply_all(self.buff)
             self._sou_mut.acquire()
@@ -88,6 +91,27 @@ class Channel(Thread):
                 o.write(raw)
             self._ost_mut.release()
 
+    def add_ist(self, i: Device) -> None:
+        """Add an input device"""
+        self._ist_mut.acquire()
+        self.ist.append(i)
+        self._ist_mut.release()
+
+    def get_ists(self) -> List[Device]:
+        """Get all input devices"""
+        self._ist_mut.acquire()
+        cp = list(self.ist)
+        self._ist_mut.release()
+        return cp
+
+    def del_ist(self, dev_ind: int) -> None:
+        """Remove an input device"""
+        self._ist_mut.acquire()
+        self.ist = list(filter(lambda i: i.indi != dev_ind, self.ist))
+        if not self.ist:
+            self.kill()
+        self._ist_mut.release()
+
     def add_ost(self, o: Device) -> None:
         """Add an output device"""
         self._ost_mut.acquire()
@@ -109,12 +133,6 @@ class Channel(Thread):
             self.kill()
         self._ost_mut.release()
 
-    def set_ist(self, i: Device) -> None:
-        """Set the input device"""
-        self._ist_mut.acquire()
-        self.ist = i
-        self._ist_mut.release()
-
     def kill(self) -> None:
         """Stop channeling audio"""
         self._sou_mut.acquire()
@@ -124,9 +142,9 @@ class Channel(Thread):
 
     def kill_all(self) -> None:
         """Stop all audio channels"""
-        if self.ist:
-            self.ist.stop_stream()
-            self.ist.close()
+        for i in self.ist:
+            i.stop_stream()
+            i.close()
         for o in self.ost:
             o.stop_stream()
             o.close()
@@ -158,4 +176,7 @@ class Channel(Thread):
 
     def __str__(self):
         """Returns a string representation of the channel"""
-        return 'Channel: {{{}}} --> {{{}}} | {} ... '.format(self.ist.indi if self.ist else '-', ', '.join(sorted([str(o.indo) for o in self.ost])) if self.ost else '-', 'running' if self._running else 'stopped')
+        return 'Channel: {{{}}} --> {{{}}} | {} ... '.format(
+                ', '.join(sorted([str(i.indi) for i in self.ist])) if self.ist else '-', 
+                ', '.join(sorted([str(o.indo) for o in self.ost])) if self.ost else '-', 
+                'running' if self._running else 'stopped')
