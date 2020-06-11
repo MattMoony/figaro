@@ -1,6 +1,6 @@
 """Handles the interactive shell for the user"""
 
-import os, pyaudio, wave, shutil, numpy as np, time
+import os, pyaudio, wave, shutil, numpy as np, time, re
 import pash.shell, pash.cmds, pash.command as pcmd, colorama as cr
 cr.init()
 from asciimatics.screen import Screen
@@ -85,15 +85,20 @@ def on_show_interpreters(cmd: pcmd.Command, args: List[str]) -> None:
     for i, p in enumerate(interpreters):
         print(' #{:02d} | {}'.format(i, str(p)))
 
-def on_start_sound(cmd: pcmd.Command, args: List[str], fname: str) -> None:
+def on_start_sound(cmd: pcmd.Command, args: List[str], params: List[str]) -> None:
     """Callback for `start sound` - adds a sound effect"""
-    if not os.path.isfile(fname):
-        utils.printerr('File "{}" doesn\'t exist ... '.format(fname))
-        return
-    try:
-        ch.add_sound(Sound(fname))
-    except Exception as e:
-        utils.printerr(str(e))
+    for i, a in enumerate(params):
+        if re.match(r'^[\d\.]*$', a):
+            continue
+        if not os.path.isfile(a):
+            utils.printerr('File "{}" doesn\'t exist ... '.format(a))
+        try:
+            if i+1 < len(args) and re.match(r'^[\d\.]+$', args[i+1]):
+                ch.add_sound(Sound(a, float(args[i+1])))
+                continue
+            ch.add_sound(Sound(a))
+        except Exception as e:
+            utils.printerr(str(e))
 
 def on_start_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
     """Callback for `start output` - adds an output device"""
@@ -112,7 +117,7 @@ def on_start_input(cmd: pcmd.Command, args: List[str], indi: int) -> None:
 def on_start_interpreter(cmd: pcmd.Command, args: List[str], fname: str) -> None:
     """Callback for `start interpreter` - interprets a .fig file"""
     try:
-        interpreters.append(Interpreter(fname, ch))
+        interpreters.append(Interpreter(fname, ch, sh))
         interpreters[-1].exec()
     except Exception as e:
         utils.printerr(str(e))
@@ -204,13 +209,13 @@ def start() -> None:
     ], hint='Show info ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     start_sound = pcmd.Command('sound', callback=on_start_sound, hint='Play a soundeffect ... ')
-    start_sound.add_arg('fname', type=str, help='Specify the sound effect\'s filename ... ')
+    start_sound.add_arg('params', type=str, nargs='*', help='Specify the filenames & volumes ... ')
     start_output = pcmd.Command('output', 'ost', callback=on_start_output, hint='Add an output device ... ')
     start_output.add_arg('indo', type=int, help='Specify the output device\'s index ... ')
     start_input = pcmd.Command('input', 'ist', callback=on_start_input, hint='Add an input device ... ')
     start_input.add_arg('indi', type=int, help='Specify the input device\'s index ... ')
     start_interpreter = pcmd.Command('interpreter', 'in', callback=on_start_interpreter, hint='Interpret a .fig file ... ')
-    start_interpreter.add_arg('fname', type=str, help='Specify the filename ... ')
+    start_interpreter.add_arg('fname', type=str, help='Specify the filenames ... ')
     sh.add_cmd(pcmd.CascCommand('start', cmds=[
         start_sound,
         start_output,
