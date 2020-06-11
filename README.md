@@ -67,16 +67,16 @@ figaro$ show devices
 
 #### Configure input/output
 
-Use the `set` command to configure your basic input / output settings. In order to change your microphone, use ...
+Use the `start` command to configure your basic input / output settings. In order to change your microphone, use ...
 
 ```bash
-figaro$ set input <device-index>
+figaro$ start input <device-index>
 ```
 
 ... you can use the same syntax for configuring one output device. Keep in mind however that audio will only be forwared to this device then (previously added devices will be stopped, unless added again) ...
 
 ```bash
-figaro$ set output <device-index>
+figaro$ start output <device-index>
 ```
 
 #### Inspect current configuration
