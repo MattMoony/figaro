@@ -8,6 +8,7 @@ from lib import cmd
 def main():
     parser = ArgumentParser()
     parser.add_argument('-g', '--gui', action='store_true', help='Use GUI?')
+    parser.add_argument('-f', '--file', type=str, help='A .fig file to be interpreted ... ')
     args = parser.parse_args()
     sys.argv = sys.argv[:1]
 
@@ -15,7 +16,7 @@ def main():
         from lib import gui
         gui.start()
         os._exit(0)
-    
+
     pash.cmds.clear(None, [])
     pash.misc.fancy_print("""   ,d8888b  d8,                                     
    88P'    `8P                                      
@@ -28,6 +29,9 @@ d88'      d88' `?88P'`88b`?88P'`88bd88'     `?8888P'
                      ,88P                           
                  `?8888P                             
 """)
+
+    if args.file:
+        cmd.on_start_interpreter(None, [], args.file)
     cmd.start()
     pash.cmds.clear(None, [])
 

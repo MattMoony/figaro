@@ -10,6 +10,7 @@ from lib import params, utils
 from lib.sound import Sound
 from lib.device import Device
 from lib.channel import Channel
+from lib.interpreter import Interpreter
 
 """The basic prompt for the figaro shell"""
 BPROMPT: str = cr.Fore.LIGHTBLUE_EX + 'figaro' + cr.Fore.LIGHTBLACK_EX + '$ ' + cr.Fore.RESET
@@ -19,6 +20,8 @@ sh: pash.shell.Shell = pash.shell.Shell(prompt=BPROMPT)
 pa: pyaudio.PyAudio = pyaudio.PyAudio()
 """The main audio channel"""
 ch: Channel = Channel()
+"""A list of all running interpreters"""
+interpreters: List[Interpreter] = []
 
 def on_exit(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `exit` - quits the shell"""
@@ -47,7 +50,7 @@ def on_show_audio(cmd: pcmd.Command, args: List[str], scale: float, char: str) -
         utils.printerr('The audio channel isn\'t running at the moment ... ')
         return
     w, h = shutil.get_terminal_size()
-    bw, bh = w//2, h
+    bw, bh = w//4*3, h
     def disp_audio(screen: Screen) -> None:
         while True:
             screen.clear()
@@ -73,6 +76,15 @@ def on_show_sounds(cmd: pcmd.Command, args: List[str]) -> None:
     for i, s in enumerate(ch.get_sounds()):
         print(' #{:02d} | {}'.format(i, str(s)))
 
+def on_show_interpreters(cmd: pcmd.Command, args: List[str]) -> None:
+    """Callback for `show interpreters` - shows all running interpreters"""
+    if not interpreters:
+        utils.printwrn('No interpreters running ... ')
+        return
+    print('Interpreters: ')
+    for i, p in enumerate(interpreters):
+        print(' #{:02d} | {}'.format(i, str(p)))
+
 def on_start_sound(cmd: pcmd.Command, args: List[str], fname: str) -> None:
     """Callback for `start sound` - adds a sound effect"""
     if not os.path.isfile(fname):
@@ -94,6 +106,14 @@ def on_start_input(cmd: pcmd.Command, args: List[str], indi: int) -> None:
     """Callback for `start input` - adds an input device"""
     try:
         ch.add_ist(Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, input=True, input_device_index=indi))
+    except Exception as e:
+        utils.printerr(str(e))
+
+def on_start_interpreter(cmd: pcmd.Command, args: List[str], fname: str) -> None:
+    """Callback for `start interpreter` - interprets a .fig file"""
+    try:
+        interpreters.append(Interpreter(fname, ch))
+        interpreters[-1].exec()
     except Exception as e:
         utils.printerr(str(e))
 
@@ -126,6 +146,25 @@ def on_stop_input(cmd: pcmd.Command, args: List[str], indi: int) -> None:
         utils.printwrn('Device isn\'t currently being used ... ')
         return
     ch.del_ist(indi)
+
+def on_stop_interpreter(cmd: pcmd.Command, args: List[str], ind: str) -> None:
+    """Callback for `stop interpreter` - stops a running interpreter"""
+    global interpreters
+    if ind.lower() in ('a', 'all'):
+        for i in interpreters:
+            i.kill()
+        interpreters = []
+        return
+    try:
+        ind = int(ind)
+    except ValueError:
+        utils.printerr('"{}" is not a valid index!'.format(ind))
+        return
+    if ind >= len(interpreters):
+        utils.printerr('Index {} is out of bounds (max: {})!'.format(ind, len(interpreters)-1))
+        return
+    interpreters[ind].kill()
+    del interpreters[ind]
 
 def on_start(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `start` - starts the channel"""
@@ -161,6 +200,7 @@ def start() -> None:
         pcmd.Command('status', 'stat', callback=on_show_status, hint='Show the audio channel\'s status ... '),
         show_audio,
         pcmd.Command('sounds', callback=on_show_sounds, hint='List all currently playing sounds ... '),
+        pcmd.Command('interpreters', 'in', callback=on_show_interpreters, hint='List all running interpreters ... ')
     ], hint='Show info ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     start_sound = pcmd.Command('sound', callback=on_start_sound, hint='Play a soundeffect ... ')
@@ -169,10 +209,13 @@ def start() -> None:
     start_output.add_arg('indo', type=int, help='Specify the output device\'s index ... ')
     start_input = pcmd.Command('input', 'ist', callback=on_start_input, hint='Add an input device ... ')
     start_input.add_arg('indi', type=int, help='Specify the input device\'s index ... ')
+    start_interpreter = pcmd.Command('interpreter', 'in', callback=on_start_interpreter, hint='Interpret a .fig file ... ')
+    start_interpreter.add_arg('fname', type=str, help='Specify the filename ... ')
     sh.add_cmd(pcmd.CascCommand('start', cmds=[
         start_sound,
         start_output,
         start_input,
+        start_interpreter,
     ], callback=on_start, hint='Start channeling audio / other things ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     stop_sound = pcmd.Command('sound', callback=on_stop_sound, hint='Remove a soundeffect ... ')
@@ -181,10 +224,13 @@ def start() -> None:
     stop_output.add_arg('indo', type=int, help='Specify the output device\'s index ... ')
     stop_input = pcmd.Command('input', 'ist', callback=on_stop_input, hint='Remove an input device ... ')
     stop_input.add_arg('indi', type=int, help='Specify the input device\'s index ... ')
+    stop_interpreter = pcmd.Command('interpreter', 'in', callback=on_stop_interpreter, hint='Stop a running interpreter ... ')
+    stop_interpreter.add_arg('ind', type=str, help='Specify the interpreter\'s index ... ')
     sh.add_cmd(pcmd.CascCommand('stop', 'kill', cmds=[
         stop_sound,
         stop_output,
         stop_input,
+        stop_interpreter,
     ], callback=on_stop, hint='Stop channeling audio / other things ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     sh.prompt_until_exit()

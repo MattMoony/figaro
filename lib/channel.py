@@ -80,7 +80,7 @@ class Channel(Thread):
                     continue
                 so = np.asarray(struct.unpack(s.format*(len(so_raw)//s.f_size), so_raw)).astype(np.float32)
                 so /= 2**(8*s.f_size-1)
-                so = np.hstack((so, np.zeros(params.BUF-len(so))))
+                so = np.hstack((so, np.zeros(params.BUF-len(so))))*4
                 self.buff = np.average([self.buff, so], axis=0, weights=[.8,.2])
             for d in reversed(dels):
                 del self.sounds[d]
