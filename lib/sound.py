@@ -15,6 +15,8 @@ class Sound(object):
     ----------
     audio : pydub.AudioSegment
         The actual audio source.
+    amp : float
+        How much the sound should be amplified.
     format : str
         The audio file's format string (16 bit int. = 'h', etc.).
     f_size : int
@@ -38,10 +40,11 @@ class Sound(object):
         Gets the remaining playtime as a string.
     """
 
-    def __init__(self, fname: str):
+    def __init__(self, fname: str, amp: float = 1.):
         with open(fname, 'rb') as f:
             self.audio: pydub.AudioSegment = pyd.AudioSegment.from_file(f)
         self.audio = self.audio.set_frame_rate(params.SMPRATE).set_channels(params.CHNNLS)
+        self.amp: float = amp
         self.f_size: int = self.audio.sample_width
         self.format: str = self.get_format(self.f_size)
         self.srate: int = self.audio.frame_rate
