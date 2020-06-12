@@ -123,7 +123,6 @@ class Interpreter(object):
             return
         key = self._parse_key(key)
         self.cu.add(key)
-        print(self.cu, self.keys)
         if self.cu in self.keys:
             threading.Thread(target=self._run, args=(*self.cmds[self.keys.index(self.cu)],)).start()
 
