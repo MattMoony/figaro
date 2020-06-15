@@ -57,6 +57,25 @@ $ python figaro.py
 
 Still, I want you to present with some of the very basic features, to make life a little easier for you and to make this readme more complete. So... here we go!
 
+#### CLI parameters
+
+Before even entering the Figaro CLI, you can already configure your audio setup by using CLI parameters. The following is a table of all available parameters and their purpose:
+
+| Parameter                        | Help                                                                                                                                                    |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| -h, --help                       | Display a list of all parameters and what they're used for.                                                                                             |
+| -g, --gui                        | Start with a GUI.                                                                                                                                        |
+| -f <filename>, --file <filename> | Interpret the file with name `<filename>` as a Figaro script and run it.                                                                                |
+| -i <ist>, --ist <ist>            | Start an input stream (`ist`) using the device with the index `<ist>`. More on devices and their indices [here](#display-all-available-audio-devices).  |
+| -o <ost>, --ost <ost>            | Start an output stream (`ost`) using the device with the index `<ost>`. More on devices and their indices [here](#display-all-available-audio-devices). |
+
+#### Basic CLI usage
+
+The two most essential commands when using the Figaro CLI are `help` and `clear`. You might be able to guess their respective meanings already.
+
+* `help` or `?` ... can be used in pretty much any place in the CLI. It will (hopefully) always be able to provide you with some useful info to help you navigate your way through the vast depths of this interface.
+* `clear` or `cls` ... simply clears the console - I tend to use this command nearly obsessively. After displaying some info - `clear` - after configuring input and output - `clear` - and so on and so forth.
+
 #### Display all available audio devices
 
 To see which devices are available, use this very simple command ...
@@ -146,6 +165,30 @@ figaro$ stop sound <sound-index>
 ```
 
 ... to stop the sound effect.
+
+#### Start/stop interpreting a Figaro Script
+
+To start interpreting a Figaro Script (`<filename>`) from inside the Figaro CLI, use the following command:
+
+```bash
+figaro$ start interpreter <filename>
+```
+
+... to then stop this script from running, use ...
+
+```bash
+figaro$ stop interpreter <intrp-index>
+```
+
+... replacing `<intrp-index>` with the index of the interpreter you want to stop. How to get an interpreter's index is explained [here](#show-all-running-interpreters). More on Figaro Script can be found [here](#figaro-script).
+
+#### Show all running interpreters
+
+This is quite simple. In a similar fashion to all other commands for displaying info, use the `show` command, this time in conjunction with the keyword `interpreters`, which will either present you with a list of all currently running interpreters (+ their respective indices) or tell you that none are in fact active at the moment ...
+
+```bash
+figaro$ show interpreters
+```
 
 ### Figaro-Script
 
