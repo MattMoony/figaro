@@ -190,6 +190,18 @@ This is quite simple. In a similar fashion to all other commands for displaying 
 figaro$ show interpreters
 ```
 
+#### Using voice-filters [beta]
+
+This part of Figaro will allow you to alter your voice's (or rather the audio input stream's) volume, pitch, etc.
+
+First, to see which filters are available to you, use the proper `show` command:
+
+```bash
+figaro$ show filters
+```
+
+_More voice-filter capabilities (and their respective documentation) will be added in future updates. As soon as I get a little more spare time to work on this project :p._
+
 ### Figaro-Script
 
 You can now also use figaro script (.fig) for defining hotkeys and their behaviour. Whether you want a sound effect to be played, or an attribute to be shown, it can all be bound to a certain keypress.

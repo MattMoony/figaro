@@ -85,6 +85,18 @@ def on_show_interpreters(cmd: pcmd.Command, args: List[str]) -> None:
     for i, p in enumerate(interpreters):
         print(' #{:02d} | {}'.format(i, str(p)))
 
+def on_show_filters(cmd: pcmd.Command, args: List[str]) -> None:
+    """Callback for `show filters` - shows all available voice-filters"""
+    if not os.path.isdir(os.path.join(params.BPATH, 'lib', 'filters')):
+        utils.printerr('Error: Directory "{}" doesn\'t exist ... '.format(os.path.join(params.BPATH, 'lib', 'filters')))
+        return
+    fs = [f[:-3] for f in os.listdir(os.path.join(params.BPATH, 'lib', 'filters')) if os.path.isfile(os.path.join(params.BPATH, 'lib', 'filters', f)) and f != 'filter.py' and f.endswith('.py')]
+    if not fs:
+        utils.printwrn('No filters available ... ')
+    else:
+        print('Filters: \n - ', end='')
+        print('\n - '.join(fs))
+
 def on_start_sound(cmd: pcmd.Command, args: List[str], params: List[str]) -> None:
     """Callback for `start sound` - adds a sound effect"""
     for i, a in enumerate(params):
@@ -205,7 +217,8 @@ def start() -> None:
         pcmd.Command('status', 'stat', callback=on_show_status, hint='Show the audio channel\'s status ... '),
         show_audio,
         pcmd.Command('sounds', callback=on_show_sounds, hint='List all currently playing sounds ... '),
-        pcmd.Command('interpreters', 'in', callback=on_show_interpreters, hint='List all running interpreters ... ')
+        pcmd.Command('interpreters', 'in', callback=on_show_interpreters, hint='List all running interpreters ... '),
+        pcmd.Command('filters', 'fil', callback=on_show_filters, hint='List all available voice filters ... '),
     ], hint='Show info ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     start_sound = pcmd.Command('sound', callback=on_start_sound, hint='Play a soundeffect ... ')
