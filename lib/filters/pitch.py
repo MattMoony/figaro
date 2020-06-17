@@ -1,6 +1,8 @@
 """Filter to change the voice's pitch"""
 
 import numpy as np
+from typing import List
+
 from lib.filters.filter import Filter
 
 class Pitch(object):
@@ -36,3 +38,10 @@ class Pitch(object):
 
     def __call__(self, data: np.ndarray) -> np.ndarray:
         return self.apply(data)
+
+    def __str__(self) -> str:
+        return f'Pitch({self.fac*100:.2f}%)'
+
+def start(args: List[str]) -> Pitch:
+    """Accepts a list of command line arguments and returns the pitch filter created from those arguments"""
+    print(args)

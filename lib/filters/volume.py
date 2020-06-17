@@ -1,6 +1,8 @@
 """Filter to change the voice's volume"""
 
-import numpy as np
+import numpy as np, re
+from typing import List
+
 from lib.filters.filter import Filter
 
 class Volume(Filter):
@@ -28,3 +30,16 @@ class Volume(Filter):
 
     def __call__(self, data: np.ndarray) -> np.ndarray:
         return self.apply(data)
+
+    def __str__(self) -> str:
+        return f'Volume({self.fac*100:.2f}%)'
+
+def start(args: List[str]) -> Volume:
+    """Accepts a list of command line arguments and returns the volume filter created from those arguments"""
+    args = [a.strip() for a in args if a.strip()]
+    if not args:
+        raise Exception('Missing parameter <factor> ... ')
+    n = args[0].strip()
+    if re.match(r'^\d+(?:\.\d+)?%$', n):
+        return Volume(float(n[:-1])/100.)
+    return Volume(float(n))

@@ -1,6 +1,6 @@
 """Handles the interactive shell for the user"""
 
-import os, pyaudio, wave, shutil, numpy as np, time, re
+import os, pyaudio, wave, shutil, numpy as np, time, re, importlib.util
 import pash.shell, pash.cmds, pash.command as pcmd, colorama as cr
 cr.init()
 from asciimatics.screen import Screen
@@ -11,6 +11,8 @@ from lib.sound import Sound
 from lib.device import Device
 from lib.channel import Channel
 from lib.interpreter import Interpreter
+from lib.filters.filter import Filter
+from lib.filters.volume import Volume
 
 """The basic prompt for the figaro shell"""
 BPROMPT: str = cr.Fore.LIGHTBLUE_EX + 'figaro' + cr.Fore.LIGHTBLACK_EX + '$ ' + cr.Fore.RESET
@@ -22,6 +24,8 @@ pa: pyaudio.PyAudio = pyaudio.PyAudio()
 ch: Channel = Channel()
 """A list of all running interpreters"""
 interpreters: List[Interpreter] = []
+"""A list of all running filters"""
+filters: List[Filter] = [Volume(1.),]
 
 def on_exit(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `exit` - quits the shell"""
@@ -85,8 +89,17 @@ def on_show_interpreters(cmd: pcmd.Command, args: List[str]) -> None:
     for i, p in enumerate(interpreters):
         print(' #{:02d} | {}'.format(i, str(p)))
 
-def on_show_filters(cmd: pcmd.Command, args: List[str]) -> None:
-    """Callback for `show filters` - shows all available voice-filters"""
+def on_show_running_filters(cmd: pcmd.Command, args: List[str]) -> None:
+    """Callback for `show filters` - shows all running voice-filters"""
+    if not filters:
+        utils.printwrn('No filters running ... ')
+    else:
+        print('Filters: ')
+        for i, f in enumerate(filters):
+            print(f' #{i:02d} | {f}')
+
+def on_show_all_filters(cmd: pcmd.Command, args: List[str]) -> None:
+    """Callback for `show filters all` - shows all available voice-filters"""
     if not os.path.isdir(os.path.join(params.BPATH, 'lib', 'filters')):
         utils.printerr('Error: Directory "{}" doesn\'t exist ... '.format(os.path.join(params.BPATH, 'lib', 'filters')))
         return
@@ -132,6 +145,24 @@ def on_start_interpreter(cmd: pcmd.Command, args: List[str], fname: str) -> None
         interpreters.append(Interpreter(fname, ch, sh))
         interpreters[-1].exec()
     except Exception as e:
+        utils.printerr(str(e))
+
+def on_start_filter(cmd: pcmd.Command, args: List[str], name: str, cargs: List[str]) -> None:
+    """Callback for `start interpreter` - interprets a .fig file"""
+    fs = [f[:-3] for f in os.listdir(os.path.join(params.BPATH, 'lib', 'filters')) if os.path.isfile(os.path.join(params.BPATH, 'lib', 'filters', f)) and f != 'filter.py' and f.endswith('.py')]
+    if name not in fs:
+        utils.printerr(f'Error: Unknown filter "{name}" ... ')
+        return
+    spec = importlib.util.spec_from_file_location(name, os.path.join(params.BPATH, 'lib', 'filters', f'{name}.py'))
+    filt = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(filt)
+    try:
+        filters.append(filt.start(cargs))
+    except NameError as e:
+        utils.printerr('Error: Invalid/incomplete filter definition ... ')
+        utils.printerr(str(e))
+    except Exception as e:
+        utils.printerr('Error: Filter init error ... ')
         utils.printerr(str(e))
 
 def on_stop_sound(cmd: pcmd.Command, args: List[str], ind: str) -> None:
@@ -218,7 +249,9 @@ def start() -> None:
         show_audio,
         pcmd.Command('sounds', callback=on_show_sounds, hint='List all currently playing sounds ... '),
         pcmd.Command('interpreters', 'in', callback=on_show_interpreters, hint='List all running interpreters ... '),
-        pcmd.Command('filters', 'fil', callback=on_show_filters, hint='List all available voice filters ... '),
+        pcmd.CascCommand('filters', 'fil', cmds=[
+            pcmd.Command('all', 'a', callback=on_show_all_filters, hint='List all available voice filters ... '),
+        ], callback=on_show_running_filters, hint='List all running/available voice filters ... '),
     ], hint='Show info ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     start_sound = pcmd.Command('sound', callback=on_start_sound, hint='Play a soundeffect ... ')
@@ -229,11 +262,15 @@ def start() -> None:
     start_input.add_arg('indi', type=int, help='Specify the input device\'s index ... ')
     start_interpreter = pcmd.Command('interpreter', 'in', callback=on_start_interpreter, hint='Interpret a .fig file ... ')
     start_interpreter.add_arg('fname', type=str, help='Specify the filenames ... ')
+    start_filter = pcmd.Command('filter', 'fil', callback=on_start_filter, hint='Add a filter to your audio input ... ')
+    start_filter.add_arg('name', type=str, help='Specify the filter\'s name ... ')
+    start_filter.add_arg('cargs', nargs='*', help='Specify the filter\'s arguments ... ')
     sh.add_cmd(pcmd.CascCommand('start', cmds=[
         start_sound,
         start_output,
         start_input,
         start_interpreter,
+        start_filter,
     ], callback=on_start, hint='Start channeling audio / other things ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     stop_sound = pcmd.Command('sound', callback=on_stop_sound, hint='Remove a soundeffect ... ')
