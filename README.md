@@ -8,6 +8,8 @@
 
 Real-time open-source voice modification program. Can be useful for many things, especially when used in combination with virtual sound i/o devices.
 
+![GitHub](https://img.shields.io/github/license/MattMoony/figaro) ![GitHub top language](https://img.shields.io/github/languages/top/MattMoony/figaro) ![GitHub stars](https://img.shields.io/github/stars/MattMoony/figaro?style=social)
+
 ## Table of Contents
 
 * [About](#about)
