@@ -5,7 +5,7 @@ from typing import List
 
 from lib.filters.filter import Filter
 
-class Pitch(object):
+class Pitch(Filter):
     """
     Changes the pitch of raw voice data.
     

@@ -8,6 +8,7 @@ from lib import params
 from lib.sound import Sound
 from lib.device import Device
 from lib.transformer import Transformer
+from lib.filters.filter import Filter
 
 class Channel(Thread):
     """
@@ -25,6 +26,8 @@ class Channel(Thread):
         The output devices.
     buff : np.ndarray
         The current buffer.
+    filters : List[Filter]
+        Filters to be applied.
     sounds : List[Sound]
         Sounds to be played.
     _running : bool
@@ -42,16 +45,18 @@ class Channel(Thread):
     """
 
     def __init__(self, transf: Optional[Transformer] = None, ist: List[Device] = [], ost: List[Device] = [], 
-                 sounds: List[Sound] = [], *args: List[Any], **kwargs: Dict[str, Any]):
+                 filters: List[Filter] = [], sounds: List[Sound] = [], *args: List[Any], **kwargs: Dict[str, Any]):
         super(Channel, self).__init__(*args, **kwargs)
         self.transf: Transformer = transf or Transformer()
         self.ist: List[Device] = ist
         self.ost: List[Device] = ost
         self.buff: np.ndarray = np.array([])
+        self.filters: List[Filter] = filters
         self.sounds: List[Sound] = sounds
         self._running: bool = False
         self._ist_mut: Lock = Lock()
         self._ost_mut: Lock = Lock()
+        self._fil_mut: Lock = Lock()
         self._sou_mut: Lock = Lock()
 
     def start(self):
@@ -71,6 +76,10 @@ class Channel(Thread):
             self.buff /= len(self.ist)
             self._ist_mut.release()
             self.buff = self.transf.apply_all(self.buff)
+            self._fil_mut.acquire()
+            for f in self.filters:
+                self.buff = f(self.buff)
+            self._fil_mut.release()
             self._sou_mut.acquire()
             dels = []
             for i, s in enumerate(self.sounds):
@@ -148,6 +157,31 @@ class Channel(Thread):
         for o in self.ost:
             o.stop_stream()
             o.close()
+
+    def add_filter(self, fil: Filter) -> None:
+        """Add a filter to the channel"""
+        self._fil_mut.acquire()
+        self.filters.append(fil)
+        self._fil_mut.release()
+
+    def get_filters(self) -> List[Filter]:
+        """Get all currently applied filters"""
+        self._fil_mut.acquire()
+        cp = list(self.filters)
+        self._fil_mut.release()
+        return cp
+
+    def del_filter(self, i: int) -> None:
+        """Stop a filter that's currently applied"""
+        self._fil_mut.acquire()
+        del self.filters[i]
+        self._fil_mut.release()
+
+    def del_all_filters(self) -> None:
+        """Stop all currently applied filters"""
+        self._fil_mut.acquire()
+        self.filters = []
+        self._fil_mut.release()
 
     def add_sound(self, sound: Sound) -> None:
         """Add a sound effect to the channel"""

@@ -24,8 +24,6 @@ pa: pyaudio.PyAudio = pyaudio.PyAudio()
 ch: Channel = Channel()
 """A list of all running interpreters"""
 interpreters: List[Interpreter] = []
-"""A list of all running filters"""
-filters: List[Filter] = [Volume(1.),]
 
 def on_exit(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `exit` - quits the shell"""
@@ -91,6 +89,7 @@ def on_show_interpreters(cmd: pcmd.Command, args: List[str]) -> None:
 
 def on_show_running_filters(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `show filters` - shows all running voice-filters"""
+    filters = ch.get_filters()
     if not filters:
         utils.printwrn('No filters running ... ')
     else:
@@ -157,7 +156,7 @@ def on_start_filter(cmd: pcmd.Command, args: List[str], name: str, cargs: List[s
     filt = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(filt)
     try:
-        filters.append(filt.start(cargs))
+        ch.add_filter(filt.start(cargs))
     except NameError as e:
         utils.printerr('Error: Invalid/incomplete filter definition ... ')
         utils.printerr(str(e))
@@ -213,6 +212,22 @@ def on_stop_interpreter(cmd: pcmd.Command, args: List[str], ind: str) -> None:
         return
     interpreters[ind].kill()
     del interpreters[ind]
+
+def on_stop_filter(cmd: pcmd.Command, args: List[str], ind: str) -> None:
+    """Callback for `stop filter` - stops a running filter"""
+    if ind.lower() in ('a', 'all'):
+        ch.del_all_filters()
+        return
+    try:
+        ind = int(ind)
+    except ValueError:
+        utils.printerr('"{}" is not a valid index!'.format(ind))
+        return
+    filters = ch.get_filters()
+    if ind >= len(filters):
+        utils.printerr('Index {} is out of bounds (max: {})!'.format(ind, len(filters)-1))
+        return
+    ch.del_filter(ind)
 
 def on_start(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `start` - starts the channel"""
@@ -281,11 +296,14 @@ def start() -> None:
     stop_input.add_arg('indi', type=int, help='Specify the input device\'s index ... ')
     stop_interpreter = pcmd.Command('interpreter', 'in', callback=on_stop_interpreter, hint='Stop a running interpreter ... ')
     stop_interpreter.add_arg('ind', type=str, help='Specify the interpreter\'s index ... ')
+    stop_filter = pcmd.Command('filter', 'fil', callback=on_stop_filter, hint='Stop a running filter ... ')
+    stop_filter.add_arg('ind', type=str, help='Specify the filter\'s index ... ')
     sh.add_cmd(pcmd.CascCommand('stop', 'kill', cmds=[
         stop_sound,
         stop_output,
         stop_input,
         stop_interpreter,
+        stop_filter,
     ], callback=on_stop, hint='Stop channeling audio / other things ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     sh.prompt_until_exit()

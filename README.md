@@ -192,14 +192,42 @@ This is quite simple. In a similar fashion to all other commands for displaying 
 figaro$ show interpreters
 ```
 
-#### Using voice-filters [beta]
+#### Using voice-filters
 
 This part of Figaro will allow you to alter your voice's (or rather the audio input stream's) volume, pitch, etc.
 
 First, to see which filters are available to you, use the proper `show` command:
 
 ```bash
+figaro$ show filters all
+```
+
+... to actually apply one of those filters, use a command in compliance with the following pattern:
+
+```bash
+figaro$ start filter <filter-name> <filter-arg0> ... <filter-argN>
+```
+
+... where `<filter-name>` should be replaced with the name you retrieved from the show command [mentioned above](#using-voice-filters) and `<filter-arg0>` to `<filter-argN>` should be replaced with the arguments the filter requires.
+
+(If you don't know what arguments you need to provide, keep reading the docs or simply try to apply the filter without arguments. It'll usually tell you what it requires.)
+
+Once you have successfully applied a filter, you'll be able to see it in the list of currently active filters:
+
+```bash
 figaro$ show filters
+```
+
+... to stop one of the running filters, get their index by using the `show` command mentioned above and use insert it into the following command:
+
+```bash
+figaro$ stop filter <filter-index>
+```
+
+... you can, of course, also stop all filters at once:
+
+```bash
+figaro$ stop filter all
 ```
 
 _More voice-filter capabilities (and their respective documentation) will be added in future updates. As soon as I get a little more spare time to work on this project :p._
@@ -282,17 +310,19 @@ _More docs coming soon! Disclaimer: Some of the commands described above might s
 
 Just a small preview of what is about to come. It's very likely that this roadmap will continue to grow in the future, as I get more ideas or if somebody wants to contribute.
 
-* [ ] [CLI](#cli)
+* [x] [CLI](#cli)
   * [x] I/O device selection
   * [x] Live status (live audio graph in console)
-  * [ ] Filter control
+  * [x] Filter control
   * [x] Sound effects (soundboard-like abilities)
 * [ ] GUI
   * [ ] Functionality
   * [ ] Design
 * [ ] Filters
   * [x] Volume
-  * [ ] Pitch-Shift
+  * [x] Pitch-Shift
+  * [x] "Trippy"-Filter
+  * [x] Echo
   * [ ] Randomized
 * [ ] [Figaro-Script](#figaro-script)
   * [x] Using CLI commands
