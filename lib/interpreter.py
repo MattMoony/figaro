@@ -135,7 +135,7 @@ class Interpreter(object):
             self.cu.remove(key)
         except KeyError:
             self.cu.clear()
-            print('.')
+            # print('.')
 
     def _cmd_pause(self, lc: int, args: List[str]) -> None:
         """Builtin `pause` - waits for the given amount of ms"""
