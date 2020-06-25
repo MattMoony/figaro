@@ -385,6 +385,8 @@ Just a small preview of what is about to come. It's very likely that this roadma
   * [x] Pitch-Shift
   * [x] "Trippy"-Filter
   * [x] Echo
+  * [x] Noise
+  * [x] Crackle
   * [ ] Randomized
 * [ ] [Figaro-Script](#figaro-script)
   * [x] Using CLI commands
