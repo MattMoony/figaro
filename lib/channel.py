@@ -103,6 +103,9 @@ class Channel(Thread):
     def add_ist(self, i: Device) -> None:
         """Add an input device"""
         self._ist_mut.acquire()
+        if i in self.ist:
+            self._ist_mut.release()
+            raise Exception("Input Stream is already being used!")
         self.ist.append(i)
         self._ist_mut.release()
 
@@ -116,6 +119,9 @@ class Channel(Thread):
     def del_ist(self, dev_ind: int) -> None:
         """Remove an input device"""
         self._ist_mut.acquire()
+        if dev_ind not in self.ist:
+            self._ist_mut.release()
+            raise Exception("Input Stream isn't being used!")
         self.ist = list(filter(lambda i: i.indi != dev_ind, self.ist))
         if not self.ist:
             self.kill()
@@ -124,6 +130,9 @@ class Channel(Thread):
     def add_ost(self, o: Device) -> None:
         """Add an output device"""
         self._ost_mut.acquire()
+        if o in self.ost:
+            self._ost_mut.release()
+            raise Exception("Output Stream is already being used!")
         self.ost.append(o)
         self._ost_mut.release()
 
@@ -137,6 +146,9 @@ class Channel(Thread):
     def del_ost(self, dev_ind: int) -> None:
         """Remove an output device"""
         self._ost_mut.acquire()
+        if dev_ind not in self.ost:
+            self._ost_mut.release()
+            raise Exception("Output Stream isn't being used!")
         self.ost = list(filter(lambda o: o.indo != dev_ind, self.ost))
         if not self.ost:
             self.kill()
