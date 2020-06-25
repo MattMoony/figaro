@@ -3,6 +3,7 @@
 import numpy as np, re
 from typing import List
 
+from lib.utils import parse_perc
 from lib.filters.filter import Filter
 
 class Trip(Filter):
@@ -44,6 +45,4 @@ def start(args: List[str]) -> Trip:
     if not args:
         raise Exception('Missing parameter <scale> ... ')
     n = args[0].strip()
-    if re.match(r'^\d+(?:\.\d+)?%$', n):
-        return Trip(float(n[:-1])/100.)
-    return Trip(float(n))
+    return Trip(parse_perc(n))

@@ -1,5 +1,6 @@
 """Several utility functions"""
 
+import re
 import colorama as cr
 cr.init()
 
@@ -14,3 +15,6 @@ def printerr(msg: str) -> None:
 
 def printwrn(msg: str) -> None:
     printcolor(msg, cr.Fore.LIGHTYELLOW_EX)
+
+def parse_perc(s: str) -> float:
+    return float(s[:-1])/100. if re.match(r'^\d+(?:\.\d+)?%$', s) else float(s)

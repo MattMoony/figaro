@@ -3,6 +3,7 @@
 import numpy as np
 from typing import List
 
+from lib.utils import parse_perc
 from lib.filters.filter import Filter
 
 class Pitch(Filter):
@@ -44,4 +45,8 @@ class Pitch(Filter):
 
 def start(args: List[str]) -> Pitch:
     """Accepts a list of command line arguments and returns the pitch filter created from those arguments"""
-    print(args)
+    args = [a.strip() for a in args if a.strip()]
+    if not args:
+        raise Exception('Missing parameter <factor> ... ')
+    n = args[0].strip()
+    return Pitch(parse_perc(n))

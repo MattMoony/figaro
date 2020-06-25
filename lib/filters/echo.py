@@ -4,6 +4,7 @@ import numpy as np, re
 from datetime import datetime
 from typing import List, Tuple
 
+from lib.utils import parse_perc
 from lib.filters.filter import Filter
 
 class Echo(Filter):
@@ -52,6 +53,6 @@ def start(args: List[str]) -> Echo:
     args = [a.strip() for a in args if a.strip()]
     if len(args) < 2:
         raise Exception('Missing parameters <scale> <pause> ... ')
-    scale = float(args[0][:-1])/100. if re.match(r'^\d+(?:\.\d+)?%$', args[0]) else float(args[0])
+    scale = parse_perc(args[0])
     pause = float(args[1])
     return Echo(scale, pause)

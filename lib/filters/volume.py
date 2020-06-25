@@ -3,6 +3,7 @@
 import numpy as np, re
 from typing import List
 
+from lib.utils import parse_perc
 from lib.filters.filter import Filter
 
 class Volume(Filter):
@@ -40,6 +41,4 @@ def start(args: List[str]) -> Volume:
     if not args:
         raise Exception('Missing parameter <factor> ... ')
     n = args[0].strip()
-    if re.match(r'^\d+(?:\.\d+)?%$', n):
-        return Volume(float(n[:-1])/100.)
-    return Volume(float(n))
+    return Volume(parse_perc(n))

@@ -52,10 +52,12 @@ class Interpreter(object):
     def exec(self) -> None:
         """Interpret the commands in the file, and start listening for keystrokes"""
         with open(self.fname, 'r', encoding='utf-8') as f:
-            sz = os.path.getsize(self.fname)
             lc = 0
-            while f.tell() < sz:
-                l = f.readline().strip()
+            while True:
+                l = f.readline()
+                if not l:
+                    break
+                l = l.strip()
                 lc += 1
                 if l.startswith('//') or not l:
                     continue
@@ -63,8 +65,11 @@ class Interpreter(object):
                     raise SyntaxError('{}:{} Syntax Error: Missing "::" after key definitions ... '.format(self.fname, lc))
                 l = l[:-2]
                 lns = [f.readline(),]
-                while f.tell() < sz and not lns[-1].strip() == 'return':
-                    lns.append(f.readline())
+                while not lns[-1].strip() == 'return':
+                    cl = f.readline()
+                    if not cl:
+                        break
+                    lns.append(cl)
                 if lns[-1].strip() != 'return':
                     raise SyntaxError('{}:{} Syntax Error: Missing "return" statement ... '.format(self.fname, lc))
                 m = {
@@ -83,6 +88,7 @@ class Interpreter(object):
                 self.keys.append(s)
                 self.cmds.append((lc+1, lns))
                 lc += len(lns)
+                print(lns, lc)
         self.lstn.start()
 
     def kill(self) -> None:
@@ -124,6 +130,7 @@ class Interpreter(object):
         key = self._parse_key(key)
         self.cu.add(key)
         if self.cu in self.keys:
+            print(self.keys)
             threading.Thread(target=self._run, args=(*self.cmds[self.keys.index(self.cu)],)).start()
 
     def _on_release(self, key: Optional[Union[kb.Key, kb.KeyCode]]) -> None:
