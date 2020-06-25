@@ -88,7 +88,6 @@ class Interpreter(object):
                 self.keys.append(s)
                 self.cmds.append((lc+1, lns))
                 lc += len(lns)
-                print(lns, lc)
         self.lstn.start()
 
     def kill(self) -> None:
@@ -130,7 +129,6 @@ class Interpreter(object):
         key = self._parse_key(key)
         self.cu.add(key)
         if self.cu in self.keys:
-            print(self.keys)
             threading.Thread(target=self._run, args=(*self.cmds[self.keys.index(self.cu)],)).start()
 
     def _on_release(self, key: Optional[Union[kb.Key, kb.KeyCode]]) -> None:
@@ -142,7 +140,6 @@ class Interpreter(object):
             self.cu.remove(key)
         except KeyError:
             self.cu.clear()
-            # print('.')
 
     def _cmd_pause(self, lc: int, args: List[str]) -> None:
         """Builtin `pause` - waits for the given amount of ms"""
