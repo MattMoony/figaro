@@ -63,13 +63,13 @@ Still, I want you to present with some of the very basic features, to make life 
 
 Before even entering the Figaro CLI, you can already configure your audio setup by using CLI parameters. The following is a table of all available parameters and their purpose:
 
-| Parameter                        | Help                                                                                                                                                    |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| -h, --help                       | Display a list of all parameters and what they're used for.                                                                                             |
-| -g, --gui                        | Start with a GUI.                                                                                                                                        |
-| -f <filename>, --file <filename> | Interpret the file with name `<filename>` as a Figaro script and run it.                                                                                |
-| -i <ist>, --ist <ist>            | Start an input stream (`ist`) using the device with the index `<ist>`. More on devices and their indices [here](#display-all-available-audio-devices).  |
-| -o <ost>, --ost <ost>            | Start an output stream (`ost`) using the device with the index `<ost>`. More on devices and their indices [here](#display-all-available-audio-devices). |
+| Parameter                        | Help                                                                                                                                                                                |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| -h, --help                       | Display a list of all parameters and what they're used for.                                                                                                                         |
+| -g, --gui                        | Start with a GUI.                                                                                                                                                                   |
+| -f <filename>, --file <filename> | Interpret the file with name `<filename>` as a Figaro script and run it.                                                                                                            |
+| -i <ist>, --ist <ist>            | Start (an) input stream(s) (`ist`) using the device(s) with the index/indices `<ist1>,...,<istN>`. More on devices and their indices [here](#display-all-available-audio-devices).  |
+| -o <ost>, --ost <ost>            | Start (an) output stream(s) (`ost`) using the device(s) with the index/indices `<ost1>,...,<ostN>`. More on devices and their indices [here](#display-all-available-audio-devices). |
 
 #### Basic CLI usage
 
