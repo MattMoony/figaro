@@ -119,7 +119,7 @@ class Channel(Thread):
     def del_ist(self, dev_ind: int) -> None:
         """Remove an input device"""
         self._ist_mut.acquire()
-        if dev_ind not in self.ist:
+        if dev_ind not in map(lambda d: d.indi, self.ist):
             self._ist_mut.release()
             raise Exception("Input Stream isn't being used!")
         self.ist = list(filter(lambda i: i.indi != dev_ind, self.ist))
@@ -146,7 +146,7 @@ class Channel(Thread):
     def del_ost(self, dev_ind: int) -> None:
         """Remove an output device"""
         self._ost_mut.acquire()
-        if dev_ind not in self.ost:
+        if dev_ind not in map(lambda d: d.indo, self.ost):
             self._ost_mut.release()
             raise Exception("Output Stream isn't being used!")
         self.ost = list(filter(lambda o: o.indo != dev_ind, self.ost))
