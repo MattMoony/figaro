@@ -11,6 +11,7 @@ def main():
     parser.add_argument('-f', '--file', type=str, help='A .fig file to be interpreted ... ')
     parser.add_argument('-i', '--ist', type=str, help='Index of the Input Stream ... ')
     parser.add_argument('-o', '--ost', type=str, help='Index of the Output Stream ... ')
+    parser.add_argument('-s', '--server', action='store_true', help='Start listening to websocket commands?')
     args = parser.parse_args()
     sys.argv = sys.argv[:1]
 
@@ -18,6 +19,9 @@ def main():
         from lib import gui
         gui.start()
         os._exit(0)
+    if args.server:
+        from lib import server
+        server.start()
 
     pash.cmds.clear(None, [])
     pash.misc.fancy_print("""   ,d8888b  d8,                                     
