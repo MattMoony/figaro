@@ -9,3 +9,4 @@ CHNNLS: int = 1
 
 HOST: str = '127.0.0.1'
 PORT: str = 0xCAFE
+DB_PATH: str = os.path.join(BPATH, 'res', 'server.db')

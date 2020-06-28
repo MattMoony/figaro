@@ -2,3 +2,6 @@ venv
 .vscode
 __pycache__
 tmp
+res/*
+!res/.gitkeep
+lib/server/conf.json

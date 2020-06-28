@@ -1,9 +1,9 @@
 """The main entry point"""
 
-import pash.misc, pash.cmds, os, sys
+import pash.misc, pash.cmds, os, sys, shutil
 from argparse import ArgumentParser
 
-from lib import cmd
+from lib import cmd, params
 
 def main():
     parser = ArgumentParser()
@@ -21,6 +21,15 @@ def main():
         os._exit(0)
     if args.server:
         from lib import server
+        from lib.server import db
+        from lib.server.models.user import User
+        if not os.path.isfile(params.DB_PATH):
+            db.setup()
+            print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
+            User.create_prompt()
+            pash.cmds.clear(None, [])
+            print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
+            server.create_conf_prompt()
         server.start()
 
     pash.cmds.clear(None, [])
