@@ -6,13 +6,15 @@ cr.init()
 from asciimatics.screen import Screen
 from typing import List
 
-from lib import params, utils
+from lib import params, utils, server
 from lib.sound import Sound
 from lib.device import Device
 from lib.channel import Channel
 from lib.interpreter import Interpreter
 from lib.filters.filter import Filter
 from lib.filters.volume import Volume
+from lib.server import db
+from lib.server.models.user import User
 
 """The basic prompt for the figaro shell"""
 BPROMPT: str = cr.Fore.LIGHTBLUE_EX + 'figaro' + cr.Fore.LIGHTBLACK_EX + '$ ' + cr.Fore.RESET
@@ -164,6 +166,17 @@ def on_start_filter(cmd: pcmd.Command, args: List[str], name: str, cargs: List[s
         utils.printerr('Error: Filter init error ... ')
         utils.printerr(str(e))
 
+def on_start_server(cmd: pcmd.Command, args: List[str]) -> None:
+    """Callback for `start server` - starts the websocket server"""
+    if not os.path.isfile(params.DB_PATH):
+        db.setup()
+        print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
+        User.create_prompt()
+        pash.cmds.clear(None, [])
+        print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
+        server.create_conf_prompt()
+    server.start(sh)
+
 def on_stop_sound(cmd: pcmd.Command, args: List[str], ind: str) -> None:
     """Callback for `stop sound` - removes a sound effect"""
     if ind.lower() in ('a', 'all'):
@@ -286,6 +299,7 @@ def start() -> None:
         start_input,
         start_interpreter,
         start_filter,
+        pcmd.Command('server', 'srv', callback=on_start_server, hint='Start the websocket server ... ')
     ], callback=on_start, hint='Start channeling audio / other things ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     stop_sound = pcmd.Command('sound', callback=on_stop_sound, hint='Remove a soundeffect ... ')

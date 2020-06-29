@@ -1,6 +1,6 @@
 """The main entry point"""
 
-import pash.misc, pash.cmds, os, sys, shutil
+import pash.misc, pash.cmds, sys
 from argparse import ArgumentParser
 
 from lib import cmd, params
@@ -19,18 +19,6 @@ def main():
         from lib import gui
         gui.start()
         os._exit(0)
-    if args.server:
-        from lib import server
-        from lib.server import db
-        from lib.server.models.user import User
-        if not os.path.isfile(params.DB_PATH):
-            db.setup()
-            print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
-            User.create_prompt()
-            pash.cmds.clear(None, [])
-            print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
-            server.create_conf_prompt()
-        server.start()
 
     pash.cmds.clear(None, [])
     pash.misc.fancy_print("""   ,d8888b  d8,                                     
@@ -55,6 +43,8 @@ d88'      d88' `?88P'`88b`?88P'`88bd88'     `?8888P'
             cmd.on_start_output(None, [], int(ind))
     if args.ist and args.ost:
         cmd.on_start(None, [])
+    if args.server:
+        cmd.on_start_server(None, [])
         
     cmd.start()
     pash.cmds.clear(None, [])
