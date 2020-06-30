@@ -1,0 +1,34 @@
+{
+  "name": "figaro-gui",
+  "version": "1.0.0",
+  "description": "The GUI for the Figaro App.",
+  "main": "dist/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsc -w",
+    "dev:web": "next",
+    "build": "tsc",
+    "build:web": "next build",
+    "start": "electron .",
+    "start:web": "next start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattMoony/figaro.git"
+  },
+  "author": "MattMoony",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/MattMoony/figaro/issues"
+  },
+  "homepage": "https://github.com/MattMoony/figaro#readme",
+  "devDependencies": {
+    "@types/react": "^16.9.41",
+    "electron": "^9.0.5",
+    "next": "^9.4.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "tsc": "^1.20150623.0",
+    "typescript": "^3.9.5"
+  }
+}
