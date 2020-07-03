@@ -1,8 +1,13 @@
 import React from 'react';
 import Popup from '../components/Popup';
 import FancyInput from '../components/FancyInput';
+import withSocket from '../components/withSocket';
 
-export default class Index extends React.Component {
+interface IndexProps {
+  sock: WebSocket;
+};
+
+class Index extends React.Component<IndexProps> {
   private loginPopup: Popup;
   private loginUname: FancyInput;
   private loginPassw: FancyInput;
@@ -80,3 +85,5 @@ export default class Index extends React.Component {
     );
   }
 }
+
+export default withSocket(Index);

@@ -8,6 +8,7 @@ function createWindow (): void {
       nodeIntegration: true,
     },
   });
+  win.webContents.openDevTools();
   win.removeMenu();
 }
 

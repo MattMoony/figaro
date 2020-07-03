@@ -5,12 +5,11 @@
   "main": "dist/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsc -w",
-    "dev:web": "next",
+    "dev:web": "next web/",
     "build": "tsc",
-    "build:web": "next build",
+    "build:web": "next build web/",
     "start": "electron .",
-    "start:web": "next start"
+    "start:web": "next start web/"
   },
   "repository": {
     "type": "git",
