@@ -2,7 +2,7 @@ import React from 'react';
 import style from './Popup.module.scss';
 
 interface PopupProps {
-  style: { [key: string]: any; };
+  style?: { [key: string]: any; };
 };
 
 interface PopupState {

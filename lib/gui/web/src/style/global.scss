@@ -9,4 +9,18 @@ html, body {
     background-color: #0B3954;
     color: #EEF1FF;
     font-family: 'Open Sans', sans-serif;
+
+    #___gatsby {
+        width: 100%;
+        height: 100%;
+
+        & > div {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: stretch;
+            align-items: stretch;
+        }
+    }
 }

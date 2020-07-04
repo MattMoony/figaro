@@ -21,7 +21,7 @@ def verify_tkn(req: Dict[str, Any]) -> bool:
     try:
         tkn = jwt.decode(req['tkn'], conf['secret'], algorithms=['HS256'])
         return bool(User.load(tkn['uname']))
-    except KeyError as e:
+    except (jwt.ExpiredSignatureError, KeyError) as e:
         return False
 
 async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None:
@@ -38,6 +38,12 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
         try:
             if req['cmd'] == 'auth':
                 u = User.load(req['uname'])
+                if not u:
+                    await ws.send(json.dumps({
+                        'success': False,
+                        'msg': 'Unknown user!'
+                    }))
+                    continue
                 if u.verify(req['pwd']):
                     await ws.send(json.dumps({
                         'success': True,
@@ -51,6 +57,12 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
                         'success': False,
                         'msg': 'Wrong password provided!',
                     }))
+                continue
+            if req['cmd'] == 'auth-status':
+                await ws.send(json.dumps({
+                    'success': True,
+                    'logged_in': verify_tkn(req),
+                }))
                 continue
             if not verify_tkn(req):
                 await ws.send(json.dumps({

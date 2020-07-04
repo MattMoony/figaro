@@ -1,11 +1,23 @@
 import React from 'react';
+import style from './index.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import withSocket from '../components/withSocket';
 
-export default class Index extends React.Component {
-  render() {
+interface IndexProps {
+  sock: WebSocket;
+}
+
+class Index extends React.Component<IndexProps, void> {
+  public render () {
     return (
-      <>
-        <h1>Hello World!</h1>
-      </>
+      <article className={style.article}>
+        <footer>
+          <i><FontAwesomeIcon icon={faPlay} /></i>
+        </footer>
+      </article>
     );
   }
 };
+
+export default Index;
