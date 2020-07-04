@@ -5,11 +5,11 @@
   "main": "dist/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:web": "next web/",
+    "dev:web": "cd web && npm run dev",
     "build": "tsc",
-    "build:web": "next build web/",
+    "build:web": "cd web && npm run build",
     "start": "electron .",
-    "start:web": "next start web/"
+    "start:web": "cd web && npm start"
   },
   "repository": {
     "type": "git",
@@ -24,9 +24,6 @@
   "devDependencies": {
     "@types/react": "^16.9.41",
     "electron": "^9.0.5",
-    "next": "^9.4.4",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
     "tsc": "^1.20150623.0",
     "typescript": "^3.9.5"
   }

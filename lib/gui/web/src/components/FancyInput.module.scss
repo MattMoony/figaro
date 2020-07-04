@@ -1,0 +1,44 @@
+.root {
+  border: none;
+  background-color: #0b4466;
+  padding: 10px;
+  font-size: 1em;
+  font-family: "Open Sans", sans-serif;
+  border-bottom: 2.5px solid #6096b6;
+  transition: 0.15s ease;
+  min-width: 150px;
+  width: 100%;
+  box-sizing: border-box;
+  color: #eef1ff;
+  margin: 5px 0;
+
+  &::placeholder {
+    color: #6096b6;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #d14081;
+  }
+}
+
+.root[type="submit"],
+.root[type="button"] {
+  background: linear-gradient(
+    to right,
+    #e1448b 0%,
+    #e1448b 50%,
+    #d14081 50%,
+    #d14081 100%
+  );
+  background-size: 200% 100%;
+  background-position: 100% 0;
+  color: #eef1ff;
+  border: none;
+  font-size: 1.1em;
+
+  &:hover, &:focus {
+    cursor: pointer;
+    background-position: 0 0;
+  }
+}
