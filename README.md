@@ -1,14 +1,18 @@
-<img align="right" src="media/figaro.png" width="125" height="125" />
-
-# Figaro
+<p align="center">
+  <img alt="Figaro" src="media/figaro.png" width="125" height="125" />
+</p>
+<h1 align="center">Figaro</h1>
+<p align="center">
+  <img alt="License" src="https://img.shields.io/github/license/MattMoony/figaro">
+  <img alt="Top Language" src="https://img.shields.io/github/languages/top/MattMoony/figaro">
+  <img alt="GitHub stars" src="https://img.shields.io/github/stars/MattMoony/figaro?style=social">
+</p>
 
 ---
 
 ## About
 
 Real-time open-source voice modification program. Can be useful for many things, especially when used in combination with virtual sound i/o devices.
-
-![GitHub](https://img.shields.io/github/license/MattMoony/figaro) ![GitHub top language](https://img.shields.io/github/languages/top/MattMoony/figaro) ![GitHub stars](https://img.shields.io/github/stars/MattMoony/figaro?style=social)
 
 ## Table of Contents
 
