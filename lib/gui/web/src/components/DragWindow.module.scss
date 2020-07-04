@@ -1,0 +1,49 @@
+.root {
+    display: inline-block;
+    position: absolute;
+    border-radius: 6px 6px 0 0;
+    box-shadow: 0 0 7px #2d2d4d;
+    overflow: hidden;
+    background-color: #0F4D72;
+
+    .head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #072435;
+        padding: 5px 7.5px;
+        user-select: none;
+        font-family: 'Source Sans Pro', sans-serif;
+
+        & > div {
+            display: flex;
+            align-items: center;
+
+            & > i {
+                margin-right: 5px;
+            }
+        }
+
+        & > i {
+            margin-left: 5px;
+            transition: .2s ease;
+
+            @keyframes wiggle {
+                 0% { transform: rotate(  0deg); }
+                25% { transform: rotate( 15deg); }
+                50% { transform: rotate(  0deg); }
+                75% { transform: rotate(-15deg); }
+            }
+
+            &:hover {
+                cursor: pointer;
+                color: #F21D3A;
+                animation: wiggle .15s ease 0s 1 forwards;
+            }
+        }
+    }
+
+    .body {
+        padding: 7.5px;
+    }
+}

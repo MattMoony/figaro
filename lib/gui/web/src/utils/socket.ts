@@ -2,6 +2,9 @@ const dURL: string = 'ws://localhost:51966';
 const id: string = Date.now() + Math.random().toString(36).substr(1,8);
 let tkn: string = undefined;
 
+const onLoginCbs: Array<()=>void> = [];
+const onLogoutCbs: Array<()=>void> = [];
+
 export function connect (url: string = dURL): Promise<WebSocket> {
   return new Promise((resolve, reject) => {
     const sock: WebSocket = new WebSocket(url);
@@ -17,7 +20,8 @@ export function waitUntilOpen (sock: WebSocket): Promise<void> {
 };
 
 export function tryLoadToken (): void {
-  tkn = (localStorage&&localStorage.getItem('tkn'))||undefined;
+  tkn = (typeof window !== 'undefined' && localStorage.getItem('tkn')) || undefined;
+  if (tkn) hasLoggedIn();
 };
 
 interface Response {
@@ -39,6 +43,16 @@ export function req<T extends Response> (cmd: string, body: object, sock?: WebSo
   });
 };
 
+export function onLogin (cb: ()=>void): void {
+  tryLoadToken();
+  if (tkn) return cb();
+  onLoginCbs.push(cb);
+};
+
+function hasLoggedIn (): void {
+  onLoginCbs.forEach(cb => cb());
+}
+
 interface LoginResponse {
   success: boolean;
   msg?: string;
@@ -51,14 +65,24 @@ export function login (uname: string, pwd: string): Promise<void> {
       if (!res.success) return reject(res.msg!);
       tkn = res.tkn!;
       localStorage.setItem('tkn', tkn);
+      hasLoggedIn();
       resolve();
     });
   });
 };
 
+export function onLogout (cb: ()=>void): void {
+  onLogoutCbs.push(cb);
+};
+
+function hasLoggedOut (): void {
+  onLogoutCbs.forEach(cb => cb());
+}
+
 export function logout (): void {
   tkn = undefined;
   localStorage.removeItem('tkn');
+  hasLoggedOut();
 }
 
 interface IsLoggedInResponse {
