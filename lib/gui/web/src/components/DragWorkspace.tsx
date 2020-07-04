@@ -1,19 +1,38 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import style from './DragWorkspace.module.scss';
 import DragWindow from './DragWindow';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 interface DragWorkspaceProps {
-  windows: Array<DragWindow>;
+  windows: Set<DragWindow>;
 }
 
-export default class DragWorkspace extends React.Component<DragWorkspaceProps> {
+interface DragWorkspaceState {
+  contextMenu: boolean;
+  cx: number;
+  cy: number;
+}
+
+export default class DragWorkspace extends React.Component<DragWorkspaceProps, DragWorkspaceState> {
   public root: HTMLDivElement;
+  private contextMenu: HTMLDivElement;
+
+  constructor (props) {
+    super(props);
+    this.state = {
+      contextMenu: false,
+      cx: 0,
+      cy: 0,
+    };
+  }
 
   public componentDidMount (): void {
     this.props.windows.forEach(w => {
-      w.setWorkspace(this)
+      w.setWorkspace(this);
       w.setPos();
     });
+    window.addEventListener('click', this.hideContextMenu.bind(this));
   }
 
   public get size (): DOMRect {
@@ -21,7 +40,7 @@ export default class DragWorkspace extends React.Component<DragWorkspaceProps> {
   }
 
   public winAmount (): number {
-    return this.props.windows.length;
+    return this.props.windows.size;
   }
 
   public allWindowsBackground (): void {
@@ -32,10 +51,54 @@ export default class DragWorkspace extends React.Component<DragWorkspaceProps> {
     this.props.windows.forEach(w => w&&w.zIndex(0));
   }
 
+  public hideAll (): void {
+    this.props.windows.forEach(w => w&&w.hide());
+  }
+
+  public showContextMenu (e: React.MouseEvent): void {
+    e.preventDefault();
+    const { clientX, clientY } = e;
+    this.setState({
+      contextMenu: true,
+    }, () => this.setContextPos(clientX - this.size.left, clientY - this.size.top));
+  }
+
+  public hideContextMenu (): void {
+    this.setState({
+      contextMenu: false,
+    });
+  }
+
+  public setContextPos (x: number, y: number) {
+    const rect: DOMRect = this.contextMenu.getBoundingClientRect();
+    this.setState({
+      cx: x < 0 ? 0 : x > this.size.width - rect.width ? this.size.width - rect.width : x,
+      cy: y < 5 ? 5 : y > this.size.height - rect.height ? this.size.height - rect.height - 5 : y,
+    });
+  }
+
   public render () {
     return (
-      <div className={style.workspace} ref={e => this.root = e}>
+      <div className={style.workspace} ref={e => this.root = e} onContextMenu={this.showContextMenu.bind(this)}>
+        <div className={style.background}>
+          Right click anywhere to get started!
+        </div>
         {this.props.children}
+        <div className={style.context} ref={e => this.contextMenu = e} style={{
+          display: this.state.contextMenu ? 'block' : 'none',
+          left: this.state.cx + 'px',
+          top: this.state.cy + 'px',
+        }}>
+          { Array.from(this.props.windows).map(w => 
+              w&&w.props.title&&
+              <div key={w.props.title} onClick={() => w.state.visible ? w.hide() : w.show()}>
+                <i style={{
+                  opacity: w.state.visible ? 1 : 0,
+                }}><FontAwesomeIcon icon={faCheck} /></i>
+                {w.props.title}
+              </div>
+          ) }
+        </div>
       </div>
     );
   }

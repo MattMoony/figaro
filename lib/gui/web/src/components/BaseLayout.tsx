@@ -51,10 +51,12 @@ class BaseLayout extends React.Component<BaseLayoutProps, BaseLayoutState> {
             });
             this.loginPopup.hide();
           })
-          .catch(msg => {
+          .catch(e => {
+            if (typeof e === 'string') return this.setState({ loginError: e, });
             this.setState({
-              loginError: msg,
+              loginError: 'Failed to connect to server! Please try again later and/or make sure the Figaro server is running.',
             });
+            console.log(e);
           });
   }
 

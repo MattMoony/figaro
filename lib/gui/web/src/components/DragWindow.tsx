@@ -7,6 +7,7 @@ import { faTimes, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 interface DragWindowProps {
   title: string;
   icon?: IconDefinition;
+  style?: object;
 };
 
 interface DragWindowState {
@@ -30,7 +31,7 @@ export default class DragWindow extends React.Component<DragWindowProps, DragWin
       ox: 0,
       oy: 0,
       moving: false,
-      visible: true,
+      visible: false,
     };
   }
   
@@ -111,7 +112,8 @@ export default class DragWindow extends React.Component<DragWindowProps, DragWin
         left: this.state.x + 'px',
         top: this.state.y + 'px',
         display: this.state.visible ? 'inline-block' : 'none',
-      }}>
+        ...(this.props.style ? this.props.style : {}),
+      }} onContextMenu={e => e.stopPropagation()}>
         <div className={style.head} onMouseDown={this.moveStart.bind(this)} onMouseUp={this.moveEnd.bind(this)}>
           <div>
             {this.props.icon ? <i><FontAwesomeIcon icon={this.props.icon} /></i> : ''}

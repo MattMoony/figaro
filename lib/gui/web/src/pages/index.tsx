@@ -1,10 +1,11 @@
 import React from 'react';
 import style from './index.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faStop, faWaveSquare } from '@fortawesome/free-solid-svg-icons';
+import { faPlay, faStop, faWaveSquare, faPlus, faDrum } from '@fortawesome/free-solid-svg-icons';
 import DragWorkspace from '../components/DragWorkspace';
 import DragWindow from '../components/DragWindow';
 import * as socket from '../utils/socket';
+import AudioWave from '../components/AudioWave';
 
 interface IndexProps {
   sock: WebSocket;
@@ -15,7 +16,7 @@ interface IndexState {
 };
 
 class Index extends React.Component<IndexProps, IndexState> {
-  private windows: Array<DragWindow> = [];
+  private windows: Set<DragWindow> = new Set();
   private workspace: DragWorkspace;
 
   constructor (props) {
@@ -29,6 +30,7 @@ class Index extends React.Component<IndexProps, IndexState> {
     socket.onLogin(() => this.setState({ loggedIn: true, }));
     socket.onLogout(() => {
       this.workspace.allAbsoluteBackground();
+      this.workspace.hideAll();
       this.setState({ loggedIn: false, })
     });
   }
@@ -37,14 +39,15 @@ class Index extends React.Component<IndexProps, IndexState> {
     return (
       <article className={style.article}>
         <DragWorkspace ref={e => this.workspace = e} windows={this.windows}>
-          <DragWindow ref={e => this.windows.push(e)} title="First">
-
+          <DragWindow ref={e => this.windows.add(e)} icon={faPlus} title="Filters">
           </DragWindow>
-          <DragWindow ref={e => this.windows.push(e)} title="Second">
-
+          <DragWindow ref={e => this.windows.add(e)} icon={faDrum} title="Sounds">
           </DragWindow>
-          <DragWindow ref={e => this.windows.push(e)} icon={faWaveSquare} title="Third">
-
+          <DragWindow ref={e => this.windows.add(e)} icon={faWaveSquare} title="Audio Wave" style={{
+            width: '60%',
+            maxWidth: '600px',
+          }}>
+            {this.state.loggedIn && <AudioWave />}
           </DragWindow>
         </DragWorkspace>
         <footer>

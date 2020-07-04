@@ -8,13 +8,17 @@ const onLogoutCbs: Array<()=>void> = [];
 export function connect (url: string = dURL): Promise<WebSocket> {
   return new Promise((resolve, reject) => {
     const sock: WebSocket = new WebSocket(url);
-    waitUntilOpen(sock).then(() => resolve(sock));
+    waitUntilOpen(sock).then(() => resolve(sock)).catch(reject);
   });
 };
 
 export function waitUntilOpen (sock: WebSocket): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (sock.readyState !== sock.OPEN) return sock.onopen = () => resolve();
+    if (sock.readyState !== sock.OPEN) {
+      sock.onopen = () => resolve();
+      sock.onerror = e => [sock.CLOSING,sock.CLOSED].includes(sock.readyState) && reject(e);
+      return;
+    }
     resolve();
   });
 };
@@ -39,7 +43,7 @@ export function req<T extends Response> (cmd: string, body: object, sock?: WebSo
         resolve(<T>JSON.parse(e.data));
       };
       sock.send(JSON.stringify({ cmd, id, tkn, ...body, }));
-    });
+    }).catch(reject);
   });
 };
 
@@ -67,7 +71,7 @@ export function login (uname: string, pwd: string): Promise<void> {
       localStorage.setItem('tkn', tkn);
       hasLoggedIn();
       resolve();
-    });
+    }).catch(reject);
   });
 };
 
@@ -100,7 +104,7 @@ export function isLoggedIn (token: string = tkn): Promise<boolean> {
         localStorage.removeItem('tkn');
       }
       resolve(res.logged_in);
-    });
+    }).catch(reject);
   });
 };
 
