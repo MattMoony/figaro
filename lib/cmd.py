@@ -175,7 +175,7 @@ def on_start_server(cmd: pcmd.Command, args: List[str]) -> None:
         pash.cmds.clear(None, [])
         print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
         server.create_conf_prompt()
-    server.start(sh)
+    server.start(sh, ch)
 
 def on_stop_sound(cmd: pcmd.Command, args: List[str], ind: str) -> None:
     """Callback for `stop sound` - removes a sound effect"""
@@ -249,6 +249,7 @@ def on_start(cmd: pcmd.Command, args: List[str]) -> None:
         utils.printwrn('Already running ... ')
         return
     ch = Channel(ch.transf, ch.ist, ch.ost)
+    server.ch = ch
     try:
         ch.start()
     except IOError as e:

@@ -8,6 +8,8 @@ interface DragWindowProps {
   title: string;
   icon?: IconDefinition;
   style?: object;
+  onShow?: ()=>void;
+  onHide?: ()=>void;
 };
 
 interface DragWindowState {
@@ -71,14 +73,14 @@ export default class DragWindow extends React.Component<DragWindowProps, DragWin
   public show (): void {
     this.setState({
       visible: true,
-    });
+    }, () => this.props.onShow ? this.props.onShow() : {});
   }
 
   public hide (): void {
     this.setState({
       visible: false,
-    });
-  };
+    }, () => this.props.onHide ? this.props.onHide() : {});
+  }
 
   private moveStart (e: MouseEvent): void {
     const rect: DOMRect = this.root.getBoundingClientRect();

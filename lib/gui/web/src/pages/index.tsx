@@ -19,6 +19,8 @@ class Index extends React.Component<IndexProps, IndexState> {
   private windows: Set<DragWindow> = new Set();
   private workspace: DragWorkspace;
 
+  private wave: AudioWave;
+
   constructor (props) {
     super(props);
     this.state = {
@@ -46,8 +48,8 @@ class Index extends React.Component<IndexProps, IndexState> {
           <DragWindow ref={e => this.windows.add(e)} icon={faWaveSquare} title="Audio Wave" style={{
             width: '60%',
             maxWidth: '600px',
-          }}>
-            {this.state.loggedIn && <AudioWave />}
+          }} onShow={() => this.wave.start()} onHide={() => this.wave.stop()}>
+            <AudioWave ref={e => this.wave = e} />
           </DragWindow>
         </DragWorkspace>
         <footer>

@@ -25,7 +25,7 @@ export function waitUntilOpen (sock: WebSocket): Promise<void> {
 
 export function tryLoadToken (): void {
   tkn = (typeof window !== 'undefined' && localStorage.getItem('tkn')) || undefined;
-  if (tkn) hasLoggedIn();
+  if (tkn) isLoggedIn().then(b => hasLoggedIn()).catch(() => {});
 };
 
 interface Response {
@@ -48,9 +48,8 @@ export function req<T extends Response> (cmd: string, body: object, sock?: WebSo
 };
 
 export function onLogin (cb: ()=>void): void {
-  tryLoadToken();
-  if (tkn) return cb();
   onLoginCbs.push(cb);
+  tryLoadToken();
 };
 
 function hasLoggedIn (): void {
@@ -111,3 +110,43 @@ export function isLoggedIn (token: string = tkn): Promise<boolean> {
 export function getUname (token: string = tkn): string {
   return JSON.parse(atob(token.split('.')[1])).uname;
 };
+
+interface GetConfResponse {
+  success: boolean;
+  msg?: string;
+  BUF?: number;
+  SMPRATE?: number;
+  CHNNLS?: number;
+}
+
+export interface FigaroConf {
+  BUF: number;
+  SMPRATE: number;
+  CHNNLS: number;
+}
+
+export function getConf (): Promise<FigaroConf> {
+  return new Promise((resolve, reject) => {
+    req<GetConfResponse>('get-conf', {}).then(res => {
+      if (!res.success) return reject(res.msg!);
+      resolve({ BUF: res.BUF!, SMPRATE: res.SMPRATE!, CHNNLS: res.CHNNLS! })
+    });
+  });
+}
+
+export function getAudioUpdates (scale: number, cb: (data: Array<number>)=>boolean): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const sock = new WebSocket(dURL);
+    waitUntilOpen(sock).then(() => {
+      sock.onmessage = (e: MessageEvent) => {
+        (<Blob>e.data).arrayBuffer().then(b => {
+          if (!cb(Array.from(new Float32Array(b)))) {
+            sock.close(1000);
+          }
+        });
+      };
+      sock.send(JSON.stringify({ cmd: 'get-audio', id, tkn, scale, }));
+      resolve();
+    }).catch(reject);
+  });
+}
