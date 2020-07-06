@@ -3,6 +3,7 @@ import style from './DragWorkspace.module.scss';
 import DragWindow from './DragWindow';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { AppConsumer } from './AppContext';
 
 interface DragWorkspaceProps {
   windows: Set<DragWindow>;
@@ -79,27 +80,38 @@ export default class DragWorkspace extends React.Component<DragWorkspaceProps, D
 
   public render () {
     return (
-      <div className={style.workspace} ref={e => this.root = e} onContextMenu={this.showContextMenu.bind(this)}>
-        <div className={style.background}>
-          Right click anywhere to get started!
-        </div>
-        {this.props.children}
-        <div className={style.context} ref={e => this.contextMenu = e} style={{
-          display: this.state.contextMenu ? 'block' : 'none',
-          left: this.state.cx + 'px',
-          top: this.state.cy + 'px',
-        }}>
-          { Array.from(this.props.windows).map(w => 
-              w&&w.props.title&&
-              <div key={w.props.title} onClick={() => w.state.visible ? w.hide() : w.show()}>
-                <i style={{
-                  opacity: w.state.visible ? 1 : 0,
-                }}><FontAwesomeIcon icon={faCheck} /></i>
-                {w.props.title}
+      <AppConsumer>
+        {ctx => (
+          <div className={style.workspace} ref={e => this.root = e} onContextMenu={this.showContextMenu.bind(this)}>
+            { ctx.authenticated && (
+                <div className={style.background}>
+                  Right click anywhere to get started!
+                </div>
+              )
+            }
+            <div style={{
+              display: ctx.authenticated ? 'block' : 'none',
+            }}>
+              { this.props.children}
+              <div className={style.context} ref={e => this.contextMenu = e} style={{
+                display: this.state.contextMenu ? 'block' : 'none',
+                left: this.state.cx + 'px',
+                top: this.state.cy + 'px',
+              }}>
+                { Array.from(this.props.windows).map(w => 
+                    w&&w.props.title&&
+                    <div key={w.props.title} onClick={() => w.state.visible ? w.hide() : w.show()}>
+                      <i style={{
+                        opacity: w.state.visible ? 1 : 0,
+                      }}><FontAwesomeIcon icon={faCheck} /></i>
+                      {w.props.title}
+                    </div>
+                ) }
               </div>
-          ) }
-        </div>
-      </div>
+            </div>
+          </div>
+        )}
+      </AppConsumer>
     );
   }
 };

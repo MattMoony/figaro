@@ -1,7 +1,8 @@
 import React from 'react';
 import style from './AudioWave.module.scss';
 import { Line } from 'react-chartjs-2';
-import * as socket from '../utils/socket';
+import { AppConsumer, AppContextProps, AppProvider } from './AppContext';
+// import * as socket from '../utils/socket';
 
 interface AudioWaveProps {
 };
@@ -12,10 +13,12 @@ interface AudioWaveState {
     datasets: Array<object>;
   };
   running: boolean;
+  errorMsg?: string;
 };
 
 export default class AudioWave extends React.Component<AudioWaveProps, AudioWaveState> {
   private static graphScale: number = 5;
+  public context: AppContextProps;
 
   constructor (props) {
     super(props);
@@ -31,11 +34,11 @@ export default class AudioWave extends React.Component<AudioWaveProps, AudioWave
       },
       running: false,
     };
-    socket.onLogout(() => this.stop());
+    // socket.onLogout(() => this.stop());
   }
 
   public start (): void {
-    socket.getConf().then(conf => {
+    this.context.conf().then(conf => {
       const lbls: Array<number> = new Array(conf.BUF).fill(null).map((_, i) => i);
       this.setState({
         graph: {
@@ -48,9 +51,22 @@ export default class AudioWave extends React.Component<AudioWaveProps, AudioWave
           ],
         },
         running: true,
-      }, () => socket.getAudioUpdates(AudioWave.graphScale, this.update.bind(this))
-                     .catch(e => window.alert(e)));
-    });
+      }, () => this.getAudioUpdates());
+    }).catch(() => this.setState({ errorMsg: 'Failed to retrieve updates ... ', }));
+  }
+
+  private getAudioUpdates (): void {
+    const sock: WebSocket = new WebSocket(AppProvider.dURL);
+    this.context.waitUntilOpen(sock).then(() => {
+      sock.onmessage = (e: MessageEvent) => {
+        (e.data as Blob).arrayBuffer().then(b => {
+          if (!this.update(Array.from(new Float32Array(b)))) {
+            sock.close(1000);
+          }
+        });
+      };
+      sock.send(JSON.stringify({ cmd: 'get-audio', id: AppProvider.id, tkn: this.context.tkn!, scale: AudioWave.graphScale, }));
+    }).catch(() => this.setState({ errorMsg: 'Failed to retrieve updates ... ', }))
   }
 
   public update (data: Array<number>): boolean {
@@ -77,32 +93,44 @@ export default class AudioWave extends React.Component<AudioWaveProps, AudioWave
 
   public render () {
     return (
-      <div className={style.root}>
-        <Line data={this.state.graph} options={{
-          animation: {
-            duration: 0,
-          },
-          hover: {
-            animationDuration: 0,
-          },
-          responsiveAnimationDuration: 0,
-          elements: {
-            line: {
-              tension: 0,
-            },
-          },
-          showLines: false,
-          scales: {
-            yAxes: [{
-              display: true,
-              ticks: {
-                min: -1/AudioWave.graphScale*2,
-                max: 1/AudioWave.graphScale*2,
-              },
-            }],
-          },
-        }} />
-      </div>
+      <AppConsumer>
+        {ctx => {
+          this.context = ctx;
+          return (
+            <div className={style.root}>
+              <Line data={this.state.graph} options={{
+                animation: {
+                  duration: 0,
+                },
+                hover: {
+                  animationDuration: 0,
+                },
+                responsiveAnimationDuration: 0,
+                elements: {
+                  line: {
+                    tension: 0,
+                  },
+                },
+                showLines: false,
+                scales: {
+                  yAxes: [{
+                    display: true,
+                    ticks: {
+                      min: -1/AudioWave.graphScale*2,
+                      max: 1/AudioWave.graphScale*2,
+                    },
+                  }],
+                },
+              }} />
+              { this.state.errorMsg ? (
+                  <div className={style.overlay}>
+                    {this.state.errorMsg}
+                  </div>
+                ) : ''}
+            </div>
+          );
+        }}
+      </AppConsumer>
     );
   }
 };
