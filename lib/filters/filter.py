@@ -1,7 +1,7 @@
 """The base class for all filters"""
 
 import numpy as np
-from typing import List
+from typing import List, Dict, Any
 
 class Filter(object):
     """
@@ -19,6 +19,9 @@ class Filter(object):
         raise NotImplementedError()
 
     def apply(self, data: np.ndarray) -> np.ndarray:
+        raise NotImplementedError()
+
+    def toJSON(self) -> Dict[str, Any]:
         raise NotImplementedError()
 
     def __call__(self, data: np.ndarray) -> np.ndarray:

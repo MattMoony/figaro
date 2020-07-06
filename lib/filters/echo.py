@@ -2,7 +2,7 @@
 
 import numpy as np, re
 from datetime import datetime
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 
 from lib.utils import parse_perc
 from lib.filters.filter import Filter
@@ -42,11 +42,14 @@ class Echo(Filter):
         self._q.append((now, data * self.scale))
         return data
 
+    def toJSON(self) -> Dict[str, Any]:
+        return dict(name='echo', scale=self.scale, pause=self.pause)
+
     def __call__(self, data: np.ndarray) -> np.ndarray:
         return self.apply(data)
 
     def __str__(self) -> str:
-        return f'Trip({self.scale*100:.2f}% damping)'
+        return f'Echo({self.pause}s delay, {self.scale*100:.2f}% damping)'
 
 def start(args: List[str]) -> Echo:
     """Accepts a list of command line arguments and returns an echo filter created from those arguments"""

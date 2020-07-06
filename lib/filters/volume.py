@@ -1,7 +1,7 @@
 """Filter to change the voice's volume"""
 
 import numpy as np, re
-from typing import List
+from typing import List, Dict, Any
 
 from lib.utils import parse_perc
 from lib.filters.filter import Filter
@@ -28,6 +28,9 @@ class Volume(Filter):
 
     def apply(self, data: np.ndarray) -> np.ndarray:
         return data*self.fac
+
+    def toJSON(self) -> Dict[str, Any]:
+        return dict(name='volume', fac=self.fac)
 
     def __call__(self, data: np.ndarray) -> np.ndarray:
         return self.apply(data)

@@ -1,7 +1,7 @@
 """Filter to change the voice's pitch"""
 
 import numpy as np
-from typing import List
+from typing import List, Dict, Any
 
 from lib.utils import parse_perc
 from lib.filters.filter import Filter
@@ -36,6 +36,9 @@ class Pitch(Filter):
         sh_freq[S:] = freq[:s]
         sh_chunk = np.fft.irfft(sh_freq)
         return sh_chunk.astype(data.dtype)
+
+    def toJSON(self) -> Dict[str, Any]:
+        return dict(name='pitch', fac=self.fac)
 
     def __call__(self, data: np.ndarray) -> np.ndarray:
         return self.apply(data)

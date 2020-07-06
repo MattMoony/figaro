@@ -103,11 +103,13 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
                     continue
                 stdout = sys.stdout
                 sys.stdout = cmdout = StringIO()
-                sh.parse(req['cmd'])
+                sh.parse(req['cmd'].strip() + ' --json')
                 sys.stdout = stdout
+                out = json.loads(cmdout.getvalue())
                 await ws.send(json.dumps({
-                    'success': True,
-                    'msg': cmdout.getvalue(),
+                    'success': 'error' not in out.keys(),
+                    'msg': out['error'] if 'error' in out.keys() else None,
+                    **{k: v for k, v in out.items() if k != 'error'},
                 }))
             except KeyError as e:
                 await ws.send(json.dumps({

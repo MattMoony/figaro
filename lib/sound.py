@@ -1,7 +1,7 @@
 """Wrapper class for a playable audio file"""
 
 import os, pydub as pyd
-from typing import Optional
+from typing import Optional, Dict, Any
 
 from lib import params
 
@@ -68,9 +68,20 @@ class Sound(object):
     def get_playtime(self) -> str:
         """Gets the remaining playtime as a string"""
         s = self.nframes/self.srate
-        m = int(s/60)
+        m = s//60
         s %= 60
         return '{:02d}:{:05.2f}'.format(m, s)
+
+    def get_totalplaytime(self) -> str:
+        """Gets the total playtime as a string"""
+        s = self.audio.frame_count()/self.srate
+        m = s//60
+        s %= 60
+        return '{:02d}:{:05.2f}'.format(m, s)
+
+    def toJSON(self) -> Dict[str, Any]:
+        """Gets the sound into a JSON-compatible format"""
+        return dict(name=self.name, cuplay=(self.audio.frame_count()-self.nframes)/self.srate, maxplay=self.audio.frame_count()/self.srate)
 
     def __str__(self) -> str:
         return self.name + ' [' + self.get_playtime() + ']'

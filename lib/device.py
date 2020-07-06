@@ -1,7 +1,7 @@
 """Extends the pyaudio.Stream class for further info"""
 
 import pyaudio
-from typing import Optional
+from typing import Optional, Dict, Any
 
 class Device(pyaudio.Stream):
     """
@@ -22,6 +22,10 @@ class Device(pyaudio.Stream):
         self.indo: Optional[int] = output_device_index
         super(Device, self).__init__(pa, *args, rate=rate, channels=channels, format=format, *args, input_device_index=input_device_index, output_device_index=output_device_index, **kwargs)
         pa._streams.add(self)
+
+    def toJSON(self) -> Dict[str, Any]:
+        """Gets the device into a JSON-compatible format"""
+        return dict(type='input' if self.indi else 'output', index=self.indi or self.indo)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Device):

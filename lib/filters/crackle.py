@@ -1,7 +1,7 @@
 """A crackling filter for audio"""
 
 import numpy as np
-from typing import List
+from typing import List, Dict, Any
 
 from lib.utils import parse_perc
 from lib.filters.filter import Filter
@@ -27,6 +27,9 @@ class Crackle(Filter):
     def apply(self, data: np.ndarray) -> np.ndarray:
         ifac = 1 - .9 * self.fac
         return data.clip(data.min() * ifac, data.max() * ifac) * (.5 / ifac)
+
+    def toJSON(self) -> Dict[str, Any]:
+        return dict(name='crackle', fac=self.fac)
 
     def __call__(self, data: np.ndarray) -> np.ndarray:
         return self.apply(data)

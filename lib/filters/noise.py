@@ -1,7 +1,7 @@
 """A noise filter for audio"""
 
 import numpy as np
-from typing import List
+from typing import List, Dict, Any
 
 from lib.utils import parse_perc
 from lib.filters.filter import Filter
@@ -26,6 +26,9 @@ class Noise(Filter):
 
     def apply(self, data: np.ndarray) -> np.ndarray:
         return data + (np.random.rand(*data.shape) - .5) * .05 * self.amp
+
+    def toJSON(self) -> Dict[str, Any]:
+        return dict(name='noise', amp=self.amp)
 
     def __call__(self, data: np.ndarray) -> np.ndarray:
         return self.apply(data)

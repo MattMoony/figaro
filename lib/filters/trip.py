@@ -1,7 +1,7 @@
 """Filter to add a trippy sound effect"""
 
 import numpy as np, re
-from typing import List
+from typing import List, Dict, Any
 
 from lib.utils import parse_perc
 from lib.filters.filter import Filter
@@ -32,6 +32,9 @@ class Trip(Filter):
             self._prev = np.zeros(data.shape)
         data, self._prev = data + self._prev, self._prev * self.scale + data
         return data
+
+    def toJSON(self) -> Dict[str, Any]:
+        return dict(name='trip', scale=self.scale)
 
     def __call__(self, data: np.ndarray) -> np.ndarray:
         return self.apply(data)

@@ -1,6 +1,6 @@
 """Handles the interactive shell for the user"""
 
-import os, pyaudio, wave, shutil, numpy as np, time, re, importlib.util
+import os, pyaudio, wave, shutil, numpy as np, time, re, importlib.util, json as JSON
 import pash.shell, pash.cmds, pash.command as pcmd, colorama as cr
 cr.init()
 from asciimatics.screen import Screen
@@ -12,7 +12,6 @@ from lib.device import Device
 from lib.channel import Channel
 from lib.interpreter import Interpreter
 from lib.filters.filter import Filter
-from lib.filters.volume import Volume
 from lib.server import db
 from lib.server.models.user import User
 
@@ -35,18 +34,32 @@ def on_exit(cmd: pcmd.Command, args: List[str]) -> None:
     pa.terminate()
     sh.exit()
 
-def on_show_devices(cmd: pcmd.Command, args: List[str]) -> None:
+def on_show_devices(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `show devices` - lists all audio devices"""
-    print('Devices:\n ', end='')
     devs = [pa.get_device_info_by_host_api_device_index(0, i) for i in range(pa.get_host_api_info_by_index(0).get('deviceCount'))]
-    print('\r Input:\n   ', end='')
-    print('\n   '.join(['{:02d}: {}'.format(i, d['name']) for i, d in enumerate(devs) if d['maxInputChannels'] > 0]))
-    print('\r Output:\n   ', end='')
-    print('\n   '.join(['{:02d}: {}'.format(i, d['name']) for i, d in enumerate(devs) if d['maxOutputChannels'] > 0]))
+    fil_d = lambda s: [(i, d['name']) for i, d in enumerate(devs) if d[s] > 0]
+    if not json:
+        print('Devices:\n ', end='')
+        print('\r Input:\n   ', end='')
+        print('\n   '.join(['{:02d}: {}'.format(*inf) for inf in fil_d('maxInputChannels')]))
+        print('\r Output:\n   ', end='')
+        print('\n   '.join(['{:02d}: {}'.format(*inf) for inf in fil_d('maxOutputChannels')]))
+        return
+    print(JSON.dumps({
+        'input': fil_d('maxInputChannels'),
+        'output': fil_d('maxOutputChannels'),
+    }))
 
-def on_show_status(cmd: pcmd.Command, args: List[str]) -> None:
+def on_show_status(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `show status` - shows the audio channel's status"""
-    print(ch)
+    if not json:
+        print(ch)
+        return
+    print(JSON.dumps({
+        'input': list(map(lambda d: d.toJSON(), ch.get_ists())),
+        'output': list(map(lambda d: d.toJSON(), ch.get_osts())),
+        'running': ch.is_running(),
+    }))
 
 def on_show_audio(cmd: pcmd.Command, args: List[str], scale: float, char: str) -> None:
     """Callback for `show audio` - shows the detected input"""
@@ -71,14 +84,22 @@ def on_show_audio(cmd: pcmd.Command, args: List[str], scale: float, char: str) -
             time.sleep(.01)
     Screen.wrapper(disp_audio)
 
-def on_show_sounds(cmd: pcmd.Command, args: List[str]) -> None:
+def on_show_sounds(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `show sounds` - shows all currently playing sounds"""
     if not ch.sounds:
-        utils.printwrn('No sounds are playing at the moment ... ')
+        if not json:
+            utils.printwrn('No sounds are playing at the moment ... ')
+        else:
+            print(JSON.dumps({ 'error': 'No sounds are playing at the moment ... '}))
         return
-    print('Sounds: ')
-    for i, s in enumerate(ch.get_sounds()):
-        print(' #{:02d} | {}'.format(i, str(s)))
+    if not json:
+        print('Sounds: ')
+        for i, s in enumerate(ch.get_sounds()):
+            print(' #{:02d} | {}'.format(i, str(s)))
+        return
+    print(JSON.dumps({
+        'sounds': list(map(lambda s: s.toJSON(), ch.get_sounds())),
+    }))
 
 def on_show_interpreters(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `show interpreters` - shows all running interpreters"""
@@ -89,27 +110,43 @@ def on_show_interpreters(cmd: pcmd.Command, args: List[str]) -> None:
     for i, p in enumerate(interpreters):
         print(' #{:02d} | {}'.format(i, str(p)))
 
-def on_show_running_filters(cmd: pcmd.Command, args: List[str]) -> None:
+def on_show_running_filters(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `show filters` - shows all running voice-filters"""
     filters = ch.get_filters()
     if not filters:
-        utils.printwrn('No filters running ... ')
-    else:
+        if not json:
+            utils.printwrn('No filters running ... ')
+        else:
+            print(JSON.dumps({ 'error': 'No filters running ... ', }))
+        return
+    if not json:
         print('Filters: ')
         for i, f in enumerate(filters):
             print(f' #{i:02d} | {f}')
+        return
+    print(JSON.dumps({
+        'filters': list(map(lambda f: f.toJSON(), filters)),
+    }))
 
-def on_show_all_filters(cmd: pcmd.Command, args: List[str]) -> None:
+def on_show_all_filters(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `show filters all` - shows all available voice-filters"""
     if not os.path.isdir(os.path.join(params.BPATH, 'lib', 'filters')):
         utils.printerr('Error: Directory "{}" doesn\'t exist ... '.format(os.path.join(params.BPATH, 'lib', 'filters')))
         return
     fs = [f[:-3] for f in os.listdir(os.path.join(params.BPATH, 'lib', 'filters')) if os.path.isfile(os.path.join(params.BPATH, 'lib', 'filters', f)) and f != 'filter.py' and f.endswith('.py')]
     if not fs:
-        utils.printwrn('No filters available ... ')
-    else:
+        if not json:
+            utils.printwrn('No filters available ... ')
+        else:
+            print(JSON.dumps({ 'error': 'No filters available ... ', }))
+        return
+    if not json:
         print('Filters: \n - ', end='')
         print('\n - '.join(fs))
+        return
+    print(JSON.dumps({
+        'filters': fs,
+    }))
 
 def on_start_sound(cmd: pcmd.Command, args: List[str], params: List[str]) -> None:
     """Callback for `start sound` - adds a sound effect"""
@@ -262,6 +299,10 @@ def on_stop(cmd: pcmd.Command, args: List[str]) -> None:
         return
     ch.kill()
 
+def _with_json(c: pcmd.Command) -> pcmd.Command:
+    c.add_arg('--json', action='store_true')
+    return c
+
 def start() -> None:
     """Start prompting the user for input."""
     # ---------------------------------------------------------------------------------------------------------------------- #
@@ -273,14 +314,14 @@ def start() -> None:
     show_audio.add_arg('-s', '--scale', type=float, dest='scale', default=5., help='Specify output scale ... ')
     show_audio.add_arg('-c', '--char', type=str, dest='char', default='▬', help='Specify the character to be used for the graph ... ')
     sh.add_cmd(pcmd.CascCommand('show', 'sh', cmds=[
-        pcmd.Command('devices', 'dev', callback=on_show_devices, hint='List all devices ... '),
-        pcmd.Command('status', 'stat', callback=on_show_status, hint='Show the audio channel\'s status ... '),
+        _with_json(pcmd.Command('devices', 'dev', callback=on_show_devices, hint='List all devices ... ')),
         show_audio,
-        pcmd.Command('sounds', callback=on_show_sounds, hint='List all currently playing sounds ... '),
+        _with_json(pcmd.Command('status', 'stat', callback=on_show_status, hint='Show the audio channel\'s status ... ')),
+        _with_json(pcmd.Command('sounds', callback=on_show_sounds, hint='List all currently playing sounds ... ')),
         pcmd.Command('interpreters', 'in', callback=on_show_interpreters, hint='List all running interpreters ... '),
-        pcmd.CascCommand('filters', 'fil', cmds=[
-            pcmd.Command('all', 'a', callback=on_show_all_filters, hint='List all available voice filters ... '),
-        ], callback=on_show_running_filters, hint='List all running/available voice filters ... '),
+        _with_json(pcmd.CascCommand('filters', 'fil', cmds=[
+            _with_json(pcmd.Command('all', 'a', callback=on_show_all_filters, hint='List all available voice filters ... ')),
+        ], callback=on_show_running_filters, hint='List all running/available voice filters ... ')),
     ], hint='Show info ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     start_sound = pcmd.Command('sound', callback=on_start_sound, hint='Play a soundeffect ... ')

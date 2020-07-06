@@ -220,6 +220,10 @@ class Channel(Thread):
         self.sounds = []
         self._sou_mut.release()
 
+    def is_running(self) -> bool:
+        """Returns `True` if the channel is currently active"""
+        return self._running
+
     def __str__(self):
         """Returns a string representation of the channel"""
         return 'Channel: {{{}}} --> {{{}}} | {} ... '.format(
