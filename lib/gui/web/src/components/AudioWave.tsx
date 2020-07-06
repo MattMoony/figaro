@@ -2,7 +2,6 @@ import React from 'react';
 import style from './AudioWave.module.scss';
 import { Line } from 'react-chartjs-2';
 import { AppConsumer, AppContextProps, AppProvider } from './AppContext';
-// import * as socket from '../utils/socket';
 
 interface AudioWaveProps {
 };
@@ -34,7 +33,6 @@ export default class AudioWave extends React.Component<AudioWaveProps, AudioWave
       },
       running: false,
     };
-    // socket.onLogout(() => this.stop());
   }
 
   public start (): void {
@@ -70,7 +68,6 @@ export default class AudioWave extends React.Component<AudioWaveProps, AudioWave
   }
 
   public update (data: Array<number>): boolean {
-    // console.log(data, this.state.running);
     this.setState({
       graph: {
         labels: this.state.graph.labels,

@@ -3,17 +3,15 @@ import '../style/global.scss';
 import style from './BaseLayout.module.scss';
 import Popup from '../components/Popup';
 import FancyInput from '../components/FancyInput';
-// import * as socket from '../utils/socket';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { AppProvider, AppConsumer, AppContextProps } from './AppContext';
 
 interface BaseLayoutProps {
-  sock: WebSocket;
+  children: React.ReactElement|React.ReactElement[];
 };
 
 interface BaseLayoutState {
-  // loggedIn: boolean;
   loginError?: string;
 };
 
@@ -28,14 +26,10 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
   constructor (props) {
     super(props);
     this.state = {
-      // loggedIn: false,
     };
-    // socket.tryLoadToken();
-    // socket.isLoggedIn().then(v => this.setState({ loggedIn: v, }));
   }
 
   private onShowLogin (): void {
-    // if (this.state.loggedIn) return this.logoutPopup.show();
     if (this.context.authenticated) return this.logoutPopup.show();
     this.setState({
       loginError: undefined,
@@ -50,9 +44,6 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
     if (!uname || !pwd) return this.setState({ loginError: 'Please enter both username and password!', });
     this.context.login(uname, pwd)
           .then(() => {
-            // this.setState({
-            //   loggedIn: true,
-            // });
             this.loginPopup.hide();
           })
           .catch(e => {
@@ -65,9 +56,6 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
 
   private onLogout (): void {
     this.context.logout();
-    // this.setState({
-    //   loggedIn: false,
-    // });
     this.logoutPopup.hide();
   }
 

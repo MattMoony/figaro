@@ -4,40 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faStop, faWaveSquare, faPlus, faDrum } from '@fortawesome/free-solid-svg-icons';
 import DragWorkspace from '../components/DragWorkspace';
 import DragWindow from '../components/DragWindow';
-// import * as socket from '../utils/socket';
 import AudioWave from '../components/AudioWave';
 import { AppConsumer, AppContextProps } from '../components/AppContext';
 
-// interface IndexProps {
-//   sock: WebSocket;
-// }
-
-// interface IndexState {
-//  loggedIn: boolean;
-// };
-
 class Index extends React.Component {
   private windows: Set<DragWindow> = new Set();
-  // private workspace: DragWorkspace;
 
   private wave: AudioWave;
   public context: AppContextProps;
-
-  // constructor (props) {
-  //   super(props);
-  //   this.state = {
-  //     loggedIn: false,
-  //   };
-  // }
-
-  // public componentDidMount (): void {
-  //   socket.onLogin(() => this.setState({ loggedIn: true, }));
-  //   socket.onLogout(() => {
-  //     this.workspace.allAbsoluteBackground();
-  //     this.workspace.hideAll();
-  //     this.setState({ loggedIn: false, })
-  //   });
-  // }
 
   public render () {
     return (
