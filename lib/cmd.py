@@ -163,19 +163,29 @@ def on_start_sound(cmd: pcmd.Command, args: List[str], params: List[str]) -> Non
         except Exception as e:
             utils.printerr(str(e))
 
-def on_start_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
+def on_start_output(cmd: pcmd.Command, args: List[str], indo: int, json: bool) -> None:
     """Callback for `start output` - adds an output device"""
     try:
         ch.add_ost(Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, output=True, output_device_index=indo))
+        if json:
+            print(JSON.dumps({}))
     except Exception as e:
-        utils.printerr(str(e))
+        if not json:
+            utils.printerr(str(e))
+        else:
+            print(JSON.dumps({ 'error': str(e), }))
 
-def on_start_input(cmd: pcmd.Command, args: List[str], indi: int) -> None:
+def on_start_input(cmd: pcmd.Command, args: List[str], indi: int, json: bool) -> None:
     """Callback for `start input` - adds an input device"""
     try:
         ch.add_ist(Device(pa, format=pyaudio.paFloat32, channels=1, rate=params.SMPRATE, input=True, input_device_index=indi))
+        if json:
+            print(JSON.dumps({}))
     except Exception as e:
-        utils.printerr(str(e))
+        if not json:
+            utils.printerr(str(e))
+        else:
+            print(JSON.dumps({ 'error': str(e), }))
 
 def on_start_interpreter(cmd: pcmd.Command, args: List[str], fname: str) -> None:
     """Callback for `start interpreter` - interprets a .fig file"""
@@ -230,19 +240,29 @@ def on_stop_sound(cmd: pcmd.Command, args: List[str], ind: str) -> None:
         return
     ch.del_sound(ind)
 
-def on_stop_output(cmd: pcmd.Command, args: List[str], indo: int) -> None:
+def on_stop_output(cmd: pcmd.Command, args: List[str], indo: int, json: bool) -> None:
     """Callback for `stop output` - removes an output device"""
     if not indo in [d.indo for d in ch.get_osts()]:
-        utils.printwrn('Device isn\'t currently being used ... ')
+        if not json:
+            utils.printwrn('Device isn\'t currently being used ... ')
+        else:
+            print(JSON.dumps({ 'error': 'Device isn\'t currently being used ... ', }))
         return
     ch.del_ost(indo)
+    if json:
+        print(JSON.dumps({}))
 
-def on_stop_input(cmd: pcmd.Command, args: List[str], indi: int) -> None:
+def on_stop_input(cmd: pcmd.Command, args: List[str], indi: int, json: bool) -> None:
     """Callback for `stop input` - removes an input device"""
     if not indi in [d.indi for d in ch.get_ists()]:
-        utils.printwrn('Device isn\'t currently being used ... ')
+        if not json:
+            utils.printwrn('Device isn\'t currently being used ... ')
+        else:
+            print(JSON.dumps({ 'error': 'Device isn\'t currently being used ... ', }))
         return
     ch.del_ist(indi)
+    if json:
+        print(JSON.dumps({}))
 
 def on_stop_interpreter(cmd: pcmd.Command, args: List[str], ind: str) -> None:
     """Callback for `stop interpreter` - stops a running interpreter"""
@@ -298,7 +318,7 @@ def on_start(cmd: pcmd.Command, args: List[str], json: bool) -> None:
         if not json:
            utils.printerr(e)
         else:
-            print(JSON.dumps({ 'error': e, }))
+            print(JSON.dumps({ 'error': str(e), }))
 
 def on_stop(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `stop` - stops the channel"""
@@ -350,8 +370,8 @@ def start() -> None:
     start_filter.add_arg('cargs', nargs='*', help='Specify the filter\'s arguments ... ')
     sh.add_cmd(_with_json(pcmd.CascCommand('start', cmds=[
         start_sound,
-        start_output,
-        start_input,
+        _with_json(start_output),
+        _with_json(start_input),
         start_interpreter,
         start_filter,
         pcmd.Command('server', 'srv', callback=on_start_server, hint='Start the websocket server ... ')
@@ -369,8 +389,8 @@ def start() -> None:
     stop_filter.add_arg('ind', type=str, help='Specify the filter\'s index ... ')
     sh.add_cmd(_with_json(pcmd.CascCommand('stop', 'kill', cmds=[
         stop_sound,
-        stop_output,
-        stop_input,
+        _with_json(stop_output),
+        _with_json(stop_input),
         stop_interpreter,
         stop_filter,
     ], callback=on_stop, hint='Stop channeling audio / other things ... ')))

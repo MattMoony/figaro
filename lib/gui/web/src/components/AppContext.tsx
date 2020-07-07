@@ -8,10 +8,13 @@ export interface AppContextProps {
   login: (uname: string, pwd: string) => Promise<void>;
   logout: () => void;
   waitUntilOpen: (sock: WebSocket) => Promise<void>;
+  req: <T extends Response>(cmd: string, body: object) => Promise<T>;
   uname?: () => string;
   conf: () => Promise<FigaroConf>;
   start: () => Promise<void>;
   stop: () => Promise<void>;
+  toggleInput: (index: number) => Promise<void>;
+  toggleOutput: (index: number) => Promise<void>;
 };
 
 const AppContext: React.Context<AppContextProps> = React.createContext<AppContextProps>({
@@ -20,14 +23,17 @@ const AppContext: React.Context<AppContextProps> = React.createContext<AppContex
   login: (uname: string, pwd: string) => new Promise((resolve, reject) => resolve()),
   logout: () => {},
   waitUntilOpen: () => new Promise((resolve, reject) => resolve()),
+  req: <T extends Response>(cmd: string, body: object) => new Promise((resolve, reject) => resolve(null)),
   conf: () => new Promise((resolve, reject) => resolve(null)),
   start: () => new Promise((resolve, reject) => resolve()),
   stop: () => new Promise((resolve, reject) => resolve()),
+  toggleInput: () => new Promise((resolve, reject) => resolve()),
+  toggleOutput: () => new Promise((resolve, reject) => resolve()),
 });
 
 export default AppContext;
 
-interface Response {
+export interface Response {
   success: boolean;
   msg?: string;
 };
@@ -69,10 +75,13 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
       login: this.login.bind(this),
       logout: this.logout.bind(this),
       waitUntilOpen: this.waitUntilOpen.bind(this),
+      req: this.req.bind(this),
       uname: this.uname.bind(this),
       conf: this.conf.bind(this),
       start: this.start.bind(this),
       stop: this.stop.bind(this),
+      toggleInput: this.toggleInput.bind(this),
+      toggleOutput: this.toggleOutput.bind(this),
     };
   }
 
@@ -195,6 +204,24 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
         if (!res.success) return reject(res.msg!);
         this.status().then(() => resolve());
       })
+    });
+  }
+
+  private toggleInput (index: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.req<Response>(`${this.state.status.input.map(i => i.index).includes(index) ? 'stop' : 'start'} ist ${index}`, {}).then(res => {
+        if (!res.success) reject(res.msg!);
+        this.status().then(() => resolve());
+      }).catch(reject);
+    });
+  }
+
+  private toggleOutput (index: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.req<Response>(`${this.state.status.output.map(o => o.index).includes(index) ? 'stop' : 'start'} ost ${index}`, {}).then(res => {
+        if (!res.success) reject(res.msg!);
+        this.status().then(() => resolve());
+      }).catch(reject);
     });
   }
 

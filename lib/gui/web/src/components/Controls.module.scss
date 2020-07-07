@@ -3,7 +3,7 @@
     justify-content: center;
     align-items: center;
 
-    div {
+    .devDiv {
         width: 25%;
         box-sizing: border-box;
         padding: 2.5px 7.5px;
@@ -23,7 +23,39 @@
         }
     }
 
-    i {
+    .popup {
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: normal;
+            font-size: 1.5em;
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #072435;
+            margin-bottom: 10px;
+        }
+
+        .device {
+            display: inline-block;
+            background-color: #2E6F97;
+            margin: 2.5px;
+            padding: 2.5px 7.5px;
+            border-radius: 3px;
+            color: #cbd1ec;
+            transition: .2s ease;
+
+            &.used {
+                background-color: #D14081;
+            }
+
+            &:hover {
+                cursor: pointer;
+                background-color: #8C548B;
+                box-shadow: 0 0 3px #175477;
+            }
+        }
+    }
+
+    & > i {
         display: inline-block;
         font-size: 1.2em;
         margin: 0 15px;
