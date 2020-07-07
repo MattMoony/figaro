@@ -1,0 +1,41 @@
+.root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    div {
+        width: 25%;
+        box-sizing: border-box;
+        padding: 2.5px 7.5px;
+        border-radius: 3px;
+        color: #2E6F97;
+        background-color: #0B3954;
+        text-align: center;
+        transition: .2s ease;
+
+        &.devices {
+            color: #3683b3;
+        }
+
+        &:hover {
+            cursor: pointer;
+            box-shadow: 0 0 3px #0B3954;
+        }
+    }
+
+    i {
+        display: inline-block;
+        font-size: 1.2em;
+        margin: 0 15px;
+        transition: .2s ease;
+        
+        &.stop {
+            color: #D14081;
+        }
+
+        &:hover {
+            cursor: pointer;
+            transform: scale(1.15);
+        }
+    }
+}

@@ -2,6 +2,8 @@ import React from 'react';
 import style from './AudioWave.module.scss';
 import { Line } from 'react-chartjs-2';
 import { AppConsumer, AppContextProps, AppProvider } from './AppContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPause } from '@fortawesome/free-solid-svg-icons';
 
 interface AudioWaveProps {
 };
@@ -119,11 +121,11 @@ export default class AudioWave extends React.Component<AudioWaveProps, AudioWave
                   }],
                 },
               }} />
-              { this.state.errorMsg ? (
-                  <div className={style.overlay}>
-                    {this.state.errorMsg}
-                  </div>
-                ) : ''}
+              <div className={style.overlay} style={{
+                display: this.state.errorMsg || !this.context.status.running ? 'flex' : 'none',
+              }} title={this.state.errorMsg ? 'Error' : 'Paused'}>
+                {this.state.errorMsg || !this.context.status.running && <i><FontAwesomeIcon icon={faPause} /></i>}
+              </div>
             </div>
           );
         }}

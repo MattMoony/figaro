@@ -3,20 +3,26 @@ import React from 'react';
 export interface AppContextProps {
   authenticated: boolean;
   tkn?: string;
+  status: FigaroStatus;
   error?: Error;
   login: (uname: string, pwd: string) => Promise<void>;
   logout: () => void;
   waitUntilOpen: (sock: WebSocket) => Promise<void>;
   uname?: () => string;
   conf: () => Promise<FigaroConf>;
+  start: () => Promise<void>;
+  stop: () => Promise<void>;
 };
 
 const AppContext: React.Context<AppContextProps> = React.createContext<AppContextProps>({
   authenticated: false,
+  status: { input: [], output: [], running: false, },
   login: (uname: string, pwd: string) => new Promise((resolve, reject) => resolve()),
   logout: () => {},
   waitUntilOpen: () => new Promise((resolve, reject) => resolve()),
   conf: () => new Promise((resolve, reject) => resolve(null)),
+  start: () => new Promise((resolve, reject) => resolve()),
+  stop: () => new Promise((resolve, reject) => resolve()),
 });
 
 export default AppContext;
@@ -30,6 +36,18 @@ export interface FigaroConf {
   BUF: number;
   SMPRATE: number;
   CHNNLS: number;
+};
+
+export interface FigaroDevice {
+  type: string;
+  index: number;
+  name: string;
+};
+
+export interface FigaroStatus {
+  input: FigaroDevice[];
+  output: FigaroDevice[];
+  running: boolean;
 };
 
 interface AppProviderProps {
@@ -47,18 +65,24 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
     super(props);
     this.state = {
       authenticated: false,
+      status: { input: [], output: [], running: false, },
       login: this.login.bind(this),
       logout: this.logout.bind(this),
       waitUntilOpen: this.waitUntilOpen.bind(this),
-      conf: this.conf.bind(this),
       uname: this.uname.bind(this),
+      conf: this.conf.bind(this),
+      start: this.start.bind(this),
+      stop: this.stop.bind(this),
     };
   }
 
   public componentDidMount (): void {
     this.setState({
       tkn: localStorage.getItem('tkn'),
-    }, () => this.isLoggedIn().then(b => b && this.setState({ authenticated: true, })).catch(e => this.setState({ error: e, })));
+    }, () => {
+      this.isLoggedIn().then(b => b && this.setState({ authenticated: true, })).catch(e => this.setState({ error: e, }));
+      this.status();
+    });
   }
 
   private waitUntilOpen (sock: WebSocket): Promise<void> {
@@ -141,6 +165,36 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
         if (!res.success) return reject(res.msg!);
         resolve({ BUF: res.BUF!, SMPRATE: res.SMPRATE!, CHNNLS: res.CHNNLS!, });
       }).catch(reject);
+    });
+  }
+
+  private status (): Promise<FigaroStatus> {
+    interface GetStatusResponse extends Response, FigaroStatus {
+    };
+    return new Promise((resolve, reject) => {
+      this.req<GetStatusResponse>('sh stat', {}).then(res => {
+        if (!res.success) return reject(res.msg!);
+        const status: FigaroStatus = { input: res.input, output: res.output, running: res.running, };
+        this.setState({ status, }, () => resolve(status));
+      }).catch(reject);
+    });
+  }
+
+  private start (): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.req<Response>('start', {}).then(res => {
+        if (!res.success) return reject(res.msg!);
+        this.status().then(() => resolve());
+      }).catch(reject);
+    })
+  }
+
+  private stop (): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.req<Response>('stop', {}).then(res => {
+        if (!res.success) return reject(res.msg!);
+        this.status().then(() => resolve());
+      })
     });
   }
 

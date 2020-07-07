@@ -1,11 +1,11 @@
 import React from 'react';
 import style from './index.module.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faStop, faWaveSquare, faPlus, faDrum } from '@fortawesome/free-solid-svg-icons';
+import { faWaveSquare, faPlus, faDrum } from '@fortawesome/free-solid-svg-icons';
 import DragWorkspace from '../components/DragWorkspace';
 import DragWindow from '../components/DragWindow';
 import AudioWave from '../components/AudioWave';
 import { AppConsumer, AppContextProps } from '../components/AppContext';
+import Controls from '../components/Controls';
 
 class Index extends React.Component {
   private windows: Set<DragWindow> = new Set();
@@ -31,7 +31,7 @@ class Index extends React.Component {
               </DragWindow>
             </DragWorkspace>
             <footer>
-              <i><FontAwesomeIcon icon={faPlay} /></i>
+              <Controls />
             </footer>
             <div className={style.overlay} style={{
               display: ctx.authenticated ? 'none' : 'flex',

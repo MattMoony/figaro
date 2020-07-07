@@ -279,25 +279,38 @@ def on_stop_filter(cmd: pcmd.Command, args: List[str], ind: str) -> None:
         return
     ch.del_filter(ind)
 
-def on_start(cmd: pcmd.Command, args: List[str]) -> None:
+def on_start(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `start` - starts the channel"""
     global ch
     if ch.is_alive():
-        utils.printwrn('Already running ... ')
+        if not json:
+            utils.printwrn('Already running ... ')
+        else:
+            print(JSON.dumps({ 'error': 'Already running ... ', }))
         return
     ch = Channel(ch.transf, ch.ist, ch.ost)
     server.ch = ch
     try:
         ch.start()
+        if json:
+            print(JSON.dumps({}))
     except IOError as e:
-        utils.printerr(e)
+        if not json:
+           utils.printerr(e)
+        else:
+            print(JSON.dumps({ 'error': e, }))
 
-def on_stop(cmd: pcmd.Command, args: List[str]) -> None:
+def on_stop(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `stop` - stops the channel"""
     if not ch.is_alive():
-        utils.printwrn('Not running ... ')
+        if not json:
+            utils.printwrn('Not running ... ')
+        else:
+            print(JSON.dumps({ 'error': 'Not running ... ', }))
         return
     ch.kill()
+    if json:
+        print(JSON.dumps({}))
 
 def _with_json(c: pcmd.Command) -> pcmd.Command:
     c.add_arg('--json', action='store_true')
@@ -335,14 +348,14 @@ def start() -> None:
     start_filter = pcmd.Command('filter', 'fil', callback=on_start_filter, hint='Add a filter to your audio input ... ')
     start_filter.add_arg('name', type=str, help='Specify the filter\'s name ... ')
     start_filter.add_arg('cargs', nargs='*', help='Specify the filter\'s arguments ... ')
-    sh.add_cmd(pcmd.CascCommand('start', cmds=[
+    sh.add_cmd(_with_json(pcmd.CascCommand('start', cmds=[
         start_sound,
         start_output,
         start_input,
         start_interpreter,
         start_filter,
         pcmd.Command('server', 'srv', callback=on_start_server, hint='Start the websocket server ... ')
-    ], callback=on_start, hint='Start channeling audio / other things ... '))
+    ], callback=on_start, hint='Start channeling audio / other things ... ')))
     # ---------------------------------------------------------------------------------------------------------------------- #
     stop_sound = pcmd.Command('sound', callback=on_stop_sound, hint='Remove a soundeffect ... ')
     stop_sound.add_arg('ind', type=str, help='Specify the sound effect\'s index ... ')
@@ -354,12 +367,12 @@ def start() -> None:
     stop_interpreter.add_arg('ind', type=str, help='Specify the interpreter\'s index ... ')
     stop_filter = pcmd.Command('filter', 'fil', callback=on_stop_filter, hint='Stop a running filter ... ')
     stop_filter.add_arg('ind', type=str, help='Specify the filter\'s index ... ')
-    sh.add_cmd(pcmd.CascCommand('stop', 'kill', cmds=[
+    sh.add_cmd(_with_json(pcmd.CascCommand('stop', 'kill', cmds=[
         stop_sound,
         stop_output,
         stop_input,
         stop_interpreter,
         stop_filter,
-    ], callback=on_stop, hint='Stop channeling audio / other things ... '))
+    ], callback=on_stop, hint='Stop channeling audio / other things ... ')))
     # ---------------------------------------------------------------------------------------------------------------------- #
     sh.prompt_until_exit()

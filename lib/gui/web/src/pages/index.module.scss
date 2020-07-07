@@ -10,20 +10,7 @@
     footer {
         background-color: #072435;
         padding: 15px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
         box-shadow: 0 -1px 3px #072435;
-
-        i {
-            font-size: 1.2em;
-            transition: .2s ease;
-
-            &:hover {
-                cursor: pointer;
-                transform: scale(1.1);
-            }
-        }
     }
 
     .overlay {
