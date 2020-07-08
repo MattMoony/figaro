@@ -178,6 +178,8 @@ Just a small preview of what is about to come. It's very likely that this roadma
 * Windows Virtual Sound I/O ... [vb-audio](https://www.vb-audio.com/Cable/)
 * PyAudio Windows Wheel ... [uci](https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyaudio)
 * FFmpeg download ... [ffmpeg.org](https://ffmpeg.org/download.html)
+* JWT minimum secret length ... [RFC 7518](https://tools.ietf.org/html/rfc7518#section-3.2)
+* JWT recommended secret length ... [Auth0](https://auth0.com/blog/brute-forcing-hs256-is-possible-the-importance-of-using-strong-keys-to-sign-jwts/)
 
 ---
 

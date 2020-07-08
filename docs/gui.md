@@ -16,7 +16,7 @@ First, you will be asked to create an admin account by providing both username a
   <img src="../media/gui/setup-1.JPG">
 </p>
 
-... after that you will be asked to provide a secret for encrypting your JWTs (JSON Web Tokens) _[THIS WILL MOST PROBABLY BE ALTERED IN FUTURE UPDATES TO ENSURE A HIGHER LEVEL OF SECURITY BY DEFAULT]_ - for now, choose carefully for the best security ...
+... after that you will be asked how long the JWT-secret key should be - the default option being `512 bits`. Although it is your choice remember that a key length of `< 256 bits` [is not recommended](https://tools.ietf.org/html/rfc7518#section-3.2) and a key length of `>= 512 bits` [is preferrable](https://auth0.com/blog/brute-forcing-hs256-is-possible-the-importance-of-using-strong-keys-to-sign-jwts/) ...
 
 <p align="center">
   <img src="../media/gui/setup-2.JPG">
