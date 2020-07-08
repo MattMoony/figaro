@@ -1,6 +1,6 @@
 """The entry point for the websocket server"""
 
-import jwt, asyncio, websockets, threading, json, os, hashlib, datetime, sys, time, struct
+import jwt, asyncio, websockets, threading, json, os, hashlib, datetime, sys, time, struct, secrets, base64
 import numpy as np
 import pash.shell
 from io import StringIO
@@ -23,9 +23,9 @@ def verify_tkn(req: Dict[str, Any]) -> bool:
     Checks the JWT of the given request for validity.
     """
     try:
-        tkn = jwt.decode(req['tkn'], conf['secret'], algorithms=['HS256'])
+        tkn = jwt.decode(req['tkn'], conf['secret'], algorithms=['HS256'], options={'require': ['exp', 'uname',]})
         return bool(User.load(tkn['uname']))
-    except (jwt.ExpiredSignatureError, KeyError) as e:
+    except (jwt.ExpiredSignatureError, jwt.InvalidAlgorithmError, jwt.InvalidSignatureError, KeyError) as e:
         return False
 
 async def send_audio(ws: websockets.server.WebSocketServerProtocol, scale: float):
@@ -133,11 +133,20 @@ def create_conf_prompt() -> None:
     """
     with open(os.path.join(params.BPATH, 'lib', 'server', 'conf.json'), 'w') as f:
         while True:
-            secret = getpass('Enter a new secret: ')
-            if getpass('Confirm new secret: ') == secret:
-                break
-            utils.printerr('Secrets don\'t match!')
-        f.write(json.dumps(dict(secret=hashlib.sha256(secret.encode()).hexdigest())))
+            secret_len = input('Enter secret length [default 512 (bits)]: ')
+            if not secret_len.strip():
+                secret_len = 512
+            else:
+                try:
+                    secret_len = int(secret_len)
+                    if secret_len % 8 != 0:
+                        utils.printwrn('No. bits should be divisible by 8 ... ')
+                        continue
+                except ValueError:
+                    utils.printerr('Enter a valid number!')
+                    continue
+            break
+        f.write(json.dumps(dict(secret=base64.b64encode(secrets.token_bytes(secret_len//8)).decode())))
 
 def start(shell: pash.shell.Shell, channel: Channel) -> None:
     """
