@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FormEvent } from 'react';
 import '../style/global.scss';
 import style from './BaseLayout.module.scss';
 import Popup from '../components/Popup';
@@ -39,7 +39,8 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
     this.loginPopup.show();
   }
 
-  private onLogin (): void {
+  private onLogin (e: React.FormEvent): void {
+    e.preventDefault();
     const [ uname, pwd ] = [ this.loginUname.value.trim(), this.loginPassw.value ];
     if (!uname || !pwd) return this.setState({ loginError: 'Please enter both username and password!', });
     this.context.login(uname, pwd)
@@ -81,9 +82,11 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
                       borderBottom: '3px solid #072435',
                       marginBottom: '10px',
                     }}>Login</h1>
-                    <FancyInput ref={e => this.loginUname = e} type="text" hint="What's your username?" />
-                    <FancyInput ref={e => this.loginPassw = e} type="password" hint="What's your password?" />
-                    <FancyInput type="submit" value="Login" onClick={this.onLogin.bind(this)} />
+                    <form onSubmit={this.onLogin.bind(this)}>
+                      <FancyInput ref={e => this.loginUname = e} type="text" hint="What's your username?" />
+                      <FancyInput ref={e => this.loginPassw = e} type="password" hint="What's your password?" />
+                      <FancyInput type="submit" value="Login" />
+                    </form>
                     <div style={{
                       display: this.state.loginError ? 'block' : 'none',
                       backgroundColor: 'rgba(242, 29, 58, .15)',

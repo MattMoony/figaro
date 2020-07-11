@@ -5,10 +5,12 @@
   "main": "dist/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon",
+    "dev:nodemon": "npm run build && electron .",
     "dev:web": "cd web && npm run dev",
     "build": "tsc",
     "build:web": "cd web && npm run build",
-    "start": "electron .",
+    "start": "cross-env NODE_ENV=production node dist/main.js",
     "start:web": "cd web && npm start"
   },
   "repository": {
@@ -22,8 +24,10 @@
   },
   "homepage": "https://github.com/MattMoony/figaro#readme",
   "devDependencies": {
+    "@types/electron": "^1.6.10",
     "@types/react": "^16.9.41",
-    "electron": "^9.0.5",
+    "cross-env": "^7.0.2",
+    "electron": "^9.1.0",
     "tsc": "^1.20150623.0",
     "typescript": "^3.9.5"
   }

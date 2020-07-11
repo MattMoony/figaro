@@ -12,10 +12,11 @@
     font-family: "Playfair Display", serif;
     margin: 0;
     transition: 0.2s ease;
+    user-select: none;
 
     &:hover {
       cursor: default;
-      text-shadow: 0 0 0.5px #eef1ff;
+      text-shadow: 0 0 .5px #eef1ff;
     }
   }
 

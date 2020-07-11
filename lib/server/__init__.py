@@ -25,7 +25,8 @@ def verify_tkn(req: Dict[str, Any]) -> bool:
     try:
         tkn = jwt.decode(req['tkn'], conf['secret'], algorithms=['HS256'], options={'require': ['exp', 'uname',]})
         return bool(User.load(tkn['uname']))
-    except (jwt.ExpiredSignatureError, jwt.InvalidAlgorithmError, jwt.InvalidSignatureError, KeyError) as e:
+    # except (jwt.ExpiredSignatureError, jwt.InvalidAlgorithmError, jwt.InvalidSignatureError, KeyError) as e:
+    except Exception:
         return False
 
 async def send_audio(ws: websockets.server.WebSocketServerProtocol, scale: float):

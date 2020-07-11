@@ -10,6 +10,7 @@ function createWindow (): void {
   });
   win.webContents.openDevTools();
   win.removeMenu();
+  win.loadURL('http://localhost:9000');
 }
 
 app.whenReady().then(createWindow);
