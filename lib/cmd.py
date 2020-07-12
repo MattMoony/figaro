@@ -101,6 +101,30 @@ def on_show_sounds(cmd: pcmd.Command, args: List[str], json: bool) -> None:
         'sounds': list(map(lambda s: s.toJSON(), ch.get_sounds())),
     }))
 
+def on_show_all_sounds(cmd: pcmd.Command, args: List[str], json: bool) -> None:
+    """Callback for `show sounds all` - shows all available sounds"""
+    spath = os.path.join(params.BPATH, 'res', 'sounds')
+    if not os.path.isdir(spath):
+        if not json:
+            utils.printerr(f'Directory "{spath}" doesn\'t exist ... ')
+        else:
+            print(JSON.dumps({ 'error': f'Directory "{spath}" doesn\'t exist ... '}))
+        return
+    sounds = [s for s in os.listdir(spath) if os.path.isfile(os.path.join(spath, s)) and s.split('.')[-1] in params.ALLOWED_EXTS]
+    if not sounds:
+        if not json:
+            utils.printwrn('No sounds available ... ')
+        else:
+            print(JSON.dumps({ 'error': 'No sounds available ... '}))
+        return
+    if not json:
+        print('Available sounds:\n - ', end='')
+        print('\n - '.join(sounds))
+        return
+    print(JSON.dumps({
+        'sounds': sounds,
+    }))
+
 def on_show_interpreters(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `show interpreters` - shows all running interpreters"""
     if not interpreters:
@@ -148,13 +172,16 @@ def on_show_all_filters(cmd: pcmd.Command, args: List[str], json: bool) -> None:
         'filters': fs,
     }))
 
-def on_start_sound(cmd: pcmd.Command, args: List[str], params: List[str]) -> None:
+def on_start_sound(cmd: pcmd.Command, args: List[str], parameters: List[str]) -> None:
     """Callback for `start sound` - adds a sound effect"""
-    for i, a in enumerate(params):
+    for i, a in enumerate(parameters):
         if re.match(r'^[\d\.]*$', a):
             continue
         if not os.path.isfile(a):
+            a = os.path.join(params.BPATH, 'res', 'sounds', a)
+        if not os.path.isfile(a):
             utils.printerr('File "{}" doesn\'t exist ... '.format(a))
+            continue
         try:
             if i+1 < len(args) and re.match(r'^[\d\.]+$', args[i+1]):
                 ch.add_sound(Sound(a, float(args[i+1])))
@@ -350,15 +377,17 @@ def start() -> None:
         _with_json(pcmd.Command('devices', 'dev', callback=on_show_devices, hint='List all devices ... ')),
         show_audio,
         _with_json(pcmd.Command('status', 'stat', callback=on_show_status, hint='Show the audio channel\'s status ... ')),
-        _with_json(pcmd.Command('sounds', callback=on_show_sounds, hint='List all currently playing sounds ... ')),
-        pcmd.Command('interpreters', 'in', callback=on_show_interpreters, hint='List all running interpreters ... '),
+        _with_json(pcmd.CascCommand('sounds', cmds=[
+            _with_json(pcmd.Command('all', 'a', callback=on_show_all_sounds, hint='List all available sounds ... ')),
+        ], callback=on_show_sounds, hint='List all currently playing sounds ... ')),
+        pcmd.Command('interpreters', 'in', callback=on_show_interpreters, hint='List all running/available interpreters ... '),
         _with_json(pcmd.CascCommand('filters', 'fil', cmds=[
             _with_json(pcmd.Command('all', 'a', callback=on_show_all_filters, hint='List all available voice filters ... ')),
         ], callback=on_show_running_filters, hint='List all running/available voice filters ... ')),
     ], hint='Show info ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     start_sound = pcmd.Command('sound', callback=on_start_sound, hint='Play a soundeffect ... ')
-    start_sound.add_arg('params', type=str, nargs='*', help='Specify the filenames & volumes ... ')
+    start_sound.add_arg('parameters', type=str, nargs='*', help='Specify the filenames & volumes ... ')
     start_output = pcmd.Command('output', 'ost', callback=on_start_output, hint='Add an output device ... ')
     start_output.add_arg('indo', type=int, help='Specify the output device\'s index ... ')
     start_input = pcmd.Command('input', 'ist', callback=on_start_input, hint='Add an input device ... ')

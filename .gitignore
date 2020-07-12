@@ -4,6 +4,9 @@ __pycache__
 tmp
 res/*
 !res/.gitkeep
+!res/sounds
+res/sounds/*
+!res/sounds/.gitkeep
 lib/server/conf.json
 node_modules
 .next

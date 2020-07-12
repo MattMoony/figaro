@@ -68,9 +68,7 @@ class Sound(object):
     def get_playtime(self) -> str:
         """Gets the remaining playtime as a string"""
         s = self.nframes/self.srate
-        m = s//60
-        s %= 60
-        return '{:02d}:{:05.2f}'.format(m, s)
+        return f'{int(s//60):02d}:{s%60:05.2f}'
 
     def get_totalplaytime(self) -> str:
         """Gets the total playtime as a string"""
