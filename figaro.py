@@ -37,12 +37,12 @@ d88'      d88' `?88P'`88b`?88P'`88bd88'     `?8888P'
         cmd.on_start_interpreter(None, [], args.file)
     if args.ist:
         for ind in args.ist.split(','):
-            cmd.on_start_input(None, [], int(ind))
+            cmd.on_start_input(None, [], int(ind), json=False)
     if args.ost:
         for ind in args.ost.split(','):
-            cmd.on_start_output(None, [], int(ind))
+            cmd.on_start_output(None, [], int(ind), json=False)
     if args.ist and args.ost:
-        cmd.on_start(None, [])
+        cmd.on_start(None, [], json=False)
     if args.server:
         cmd.on_start_server(None, [])
         
