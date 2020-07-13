@@ -67,6 +67,9 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
   public static id: string = Date.now() + Math.random().toString(36).substr(1,8);
   public static dURL: string = 'ws://localhost:51966';
 
+  private sock: WebSocket;
+  private resolvers: ((res: object)=>void)[] = [];
+
   constructor (props) {
     super(props);
     this.state = {
@@ -97,8 +100,8 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
   private waitUntilOpen (sock: WebSocket): Promise<void> {
     return new Promise((resolve, reject) => {
       if (sock.readyState !== sock.OPEN) {
-        sock.onopen = () => resolve();
-        sock.onerror = e => [sock.CLOSING, sock.CLOSED].includes(sock.readyState) && reject(e);
+        sock.addEventListener('open', () => resolve());
+        sock.addEventListener('error', e => [sock.CLOSING, sock.CLOSED].includes(sock.readyState) && reject(e));
         return;
       }
       resolve();
@@ -106,14 +109,17 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
   }
 
   private req<T extends Response> (cmd: string, body: object): Promise<T> {
+    if (!this.sock) {
+      this.sock = new WebSocket(AppProvider.dURL);
+      this.sock.onmessage = (e: MessageEvent) => {
+        if (!this.resolvers.length) return;
+        this.resolvers.shift()(JSON.parse(e.data));
+      };
+    }
     return new Promise((resolve, reject) => {
-      const sock: WebSocket = new WebSocket(AppProvider.dURL);
-      this.waitUntilOpen(sock).then(() => {
-        sock.onmessage = (e: MessageEvent) => {
-          sock.close();
-          resolve(JSON.parse(e.data) as T);
-        };
-        sock.send(JSON.stringify({ cmd, id: AppProvider.id, tkn: this.state.tkn, ...body, }));
+      this.waitUntilOpen(this.sock).then(() => {
+        this.resolvers.push((res: object) => resolve(res as T));
+        this.sock.send(JSON.stringify({ cmd, id: AppProvider.id, tkn: this.state.tkn, ...body, }));
       }).catch(reject);
     });
   }
