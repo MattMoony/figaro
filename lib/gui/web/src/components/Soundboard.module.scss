@@ -10,18 +10,45 @@
         align-items: center;
         min-width: 3em;
         min-height: 3em;
+        border: none;
         border-radius: 50%;
         background-color: #0B3954;
         box-shadow: 0 0 3px #0B3954;
         margin: 2.5px;
         color: #2e6f97;
         text-shadow: 0 0 4px #2e6f97;
+        position: relative;
         transition: .2s ease;
 
         &:hover {
             cursor: pointer;
             transform: scale(1.1);
             box-shadow: 0 0 8px #0B3954;
+        }
+
+        &:focus {
+            outline: none;
+                    
+            @keyframes waves {
+                from { transform: scale(  1); opacity: .7; }
+                to   { transform: scale(1.5); opacity:  0; }
+            }
+
+            &::after {
+                animation: waves .4s ease-out 0s 1 forwards;
+            }
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            min-width: 3em;
+            min-height: 3em;
+            background-color: #0B3954;
+            border-radius: 50%;
+            z-index: -1;
         }
     }
 }

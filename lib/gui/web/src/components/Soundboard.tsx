@@ -32,6 +32,10 @@ export default class Soundboard extends React.Component<SoundboardProps, Soundbo
       });
   }
 
+  private onPlaySound (sound: string): void {
+    this.context.req<Response>(`start sound ${sound}`, {});
+  }
+
   public render () {
     return (
       <AppConsumer>
@@ -39,7 +43,7 @@ export default class Soundboard extends React.Component<SoundboardProps, Soundbo
           this.context = ctx;
           return (
             <div className={style.root}>
-              { this.state.sounds.map(s => <div className={style.sound} key={s} title={s}>{s[0].toUpperCase()}</div>) }
+              { this.state.sounds.map(s => <button className={style.sound} key={s} title={s} onClick={() => this.onPlaySound(s)}>{s[0].toUpperCase()}</button>) }
             </div>
           );
         }}

@@ -172,7 +172,7 @@ def on_show_all_filters(cmd: pcmd.Command, args: List[str], json: bool) -> None:
         'filters': fs,
     }))
 
-def on_start_sound(cmd: pcmd.Command, args: List[str], parameters: List[str]) -> None:
+def on_start_sound(cmd: pcmd.Command, args: List[str], parameters: List[str], json: bool) -> None:
     """Callback for `start sound` - adds a sound effect"""
     for i, a in enumerate(parameters):
         if re.match(r'^[\d\.]*$', a):
@@ -180,15 +180,24 @@ def on_start_sound(cmd: pcmd.Command, args: List[str], parameters: List[str]) ->
         if not os.path.isfile(a):
             a = os.path.join(params.BPATH, 'res', 'sounds', a)
         if not os.path.isfile(a):
-            utils.printerr('File "{}" doesn\'t exist ... '.format(a))
-            continue
+            if not json:
+                utils.printerr(f'File "{a}" doesn\'t exist ... ')
+                continue
+            else:
+                print(JSON.dumps({ 'error': f'File "{a}" doesn\'t exist ... "', }))
+                return
         try:
             if i+1 < len(args) and re.match(r'^[\d\.]+$', args[i+1]):
                 ch.add_sound(Sound(a, float(args[i+1])))
                 continue
             ch.add_sound(Sound(a))
         except Exception as e:
-            utils.printerr(str(e))
+            if not json:
+                utils.printerr(str(e))
+            else:
+                print(JSON.dumps({ 'error': str(e), }))
+        if json:
+            print(JSON.dumps({}))
 
 def on_start_output(cmd: pcmd.Command, args: List[str], indo: int, json: bool) -> None:
     """Callback for `start output` - adds an output device"""
@@ -398,7 +407,7 @@ def start() -> None:
     start_filter.add_arg('name', type=str, help='Specify the filter\'s name ... ')
     start_filter.add_arg('cargs', nargs='*', help='Specify the filter\'s arguments ... ')
     sh.add_cmd(_with_json(pcmd.CascCommand('start', cmds=[
-        start_sound,
+        _with_json(start_sound),
         _with_json(start_output),
         _with_json(start_input),
         start_interpreter,
