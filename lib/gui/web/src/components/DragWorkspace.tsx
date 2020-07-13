@@ -97,10 +97,11 @@ export default class DragWorkspace extends React.Component<DragWorkspaceProps, D
                 display: this.state.contextMenu ? 'block' : 'none',
                 left: this.state.cx + 'px',
                 top: this.state.cy + 'px',
+                zIndex: this.winAmount()+1,
               }}>
                 { Array.from(this.props.windows).map(w => 
                     w&&w.props.title&&
-                    <div key={w.props.title} onClick={() => w.state.visible ? w.hide() : w.show()}>
+                    <div key={w.props.title} onClick={(e: React.MouseEvent) => w.state.visible ? w.hide() : w.show(e.clientX-this.size.left, e.clientY-this.size.top)}>
                       <i style={{
                         opacity: w.state.visible ? 1 : 0,
                       }}><FontAwesomeIcon icon={faCheck} /></i>

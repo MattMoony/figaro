@@ -1,0 +1,27 @@
+.root {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+
+    .sound {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 3em;
+        min-height: 3em;
+        border-radius: 50%;
+        background-color: #0B3954;
+        box-shadow: 0 0 3px #0B3954;
+        margin: 2.5px;
+        color: #2e6f97;
+        text-shadow: 0 0 4px #2e6f97;
+        transition: .2s ease;
+
+        &:hover {
+            cursor: pointer;
+            transform: scale(1.1);
+            box-shadow: 0 0 8px #0B3954;
+        }
+    }
+}

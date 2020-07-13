@@ -6,6 +6,7 @@ import DragWindow from '../components/DragWindow';
 import AudioWave from '../components/AudioWave';
 import { AppConsumer, AppContextProps } from '../components/AppContext';
 import Controls from '../components/Controls';
+import Soundboard from '../components/Soundboard';
 
 class Index extends React.Component {
   private windows: Set<DragWindow> = new Set();
@@ -21,7 +22,11 @@ class Index extends React.Component {
             <DragWorkspace windows={this.windows}>
               <DragWindow ref={e => this.windows.add(e)} icon={faPlus} title="Filters">
               </DragWindow>
-              <DragWindow ref={e => this.windows.add(e)} icon={faDrum} title="Sounds">
+              <DragWindow ref={e => this.windows.add(e)} icon={faDrum} title="Sounds" style={{
+                maxWidth: '350px',
+                maxHeight: '400px',
+              }}>
+                <Soundboard />
               </DragWindow>
               <DragWindow ref={e => this.windows.add(e)} icon={faWaveSquare} title="Audio Wave" style={{
                 width: '60%',

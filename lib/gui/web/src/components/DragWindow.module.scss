@@ -1,9 +1,11 @@
 .root {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    align-items: stretch;
     position: absolute;
     border-radius: 6px 6px 0 0;
     box-shadow: 1px 1px 4px #072435;
-    overflow: hidden;
     background-color: #0F4D72;
 
     .head {
@@ -44,7 +46,23 @@
     }
 
     .body {
+        flex-grow: 1;
         padding: 7.5px;
         position: relative;
+        height: 100%;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background-color: rgba(0,0,0,.3);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: #1a6594;
+            border-radius: 5px;
+        }
     }
 }

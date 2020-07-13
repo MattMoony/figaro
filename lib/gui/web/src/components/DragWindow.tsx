@@ -70,10 +70,18 @@ export default class DragWindow extends React.Component<DragWindowProps, DragWin
     });
   }
 
-  public show (): void {
+  public show();
+  public show(x: number, y: number);
+
+  public show (x?: number, y?: number): void {
+    this.workspace.allWindowsBackground();
+    this.intoForeground();
     this.setState({
       visible: true,
-    }, () => this.props.onShow ? this.props.onShow() : {});
+    }, () => {
+      this.setPos(x, y);
+      if (this.props.onShow) this.props.onShow();
+    });
   }
 
   public hide (): void {
@@ -113,7 +121,7 @@ export default class DragWindow extends React.Component<DragWindowProps, DragWin
       <div ref={e => this.root = e} className={style.root} style={{
         left: this.state.x + 'px',
         top: this.state.y + 'px',
-        display: this.state.visible ? 'inline-block' : 'none',
+        display: this.state.visible ? 'flex' : 'none',
         ...(this.props.style ? this.props.style : {}),
       }} onContextMenu={e => e.stopPropagation()}>
         <div className={style.head} onMouseDown={this.moveStart.bind(this)} onMouseUp={this.moveEnd.bind(this)}>
