@@ -24,6 +24,8 @@ interface DragWindowState {
 export default class DragWindow extends React.Component<DragWindowProps, DragWindowState> {
   private root: HTMLDivElement;
   private workspace: DragWorkspace;
+  
+  public zMin: number;
 
   constructor (props) {
     super(props);
@@ -35,6 +37,10 @@ export default class DragWindow extends React.Component<DragWindowProps, DragWin
       moving: false,
       visible: false,
     };
+  }
+
+  public componentDidMount () {
+    this.zIndex(this.zMin);
   }
   
   public setWorkspace (workspace: DragWorkspace) {
@@ -48,11 +54,11 @@ export default class DragWindow extends React.Component<DragWindowProps, DragWin
   }
 
   public intoBackground (): void {
-    this.zIndex(Math.max(0, +this.root.style.zIndex - 1));
+    this.zIndex(Math.max(this.zMin, +this.root.style.zIndex - 1));
   }
 
   public intoForeground (): void {
-    this.zIndex(this.workspace.winAmount());
+    this.zIndex(this.workspace.winAmount()+this.zMin);
   }
 
   public setPos (): void;

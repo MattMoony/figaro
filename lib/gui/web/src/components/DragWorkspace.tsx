@@ -7,6 +7,7 @@ import { AppConsumer } from './AppContext';
 
 interface DragWorkspaceProps {
   windows: Set<DragWindow>;
+  zMin?: number;
 }
 
 interface DragWorkspaceState {
@@ -31,7 +32,8 @@ export default class DragWorkspace extends React.Component<DragWorkspaceProps, D
   public componentDidMount (): void {
     this.props.windows.forEach(w => {
       w.setWorkspace(this);
-      w.setPos();
+      w.zMin = this.props.zMin || 0;
+      // w.setPos();
     });
     window.addEventListener('click', this.hideContextMenu.bind(this));
   }

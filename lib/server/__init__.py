@@ -41,6 +41,17 @@ async def send_audio(ws: websockets.server.WebSocketServerProtocol, scale: float
             return
         await asyncio.sleep(0.05)
 
+async def send_sounds(ws: websockets.server.WebSocketServerProtocol):
+    """
+    Regularly sends the currently running sounds.
+    """
+    while True:
+        try:
+            await ws.send(json.dumps(list(map(lambda s: s.toJSON(), ch.get_sounds()))))
+        except websockets.exceptions.ConnectionClosed:
+            return
+        await asyncio.sleep(0.1)
+
 async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None:
     """
     Actually dispatch the websocket-requests.
@@ -102,11 +113,21 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
                         continue
                     asyncio.ensure_future(send_audio(ws, req['scale']))
                     continue
+                if req['cmd'] == 'get-sounds':
+                    asyncio.ensure_future(send_sounds(ws))
+                    continue
                 stdout = sys.stdout
                 sys.stdout = cmdout = StringIO()
                 sh.parse(req['cmd'].strip() + ' --json')
                 sys.stdout = stdout
-                out = json.loads(cmdout.getvalue())
+                try:
+                    out = json.loads(cmdout.getvalue())
+                except json.decoder.JSONDecodeError:
+                    await ws.send(json.dumps({
+                        'success': False,
+                        'msg': 'Internal Server Error!',
+                    }))
+                    continue
                 await ws.send(json.dumps({
                     'success': 'error' not in out.keys(),
                     'msg': out['error'] if 'error' in out.keys() else None,
