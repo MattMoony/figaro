@@ -7,6 +7,7 @@ export interface AppContextProps {
   error?: Error;
   login: (uname: string, pwd: string) => Promise<void>;
   logout: () => void;
+  onLogin: (cb: ()=>void)=>void;
   waitUntilOpen: (sock: WebSocket) => Promise<void>;
   req: <T extends Response>(cmd: string, body: object) => Promise<T>;
   uname?: () => string;
@@ -22,6 +23,7 @@ const AppContext: React.Context<AppContextProps> = React.createContext<AppContex
   status: { input: [], output: [], running: false, },
   login: (uname: string, pwd: string) => new Promise((resolve, reject) => resolve()),
   logout: () => {},
+  onLogin: (cb: ()=>void)=>{},
   waitUntilOpen: () => new Promise((resolve, reject) => resolve()),
   req: <T extends Response>(cmd: string, body: object) => new Promise((resolve, reject) => resolve(null)),
   conf: () => new Promise((resolve, reject) => resolve(null)),
@@ -34,6 +36,7 @@ const AppContext: React.Context<AppContextProps> = React.createContext<AppContex
 export default AppContext;
 
 export interface Response {
+  rid: string;
   success: boolean;
   msg?: string;
 };
@@ -68,7 +71,8 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
   public static dURL: string = 'ws://localhost:51966';
 
   private sock: WebSocket;
-  private resolvers: ((res: object)=>void)[] = [];
+  private resolvers: { [key: string]: (res: object)=>void } = {};
+  private cbs: (()=>void)[] = [];
 
   constructor (props) {
     super(props);
@@ -77,6 +81,7 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
       status: { input: [], output: [], running: false, },
       login: this.login.bind(this),
       logout: this.logout.bind(this),
+      onLogin: this.onLogin.bind(this),
       waitUntilOpen: this.waitUntilOpen.bind(this),
       req: this.req.bind(this),
       uname: this.uname.bind(this),
@@ -112,14 +117,17 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
     if (!this.sock) {
       this.sock = new WebSocket(AppProvider.dURL);
       this.sock.onmessage = (e: MessageEvent) => {
-        if (!this.resolvers.length) return;
-        this.resolvers.shift()(JSON.parse(e.data));
+        const rid: string = JSON.parse(e.data).rid;
+        if (!Object.keys(this.resolvers).includes(rid)) return;
+        this.resolvers[rid](JSON.parse(e.data));
+        delete this.resolvers[rid];
       };
     }
     return new Promise((resolve, reject) => {
       this.waitUntilOpen(this.sock).then(() => {
-        this.resolvers.push((res: object) => resolve(res as T));
-        this.sock.send(JSON.stringify({ cmd, id: AppProvider.id, tkn: this.state.tkn, ...body, }));
+        const tmstmp: number = Date.now();
+        this.resolvers[btoa(cmd + tmstmp)] = (res: object) => resolve(res as T);
+        this.sock.send(JSON.stringify({ cmd, id: AppProvider.id, tkn: this.state.tkn, timestamp: tmstmp, ...body, }));
       }).catch(reject);
     });
   }
@@ -134,6 +142,7 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
         if (!res.logged_in) {
           this.logout();
         }
+        this.cbs.forEach(cb => cb());
         resolve(res.logged_in);
       }).catch(reject);
     });
@@ -151,6 +160,7 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
           tkn: res.tkn!,
         }, () => {
           localStorage.setItem('tkn', this.state.tkn);
+          this.cbs.forEach(cb => cb());
           resolve();
         });
       }).catch(reject);
@@ -162,6 +172,10 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
       tkn: undefined,
       authenticated: false,
     }, () => localStorage.removeItem('tkn'));
+  }
+
+  private onLogin (cb: ()=>void): void {
+    this.cbs.push(cb);
   }
 
   private uname (): string {

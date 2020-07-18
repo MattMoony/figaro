@@ -63,12 +63,16 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
             except json.decoder.JSONDecodeError:
                 continue
             try:
+                rid = ''
+                if 'timestamp' in req.keys():
+                    rid = base64.b64encode((req['cmd'] + str(req['timestamp'])).encode()).decode()
                 if req['cmd'] == 'auth':
                     u = User.load(req['uname'])
                     if not u:
                         await ws.send(json.dumps({
                             'success': False,
-                            'msg': 'Unknown user!'
+                            'msg': 'Unknown user!',
+                            'rid': rid,
                         }))
                         continue
                     if u.verify(req['pwd']):
@@ -78,30 +82,35 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
                                     'uname': u.uname, 
                                     'exp': datetime.datetime.utcnow() + datetime.timedelta(days=30),
                                 }, conf['secret'], algorithm='HS256').decode(),
+                            'rid': rid,
                         }))
                     else:
                         await ws.send(json.dumps({
                             'success': False,
                             'msg': 'Wrong password provided!',
+                            'rid': rid,
                         }))
                     continue
                 if req['cmd'] == 'auth-status':
                     await ws.send(json.dumps({
                         'success': True,
                         'logged_in': verify_tkn(req),
+                        'rid': rid,
                     }))
                     continue
                 if not verify_tkn(req):
                     await ws.send(json.dumps({
                         'success': False,
                         'msg': 'Authentication failed!',
+                        'rid': rid,
                     }))
                 if req['cmd'] == 'get-conf':
                     await ws.send(json.dumps({
                         'success': True,
                         'BUF': params.BUF,
                         'SMPRATE': params.SMPRATE,
-                        'CHNNLS': params.CHNNLS
+                        'CHNNLS': params.CHNNLS,
+                        'rid': rid,
                     }))
                     continue
                 if req['cmd'] == 'get-audio':
@@ -126,17 +135,20 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
                     await ws.send(json.dumps({
                         'success': False,
                         'msg': 'Internal Server Error!',
+                        'rid': rid,
                     }))
                     continue
                 await ws.send(json.dumps({
                     'success': 'error' not in out.keys(),
                     'msg': out['error'] if 'error' in out.keys() else None,
+                    'rid': rid,
                     **{k: v for k, v in out.items() if k != 'error'},
                 }))
             except KeyError as e:
                 await ws.send(json.dumps({
                     'success': False,
                     'msg': 'Internal Server Error!',
+                    'rid': rid,
                 }))
     except websockets.exceptions.ConnectionClosed:
         return

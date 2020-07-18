@@ -3,6 +3,7 @@ import style from './SoundsStatus.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMusic, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AppConsumer, AppContextProps, AppProvider, Response } from './AppContext';
+import { array } from 'prop-types';
 
 interface FigaroSound {
   name: string;
@@ -35,8 +36,11 @@ export default class SoundsStatus extends React.Component<SoundsStatusProps, Sou
     const sock: WebSocket = new WebSocket(AppProvider.dURL);
     this.context.waitUntilOpen(sock).then(() => {
       sock.onmessage = (e: MessageEvent) => {
+        const sounds: object = JSON.parse(e.data);
+        console.log(sounds);
+        if (!(sounds instanceof Array)) return;
         this.setState({
-          sounds: (JSON.parse(e.data) as FigaroSound[]),
+          sounds: (sounds as FigaroSound[]),
         });
       };
       sock.send(JSON.stringify({ cmd: 'get-sounds', id: AppProvider.id, tkn: this.context.tkn!, }));
