@@ -90,7 +90,21 @@ _soon to be implemented and documented_
 
 #### Sounds
 
-_soon to be implemented and documented_
+The "Sounds" workspace component grands you full control over all sound files located in the default directory `res/sounds`. The component window itself consists of several buttons, depending on the amount of sound effects you have. By pressing one of the buttons, you start the corresponding sound effect.
+
+<p align="center">
+  <img src="../media/gui/sounds-window.JPG">
+</p>
+
+_To be able to differentiate between sound effects, the full filename is displayed when hovering over a button._
+
+To see which sound effects are currently playing and how long they will be playing for, all one has to do is to look to the bottom right corner of the workspace - a list of all sound effects and their individual progress will be displayed here.
+
+<p align="center">
+  <img src="../media/gui/sounds-status.JPG">
+</p>
+
+As you can probably imagine, the individual `x`s next to the sound effects' names are for stopping that sound effect, whereas the red `Stop all` button at the bottom is for stopping all currently playing sound effects (unbelievable, I know ^^).
 
 #### Audio Wave
 
