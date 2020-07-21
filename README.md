@@ -152,7 +152,7 @@ Just a small preview of what is about to come. It's very likely that this roadma
   * [x] I/O device selection
   * [x] Live sound wave graph
   * [ ] Filter control
-  * [ ] Soundboard
+  * [x] Soundboard
 * [ ] Filters
   * [x] Volume
   * [x] Pitch-Shift
