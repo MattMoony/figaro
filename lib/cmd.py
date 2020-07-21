@@ -260,21 +260,29 @@ def on_start_server(cmd: pcmd.Command, args: List[str]) -> None:
         server.create_conf_prompt()
     server.start(sh, ch)
 
-def on_stop_sound(cmd: pcmd.Command, args: List[str], ind: str) -> None:
+def on_stop_sound(cmd: pcmd.Command, args: List[str], ind: str, json: bool) -> None:
     """Callback for `stop sound` - removes a sound effect"""
     if ind.lower() in ('a', 'all'):
         ch.del_all_sounds()
-        return
-    try:
-        ind = int(ind)
-    except ValueError:
-        utils.printerr('"{}" is not a valid index!'.format(ind))
-        return
-    mxind = len(ch.get_sounds())-1
-    if ind > mxind:
-        utils.printerr('Index {} is out of bounds (max: {})!'.format(ind, mxind))
-        return
-    ch.del_sound(ind)
+    else:
+        try:
+            ind = int(ind)
+        except ValueError:
+            if not json:
+                utils.printerr(f'"{ind} is not a valid index!')
+            else:
+                print(JSON.dumps({ 'error': f'"{ind} is not a valid index!' }))
+            return
+        mxind = len(ch.get_sounds())-1
+        if ind > mxind:
+            if not json:
+                utils.printerr(f'Index {ind} is out of bounds (max: {mxind})!')
+            else:
+                print(JSON.dumps({ 'error': f'Index {ind} is out of bounds (max: {mxind})!' }))
+            return
+        ch.del_sound(ind)
+    if json:
+        print(JSON.dumps({}))
 
 def on_stop_output(cmd: pcmd.Command, args: List[str], indo: int, json: bool) -> None:
     """Callback for `stop output` - removes an output device"""
@@ -426,7 +434,7 @@ def start() -> None:
     stop_filter = pcmd.Command('filter', 'fil', callback=on_stop_filter, hint='Stop a running filter ... ')
     stop_filter.add_arg('ind', type=str, help='Specify the filter\'s index ... ')
     sh.add_cmd(_with_json(pcmd.CascCommand('stop', 'kill', cmds=[
-        stop_sound,
+        _with_json(stop_sound),
         _with_json(stop_output),
         _with_json(stop_input),
         stop_interpreter,

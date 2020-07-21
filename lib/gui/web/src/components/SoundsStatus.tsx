@@ -37,7 +37,6 @@ export default class SoundsStatus extends React.Component<SoundsStatusProps, Sou
     this.context.waitUntilOpen(sock).then(() => {
       sock.onmessage = (e: MessageEvent) => {
         const sounds: object = JSON.parse(e.data);
-        console.log(sounds);
         if (!(sounds instanceof Array)) return;
         this.setState({
           sounds: (sounds as FigaroSound[]),
@@ -47,29 +46,38 @@ export default class SoundsStatus extends React.Component<SoundsStatusProps, Sou
     });
   }
 
+  private onStop (id?: number): void {
+    this.context.req<Response>(`stop sound ${id !== undefined ? id : 'a'}`, {});
+  }
+
   public render () {
     return (
       <AppConsumer>
         {ctx => {
           this.context = ctx;
           return (
-            <>
-              { this.state.sounds.map(s => (
-                <div className={style.sound} key={s.name+Math.random().toString(36)}>
-                  <div>
-                    <i><FontAwesomeIcon icon={faMusic}/></i><span>{s.name}</span>
+            <div className={style.root}>
+              <div className={style.sounds}>
+                { this.state.sounds.map((s: FigaroSound, i: number) => (
+                  <div className={style.sound} key={i}>
+                    <div>
+                      <i><FontAwesomeIcon icon={faMusic}/></i><span>{s.name}</span>
+                    </div>
+                    <i onClick={() => this.onStop(i)}><FontAwesomeIcon icon={faTimes}/></i>
+                    <div style={{
+                      width: Math.min(100, (s.cuplay/s.maxplay)*100) + '%',
+                    }}></div>
                   </div>
-                  <i><FontAwesomeIcon icon={faTimes}/></i>
-                  <div style={{
-                    width: Math.min(100, (s.cuplay/s.maxplay)*100) + '%',
-                  }}></div>
-                </div>
-              )) }
-              { this.state.sounds.length ? <div className={style.stop}>
-                  <i><FontAwesomeIcon icon={faTrash}/></i>
-                  Stop all
-                </div> : '' }
-            </>
+                )) }
+              </div>
+              { this.state.sounds.length 
+                ? <div onClick={() => this.onStop()} className={style.stop}>
+                    <i><FontAwesomeIcon icon={faTrash}/></i>
+                    Stop all
+                  </div> 
+                : '' 
+              }
+            </div>
           );
         }}
       </AppConsumer>

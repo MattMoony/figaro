@@ -15,21 +15,6 @@
         min-width: 250px;
         width: 15%;
         max-width: 350px;
-        max-height: 250px;
-        overflow-y: auto;
-
-        &::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        &::-webkit-scrollbar-track {
-            background-color: rgba(0,0,0,.3);
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background-color: #1a6594;
-            border-radius: 5px;
-        }
     }
 
     footer {
