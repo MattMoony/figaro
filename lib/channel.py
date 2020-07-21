@@ -193,7 +193,7 @@ class Channel(Thread):
         """Stop all currently applied filters"""
         self._fil_mut.acquire()
         # self.filters = []
-        for i, f in enumerate(reversed(self.filters)):
+        for i, f in reversed(list(enumerate(self.filters))):
             del self.filters[i]
         self._fil_mut.release()
 
@@ -220,7 +220,7 @@ class Channel(Thread):
         """Stop all currently running sound effects"""
         self._sou_mut.acquire()
         # self.sounds = []
-        for i, f in enumerate(reversed(self.sounds)):
+        for i, f in reversed(list(enumerate(self.sounds))):
             del self.sounds[i]
         self._sou_mut.release()
 
