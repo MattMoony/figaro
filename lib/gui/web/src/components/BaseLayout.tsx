@@ -30,7 +30,10 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
   }
 
   private onShowLogin (): void {
-    if (this.context.authenticated) return this.logoutPopup.show();
+    if (this.context.authenticated) {
+      if (localStorage.getItem('no-logout')) return;
+      return this.logoutPopup.show();
+    }
     this.setState({
       loginError: undefined,
     });

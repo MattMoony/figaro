@@ -3,7 +3,6 @@ import style from './SoundsStatus.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMusic, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AppConsumer, AppContextProps, AppProvider, Response } from './AppContext';
-import { array } from 'prop-types';
 
 interface FigaroSound {
   name: string;

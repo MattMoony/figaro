@@ -1,9 +1,8 @@
 {
-  "name": "gatsby-starter-default",
-  "private": true,
-  "description": "A simple starter to get up and developing quickly with Gatsby",
-  "version": "0.1.0",
-  "author": "Kyle Mathews <mathews.kyle@gmail.com>",
+  "name": "figaro-gui",
+  "description": "The GUI for Figaro built with Gatsby.",
+  "version": "1.0",
+  "author": "MattMoony <m4ttm00ny@gmail.com>",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.29",
     "@fortawesome/free-solid-svg-icons": "^5.13.1",
@@ -31,7 +30,7 @@
   "keywords": [
     "gatsby"
   ],
-  "license": "0BSD",
+  "license": "GPLv3",
   "scripts": {
     "build": "gatsby build",
     "dev": "gatsby develop",
@@ -43,9 +42,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
+    "url": "https://github.com/MattMoony/figaro.git"
   },
   "bugs": {
-    "url": "https://github.com/gatsbyjs/gatsby/issues"
-  }
+    "url": "https://github.com/MattMoony/figaro/issues"
+  },
+  "homepage": "https://github.com/MattMoony/figaro#readme"
 }

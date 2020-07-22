@@ -1,13 +1,12 @@
 import React from 'react';
 import style from './index.module.scss';
-import { faWaveSquare, faPlus, faDrum, faMusic, faGuitar, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faWaveSquare, faPlus, faDrum } from '@fortawesome/free-solid-svg-icons';
 import DragWorkspace from '../components/DragWorkspace';
 import DragWindow from '../components/DragWindow';
 import AudioWave from '../components/AudioWave';
 import { AppConsumer, AppContextProps } from '../components/AppContext';
 import Controls from '../components/Controls';
 import Soundboard from '../components/Soundboard';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SoundsStatus from '../components/SoundsStatus';
 
 class Index extends React.Component {

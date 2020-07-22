@@ -43,6 +43,7 @@ export default class Popup extends React.Component<PopupProps, PopupState> {
     return (
       <div className={style.root} onClick={this.outerClick.bind(this)} style={{
         display: this.state.visible ? 'flex' : 'none',
+        zIndex: 1000,
       }}>
         <div onClick={this.innerClick.bind(this)} style={this.props.style}>
           {this.props.children}
