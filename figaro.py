@@ -3,7 +3,7 @@
 import pash.misc, pash.cmds, sys
 from argparse import ArgumentParser
 
-from figaro import cmd, params
+from figaro import cmd, params, gui
 
 def main():
     parser = ArgumentParser()
@@ -11,6 +11,7 @@ def main():
     parser.add_argument('-i', '--ist', type=str, help='Index of the Input Stream ... ')
     parser.add_argument('-o', '--ost', type=str, help='Index of the Output Stream ... ')
     parser.add_argument('-s', '--server', action='store_true', help='Start listening to websocket commands?')
+    parser.add_argument('-g', '--gui', action='store_true', help='Start the GUI?')
     args = parser.parse_args()
     sys.argv = sys.argv[:1]
 
@@ -39,7 +40,9 @@ d88'      d88' `?88P'`88b`?88P'`88bd88'     `?8888P'
         cmd.on_start(None, [], json=False)
     if args.server:
         cmd.on_start_server(None, [])
-        
+    if args.gui:
+        gui.start()
+
     cmd.start()
     pash.cmds.clear(None, [])
 

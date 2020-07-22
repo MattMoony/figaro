@@ -6,7 +6,7 @@ cr.init()
 from asciimatics.screen import Screen
 from typing import List
 
-from figaro import params, utils, server
+from figaro import params, utils, server, gui
 from figaro.sound import Sound
 from figaro.device import Device
 from figaro.channel import Channel
@@ -32,6 +32,7 @@ def on_exit(cmd: pcmd.Command, args: List[str]) -> None:
         ch.kill()
     ch.kill_all()
     pa.terminate()
+    gui.stop()
     sh.exit()
 
 def on_show_devices(cmd: pcmd.Command, args: List[str], json: bool) -> None:
