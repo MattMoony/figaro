@@ -4,11 +4,11 @@ import struct, time, numpy as np
 from threading import Thread, Lock
 from typing import Any, List, Dict, Optional
 
-from lib import params
-from lib.sound import Sound
-from lib.device import Device
-from lib.transformer import Transformer
-from lib.filters.filter import Filter
+from figaro import params
+from figaro.sound import Sound
+from figaro.device import Device
+from figaro.transformer import Transformer
+from figaro.filters.filter import Filter
 
 class Channel(Thread):
     """

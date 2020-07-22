@@ -6,14 +6,14 @@ cr.init()
 from asciimatics.screen import Screen
 from typing import List
 
-from lib import params, utils, server
-from lib.sound import Sound
-from lib.device import Device
-from lib.channel import Channel
-from lib.interpreter import Interpreter
-from lib.filters.filter import Filter
-from lib.server import db
-from lib.server.models.user import User
+from figaro import params, utils, server
+from figaro.sound import Sound
+from figaro.device import Device
+from figaro.channel import Channel
+from figaro.interpreter import Interpreter
+from figaro.filters.filter import Filter
+from figaro.server import db
+from figaro.server.models.user import User
 
 """The basic prompt for the figaro shell"""
 BPROMPT: str = cr.Fore.LIGHTBLUE_EX + 'figaro' + cr.Fore.LIGHTBLACK_EX + '$ ' + cr.Fore.RESET
@@ -154,10 +154,10 @@ def on_show_running_filters(cmd: pcmd.Command, args: List[str], json: bool) -> N
 
 def on_show_all_filters(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `show filters all` - shows all available voice-filters"""
-    if not os.path.isdir(os.path.join(params.BPATH, 'lib', 'filters')):
-        utils.printerr('Error: Directory "{}" doesn\'t exist ... '.format(os.path.join(params.BPATH, 'lib', 'filters')))
+    if not os.path.isdir(os.path.join(params.BPATH, 'figaro', 'filters')):
+        utils.printerr('Error: Directory "{}" doesn\'t exist ... '.format(os.path.join(params.BPATH, 'figaro', 'filters')))
         return
-    fs = [f[:-3] for f in os.listdir(os.path.join(params.BPATH, 'lib', 'filters')) if os.path.isfile(os.path.join(params.BPATH, 'lib', 'filters', f)) and f != 'filter.py' and f.endswith('.py')]
+    fs = [f[:-3] for f in os.listdir(os.path.join(params.BPATH, 'figaro', 'filters')) if os.path.isfile(os.path.join(params.BPATH, 'figaro', 'filters', f)) and f != 'filter.py' and f.endswith('.py')]
     if not fs:
         if not json:
             utils.printwrn('No filters available ... ')
@@ -233,11 +233,11 @@ def on_start_interpreter(cmd: pcmd.Command, args: List[str], fname: str) -> None
 
 def on_start_filter(cmd: pcmd.Command, args: List[str], name: str, cargs: List[str]) -> None:
     """Callback for `start interpreter` - interprets a .fig file"""
-    fs = [f[:-3] for f in os.listdir(os.path.join(params.BPATH, 'lib', 'filters')) if os.path.isfile(os.path.join(params.BPATH, 'lib', 'filters', f)) and f != 'filter.py' and f.endswith('.py')]
+    fs = [f[:-3] for f in os.listdir(os.path.join(params.BPATH, 'figaro', 'filters')) if os.path.isfile(os.path.join(params.BPATH, 'figaro', 'filters', f)) and f != 'filter.py' and f.endswith('.py')]
     if name not in fs:
         utils.printerr(f'Error: Unknown filter "{name}" ... ')
         return
-    spec = importlib.util.spec_from_file_location(name, os.path.join(params.BPATH, 'lib', 'filters', f'{name}.py'))
+    spec = importlib.util.spec_from_file_location(name, os.path.join(params.BPATH, 'figaro', 'filters', f'{name}.py'))
     filt = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(filt)
     try:

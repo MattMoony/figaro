@@ -3,22 +3,16 @@
 import pash.misc, pash.cmds, sys
 from argparse import ArgumentParser
 
-from lib import cmd, params
+from figaro import cmd, params
 
 def main():
     parser = ArgumentParser()
-    # parser.add_argument('-g', '--gui', action='store_true', help='Use GUI?')
     parser.add_argument('-f', '--file', type=str, help='A .fig file to be interpreted ... ')
     parser.add_argument('-i', '--ist', type=str, help='Index of the Input Stream ... ')
     parser.add_argument('-o', '--ost', type=str, help='Index of the Output Stream ... ')
     parser.add_argument('-s', '--server', action='store_true', help='Start listening to websocket commands?')
     args = parser.parse_args()
     sys.argv = sys.argv[:1]
-
-    # if args.gui:
-    #     from lib import gui
-    #     gui.start()
-    #     os._exit(0)
 
     pash.cmds.clear(None, [])
     pash.misc.fancy_print("""   ,d8888b  d8,                                     

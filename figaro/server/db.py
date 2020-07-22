@@ -3,7 +3,7 @@
 import sqlite3
 from typing import List, Tuple, Optional, Any, Union
 
-from lib import params
+from figaro import params
 
 def connect(db_path: str = params.DB_PATH) -> Tuple[sqlite3.Connection, sqlite3.Cursor]:
     """

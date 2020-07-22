@@ -1,7 +1,7 @@
 {
   "name": "figaro-gui",
   "description": "The GUI for Figaro built with Gatsby.",
-  "version": "1.0",
+  "version": "0.1.0",
   "author": "MattMoony <m4ttm00ny@gmail.com>",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.29",

@@ -4,8 +4,8 @@ import argon2
 from getpass import getpass
 from typing import List, Union
 
-from lib import utils
-from lib.server import db
+from figaro import utils
+from figaro.server import db
 
 class User(object):
     """

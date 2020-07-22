@@ -7,7 +7,7 @@ res/*
 !res/sounds
 res/sounds/*
 !res/sounds/.gitkeep
-lib/server/conf.json
+figaro/server/conf.json
 node_modules
 .next
 dist

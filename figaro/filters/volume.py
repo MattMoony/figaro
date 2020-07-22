@@ -3,8 +3,8 @@
 import numpy as np, re
 from typing import List, Dict, Any
 
-from lib.utils import parse_perc
-from lib.filters.filter import Filter
+from figaro.utils import parse_perc
+from figaro.filters.filter import Filter
 
 class Volume(Filter):
     """

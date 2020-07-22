@@ -7,9 +7,9 @@ from io import StringIO
 from getpass import getpass
 from typing import Dict, Any
 
-from lib import params, utils
-from lib.channel import Channel
-from lib.server.models.user import User
+from figaro import params, utils
+from figaro.channel import Channel
+from figaro.server.models.user import User
 
 """The configuration of the websocket server"""
 conf: Dict[str, Any] = dict()
@@ -165,7 +165,7 @@ def create_conf_prompt() -> None:
     """
     Prompt the user to create a config file.
     """
-    with open(os.path.join(params.BPATH, 'lib', 'server', 'conf.json'), 'w') as f:
+    with open(os.path.join(params.BPATH, 'figaro', 'server', 'conf.json'), 'w') as f:
         while True:
             secret_len = input('Enter secret length [default 512 (bits)]: ')
             if not secret_len.strip():
@@ -187,7 +187,7 @@ def start(shell: pash.shell.Shell, channel: Channel) -> None:
     Starts the server; starts listening for websocket connections
     """
     global conf, sh, ch
-    with open(os.path.join(params.BPATH, 'lib', 'server', 'conf.json')) as f:
+    with open(os.path.join(params.BPATH, 'figaro', 'server', 'conf.json')) as f:
         conf = json.load(f)
     sh = shell
     ch = channel
