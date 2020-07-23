@@ -69,6 +69,15 @@ class User(object):
         return User(res[0], uname, res[1], check_store=False)
 
     @classmethod
+    def load_root(cls) -> "User":
+        """
+        Load the root user from the db.
+        """
+        # still needs to be properly implemented ... 
+        res = db.fetchone('SELECT uid, name, pass FROM users ORDER BY uid LIMIT 1')
+        return User(res[0], res[1], res[2], check_store=False)
+
+    @classmethod
     def load_all(cls) -> List["User"]:
         """
         Load all users stored in the database.

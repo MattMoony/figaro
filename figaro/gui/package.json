@@ -30,5 +30,6 @@
     "electron": "^9.1.0",
     "tsc": "^1.20150623.0",
     "typescript": "^3.9.5"
-  }
+  },
+  "dependencies": {}
 }

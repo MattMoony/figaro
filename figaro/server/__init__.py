@@ -180,7 +180,11 @@ def create_conf_prompt() -> None:
                     utils.printerr('Enter a valid number!')
                     continue
             break
-        f.write(json.dumps(dict(secret=base64.b64encode(secrets.token_bytes(secret_len//8)).decode())))
+        secret = base64.b64encode(secrets.token_bytes(secret_len//8)).decode()
+        f.write(json.dumps(dict(secret=secret)))
+        with open(os.path.join(params.BPATH, 'figaro', 'gui', '.tkn'), 'w') as o:
+            root = User.load_root()
+            o.write(jwt.encode({ 'uname': root.uname, }, secret, algorithm='HS256').decode())
 
 def start(shell: pash.shell.Shell, channel: Channel) -> None:
     """
