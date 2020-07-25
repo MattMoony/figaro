@@ -42,4 +42,5 @@ def start():
 
 def stop():
     """Stops the server hosting the static files"""
-    httpd.shutdown()
+    if httpd:
+        httpd.shutdown()

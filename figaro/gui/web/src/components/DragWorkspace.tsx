@@ -99,7 +99,7 @@ export default class DragWorkspace extends React.Component<DragWorkspaceProps, D
                 display: this.state.contextMenu ? 'block' : 'none',
                 left: this.state.cx + 'px',
                 top: this.state.cy + 'px',
-                zIndex: this.winAmount()+1,
+                zIndex: this.props.zMin+this.winAmount()+1,
               }}>
                 { Array.from(this.props.windows).map(w => 
                     w&&w.props.title&&
