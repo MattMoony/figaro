@@ -1,0 +1,9 @@
+[Core]
+Name = Pitch
+Module = pitch
+
+[Documentation]
+Author = Matthias Monschein
+Version = 0.1
+Website = https://mattmoony.github.io
+Description = Changes the pitch of raw voice data.

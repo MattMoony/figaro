@@ -1,0 +1,9 @@
+[Core]
+Name = Volume
+Module = volume
+
+[Documentation]
+Author = Matthias Monschein
+Version = 0.1
+Website = https://mattmoony.github.io
+Description = Changes the volume of raw voice data.

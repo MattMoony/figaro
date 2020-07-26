@@ -11,6 +11,7 @@ res/*
 !res/sounds
 res/sounds/*
 !res/sounds/.gitkeep
+!res/filters
 
 figaro/server/conf.json
 figaro/gui/.tkn

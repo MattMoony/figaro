@@ -1,0 +1,9 @@
+[Core]
+Name = Noise
+Module = noise
+
+[Documentation]
+Author = Matthias Monschein
+Version = 0.1
+Website = https://mattmoony.github.io
+Description = Adds noise to audio.

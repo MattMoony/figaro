@@ -1,0 +1,9 @@
+[Core]
+Name = Crackle
+Module = crackle
+
+[Documentation]
+Author = Matthias Monschein
+Version = 0.1
+Website = https://mattmoony.github.io
+Description = Adds a crackling effect to audio.

@@ -6,7 +6,7 @@ cr.init()
 from asciimatics.screen import Screen
 from typing import List
 
-from figaro import params, utils, server, gui
+from figaro import params, utils, server, gui, filters
 from figaro.sound import Sound
 from figaro.device import Device
 from figaro.channel import Channel
@@ -155,11 +155,9 @@ def on_show_running_filters(cmd: pcmd.Command, args: List[str], json: bool) -> N
 
 def on_show_all_filters(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `show filters all` - shows all available voice-filters"""
-    if not os.path.isdir(os.path.join(params.BPATH, 'figaro', 'filters')):
-        utils.printerr('Error: Directory "{}" doesn\'t exist ... '.format(os.path.join(params.BPATH, 'figaro', 'filters')))
-        return
-    fs = [f[:-3] for f in os.listdir(os.path.join(params.BPATH, 'figaro', 'filters')) if os.path.isfile(os.path.join(params.BPATH, 'figaro', 'filters', f)) and f != 'filter.py' and f.endswith('.py')]
-    if not fs:
+    filters.manager.collectPlugins()
+    plugins = filters.get_names()
+    if not plugins:
         if not json:
             utils.printwrn('No filters available ... ')
         else:
@@ -167,10 +165,10 @@ def on_show_all_filters(cmd: pcmd.Command, args: List[str], json: bool) -> None:
         return
     if not json:
         print('Filters: \n - ', end='')
-        print('\n - '.join(fs))
+        print('\n - '.join(plugins))
         return
     print(JSON.dumps({
-        'filters': fs,
+        'filters': list(plugins)
     }))
 
 def on_start_sound(cmd: pcmd.Command, args: List[str], parameters: List[str], json: bool) -> None:
@@ -234,15 +232,14 @@ def on_start_interpreter(cmd: pcmd.Command, args: List[str], fname: str) -> None
 
 def on_start_filter(cmd: pcmd.Command, args: List[str], name: str, cargs: List[str]) -> None:
     """Callback for `start interpreter` - interprets a .fig file"""
-    fs = [f[:-3] for f in os.listdir(os.path.join(params.BPATH, 'figaro', 'filters')) if os.path.isfile(os.path.join(params.BPATH, 'figaro', 'filters', f)) and f != 'filter.py' and f.endswith('.py')]
-    if name not in fs:
+    name = name.lower()
+    plugins = filters.get_names()
+    if name not in map(lambda p: p.lower(), plugins):
         utils.printerr(f'Error: Unknown filter "{name}" ... ')
         return
-    spec = importlib.util.spec_from_file_location(name, os.path.join(params.BPATH, 'figaro', 'filters', f'{name}.py'))
-    filt = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(filt)
+    p = filters.get(plugins[[p.lower() for p in plugins].index(name)])
     try:
-        ch.add_filter(filt.start(cargs))
+        ch.add_filter(p.plugin_object.start(cargs))
     except NameError as e:
         utils.printerr('Error: Invalid/incomplete filter definition ... ')
         utils.printerr(str(e))

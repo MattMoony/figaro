@@ -1,0 +1,9 @@
+[Core]
+Name = Echo
+Module = echo
+
+[Documentation]
+Author = Matthias Monschein
+Version = 0.1
+Website = https://mattmoony.github.io
+Description = Adds an echo to audio.
