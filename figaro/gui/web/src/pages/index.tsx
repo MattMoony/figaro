@@ -8,6 +8,7 @@ import { AppConsumer, AppContextProps } from '../components/AppContext';
 import Controls from '../components/Controls';
 import Soundboard from '../components/Soundboard';
 import SoundsStatus from '../components/SoundsStatus';
+import FiltersManager from '../components/FiltersManager';
 
 class Index extends React.Component {
   private windows: Set<DragWindow> = new Set();
@@ -21,11 +22,17 @@ class Index extends React.Component {
         {ctx => (
           <article className={style.article}>
             <DragWorkspace windows={this.windows} zMin={10}>
-              <DragWindow ref={e => this.windows.add(e)} icon={faPlus} title="Filters">
+              <DragWindow ref={e => this.windows.add(e)} icon={faPlus} title="Filters" style={{
+                minWidth: '200px',
+                width: '15%',
+                maxWidth: '500px',
+                maxHeight: '350px',
+              }}>
+                <FiltersManager />
               </DragWindow>
               <DragWindow ref={e => this.windows.add(e)} icon={faDrum} title="Sounds" style={{
                 maxWidth: '350px',
-                maxHeight: '400px',
+                maxHeight: '350px',
               }}>
                 <Soundboard />
               </DragWindow>

@@ -168,7 +168,10 @@ def on_show_all_filters(cmd: pcmd.Command, args: List[str], json: bool) -> None:
         print('\n - '.join(plugins))
         return
     print(JSON.dumps({
-        'filters': list(plugins)
+        'filters': [{
+            'name': p,
+            'html': filters.get(p).plugin_object.html().strip(),
+        } for p in plugins],
     }))
 
 def on_start_sound(cmd: pcmd.Command, args: List[str], parameters: List[str], json: bool) -> None:

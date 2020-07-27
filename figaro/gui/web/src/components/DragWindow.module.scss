@@ -47,10 +47,10 @@
 
     .body {
         flex-grow: 1;
-        padding: 7.5px;
         position: relative;
         height: 100%;
         overflow-y: auto;
+        padding: 7.5px;
 
         &::-webkit-scrollbar {
             width: 5px;

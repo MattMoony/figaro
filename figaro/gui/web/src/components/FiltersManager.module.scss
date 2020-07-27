@@ -1,0 +1,20 @@
+.root {
+    width: 100%;
+
+    & > div {
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+
+        &.add {
+            display: flex;
+            justify-content: center;
+            font-weight: bold;
+            background-color: #D14081;
+
+            & > i {
+                margin-right: 5px;
+            }
+        }
+    }
+}
