@@ -34,7 +34,7 @@ Real-time open-source voice modification program. Can be useful for many things,
 
 ## Setup
 
-First of all, for `Figaro` to be able to work with audio files other than `wav`, you need to download and install `ffmpeg` (see [References](##References) for the link to the official download page).
+First of all, for `Figaro` to be able to work with audio files other than `wav`, you need to download and install `ffmpeg` (see [References](#References) for the link to the official download page).
 
 If you have Python 3.x installed, try installing the requirements:
 
@@ -42,7 +42,7 @@ If you have Python 3.x installed, try installing the requirements:
 $ python -m pip install -r requirements.txt
 ```
 
-... if you're on Windows and you get an error when installing `PyAudio` try downloading a PIP wheel suitable for your Python version from the link provided in [References](##References).
+... if you're on Windows and you get an error when installing `PyAudio` try downloading a PIP wheel suitable for your Python version from the link provided in [References](#References).
 
 If everything works out, you're good to go!
 
@@ -50,7 +50,7 @@ If everything works out, you're good to go!
 
 The following steps will explain how to use this program with the commonly used voice-chat application `Discord` on Windows:
 
-1. Download and install a virtual audio input device (if you don't know any specific one, try the one mentioned in [References](##References)).
+1. Download and install a virtual audio input device (if you don't know any specific one, try the one mentioned in [References](#References)).
 2. When selecting an output device at the startup of `Figaro`, choose the virtual input device you just installed (e.g.: `CABLE Input`).
 3. In Discord, go to `User Settings > Voice & Video > Input Device` and select the virtual input device from the dropdown (e.g.: `CABLE Output`).
 4. There you go, your friends should only be able to hear your filtered voice now.
