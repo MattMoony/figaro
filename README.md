@@ -42,7 +42,9 @@ If you have Python 3.x installed, try installing the requirements:
 $ python -m pip install -r requirements.txt
 ```
 
-... if you're on Windows and you get an error when installing `PyAudio` try downloading a PIP wheel suitable for your Python version from the link provided in [References](#References).
+... if you're on **Windows** and you get an error when installing `PyAudio` try downloading a PIP wheel suitable for your Python version from the link provided in [References](#References).
+
+... if you're on **Linux** and you get an error when installing the `pypiwin32` and `pywin32`, remove them from the `requirements.txt` list and try installing the dependencies once more. Everything should work now. *(This workaround shouldn't have to exist, so I will work on finding a better dependency management system)*
 
 If everything works out, you're good to go!
 
