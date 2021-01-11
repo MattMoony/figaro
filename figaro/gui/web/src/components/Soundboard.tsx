@@ -33,7 +33,7 @@ export default class Soundboard extends React.Component<SoundboardProps, Soundbo
   }
 
   private onPlaySound (sound: string): void {
-    this.context.req<Response>(`start sound ${sound}`, {});
+    this.context.req<Response>(`start sound "${sound}"`, {});
   }
 
   public render () {
