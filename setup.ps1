@@ -86,7 +86,7 @@ npm i
 Set-Location ..\..\..\
 
 log "warning" "If you want to use `"Figaro`" with programs such as Discord, you will have to install a loopback adapter."
-$yn = (Read-Host -Prompt "Do you this setup script to download and install the https://vb-audio.com/Cable/ loopback device now?")
+$yn = (Read-Host -Prompt "Do you want this setup script to download and install the https://vb-audio.com/Cable/ loopback device now?")
 if ($yN.StartsWith("y")) {
     Invoke-WebRequest "https://download.vb-audio.com/Download_CABLE/VBCABLE_Driver_Pack43.zip" -OutFile "${env:Temp}\VBCABLE_Driver_Pack.zip"
     Expand-Archive -Force "${env:Temp}\VBCABLE_Driver_Pack.zip" "${env:Temp}\VBCABLE_Driver_Pack"
