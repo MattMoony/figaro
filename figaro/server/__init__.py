@@ -102,20 +102,28 @@ def create_conf_prompt() -> None:
                     utils.printerr('Enter a valid number!')
                     continue
             break
-        secret = base64.b64encode(secrets.token_bytes(secret_len//8)).decode()
-        f.write(json.dumps(dict(secret=secret)))
+        secret = secrets.token_bytes(secret_len//8)
+        f.write(json.dumps(dict(secret=base64.b64encode(secret).decode())))
         with open(os.path.join(params.BPATH, 'figaro', 'gui', '.tkn'), 'w') as o:
             root = User.load_root()
             o.write(jwt.encode({ 'uname': root.uname, }, secret, algorithm='HS256').decode())
+
+def load_conf() -> None:
+    """
+    Loads the config and decodes values where needed.
+    """
+    global conf
+    with open(os.path.join(params.BPATH, 'figaro', 'server', 'conf.json')) as f:
+        conf = json.load(f)
+        conf['secret'] = base64.b64decode(conf['secret'])
+        auth.init(conf)
 
 def start(shell: pash.shell.Shell, channel: Channel) -> None:
     """
     Starts the server; starts listening for websocket connections
     """
-    global conf, sh, ch
-    with open(os.path.join(params.BPATH, 'figaro', 'server', 'conf.json')) as f:
-        conf = json.load(f)
-        auth.init(conf)
+    global sh, ch
+    load_conf()
     sh = shell
     ch = channel
     loop = asyncio.new_event_loop()
