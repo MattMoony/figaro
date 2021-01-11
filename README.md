@@ -19,7 +19,8 @@ Real-time open-source voice modification program. Can be useful for many things,
 - [About](#about)
 - [Table of Contents](#table-of-contents)
 - [Setup](#setup)
-  - [Advanced setup](#advanced-setup)
+  - [Manual Setup](#manual-setup)
+    - [Advanced setup](#advanced-setup)
 - [Usage](#usage)
   - [CLI](#cli)
   - [GUI](#gui)
@@ -34,21 +35,29 @@ Real-time open-source voice modification program. Can be useful for many things,
 
 ## Setup
 
-First of all, for `Figaro` to be able to work with audio files other than `wav`, you need to download and install `ffmpeg` (see [References](#References) for the link to the official download page).
+If you're on `Linux` or `Windows`, setup is much easier now! Simply run the appropriate setup script and it will guide you through the whole process.
 
-If you have Python 3.x installed, try installing the requirements:
+- **Linux**: `./setup.sh`
+- **Windows**: `.\setup.ps1`
+
+After the script has successfully finished, you're done! You can simply start _Figaro_ now:
 
 ```bash
-$ python -m pip install -r requirements.txt
+python figaro.py
 ```
+
+### Manual Setup
+
+First of all, for `Figaro` to be able to work with audio files other than `wav`, you need to download and install `ffmpeg` (see [References](#References) for the link to the official download page).
+
+- **Linux**: `pip install -r requirements-unix.txt`
+- **Windows**: `pip install -r requirements-windows.txt`
 
 ... if you're on **Windows** and you get an error when installing `PyAudio` try downloading a PIP wheel suitable for your Python version from the link provided in [References](#References).
 
-... if you're on **Linux** and you get an error when installing the `pypiwin32` and `pywin32`, remove them from the `requirements.txt` list and try installing the dependencies once more. Everything should work now. *(This workaround shouldn't have to exist, so I will work on finding a better dependency management system)*
-
 If everything works out, you're good to go!
 
-### Advanced setup
+#### Advanced setup
 
 The following steps will explain how to use this program with the commonly used voice-chat application `Discord` on Windows:
 
