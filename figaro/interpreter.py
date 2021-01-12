@@ -6,8 +6,8 @@ from pynput import keyboard as kb
 from typing import List, Dict, Union, Optional, Set, Callable
 
 from figaro import utils
-from figaro.sound import Sound
 from figaro.channel import Channel
+from figaro.sounds.sound import Sound
 
 class Interpreter(object):
     """

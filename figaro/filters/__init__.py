@@ -1,3 +1,5 @@
+"""Home of the filter manager"""
+
 import os
 from yapsy.PluginInfo import PluginInfo
 from yapsy.PluginManager import PluginManager

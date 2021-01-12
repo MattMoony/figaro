@@ -5,8 +5,8 @@ from threading import Thread, Lock
 from typing import Any, List, Dict, Optional
 
 from figaro import params
-from figaro.sound import Sound
 from figaro.device import Device
+from figaro.sounds.sound import Sound
 from figaro.transformer import Transformer
 from figaro.filters.filter import Filter
 

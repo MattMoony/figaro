@@ -6,12 +6,12 @@ cr.init()
 from asciimatics.screen import Screen
 from typing import List
 
-from figaro import params, utils, server, gui, filters
-from figaro.sound import Sound
+from figaro import params, utils, server, gui, filters, sounds
 from figaro.device import Device
 from figaro.channel import Channel
-from figaro.interpreter import Interpreter
+from figaro.sounds.sound import Sound
 from figaro.filters.filter import Filter
+from figaro.interpreter import Interpreter
 from figaro.server import db
 from figaro.server.models.user import User
 
@@ -104,27 +104,34 @@ def on_show_sounds(cmd: pcmd.Command, args: List[str], json: bool) -> None:
 
 def on_show_all_sounds(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     """Callback for `show sounds all` - shows all available sounds"""
-    spath = os.path.join(params.BPATH, 'res', 'sounds')
-    if not os.path.isdir(spath):
-        if not json:
-            utils.printerr(f'Directory "{spath}" doesn\'t exist ... ')
-        else:
-            print(JSON.dumps({ 'error': f'Directory "{spath}" doesn\'t exist ... '}))
-        return
-    sounds = [s for s in os.listdir(spath) if os.path.isfile(os.path.join(spath, s)) and s.split('.')[-1] in params.ALLOWED_EXTS]
-    if not sounds:
-        if not json:
-            utils.printwrn('No sounds available ... ')
-        else:
-            print(JSON.dumps({ 'error': 'No sounds available ... '}))
-        return
+    _sounds = sounds.get_all()
     if not json:
         print('Available sounds:\n - ', end='')
-        print('\n - '.join(sounds))
+        print('\n - '.join(_sounds))
         return
     print(JSON.dumps({
-        'sounds': sounds,
+        'sounds': _sounds,
     }))
+
+def on_show_sounds_conf(cmd: pcmd.Command, args: List[str], sound: str, json: bool) -> None:
+    """Callback for `show sounds configuration` - shows the current sounds config"""
+    if sound.strip().lower() in ['a', 'all']:
+        conf = sounds.get_conf()
+        if not json:
+            print('Current config:\n - ', end='')
+            print('\n - '.join(f'{k}: Path="{v["path"]}", Amplification={v["vol"]}, Color={v["color"]}' for k, v in conf.items()))
+            return
+    else:
+        try:
+            conf = sounds.get(sound)
+        except:
+            utils.printerr(f'Unknown sound effect "{sound}" ... ')
+            return
+        if not json:
+            print(f'Current config for "{sound}":\n ', end='')
+            print('\n '.join(f'{k}: {v}' for k, v in conf.items()))
+            return
+    print(JSON.dumps(conf))
 
 def on_show_interpreters(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `show interpreters` - shows all running interpreters"""
@@ -391,12 +398,15 @@ def start() -> None:
     show_audio = pcmd.Command('audio', callback=on_show_audio, hint='Show what audio input is detected ... ')
     show_audio.add_arg('-s', '--scale', type=float, dest='scale', default=5., help='Specify output scale ... ')
     show_audio.add_arg('-c', '--char', type=str, dest='char', default='▬', help='Specify the character to be used for the graph ... ')
+    show_sound_conf = pcmd.Command('configuration', 'config', 'conf', callback=on_show_sounds_conf, hint='Show a specific audio file\'s config ... ')
+    show_sound_conf.add_arg('sound', type=str, help='Specify which sound to show info about ... ')
     sh.add_cmd(pcmd.CascCommand('show', 'sh', cmds=[
         _with_json(pcmd.Command('devices', 'dev', callback=on_show_devices, hint='List all devices ... ')),
         show_audio,
         _with_json(pcmd.Command('status', 'stat', callback=on_show_status, hint='Show the audio channel\'s status ... ')),
         _with_json(pcmd.CascCommand('sounds', cmds=[
             _with_json(pcmd.Command('all', 'a', callback=on_show_all_sounds, hint='List all available sounds ... ')),
+            _with_json(show_sound_conf),
         ], callback=on_show_sounds, hint='List all currently playing sounds ... ')),
         pcmd.Command('interpreters', 'in', callback=on_show_interpreters, hint='List all running/available interpreters ... '),
         _with_json(pcmd.CascCommand('filters', 'fil', cmds=[
