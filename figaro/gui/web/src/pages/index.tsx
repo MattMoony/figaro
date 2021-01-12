@@ -14,6 +14,7 @@ class Index extends React.Component {
   private windows: Set<DragWindow> = new Set();
 
   private wave: AudioWave;
+  private soundboard: Soundboard;
   public context: AppContextProps;
 
   public render () {
@@ -33,8 +34,8 @@ class Index extends React.Component {
               <DragWindow ref={e => this.windows.add(e)} icon={faDrum} title="Sounds" style={{
                 maxWidth: '350px',
                 maxHeight: '350px',
-              }}>
-                <Soundboard />
+              }} onShow={() => this.soundboard.refresh()}>
+                <Soundboard ref={e => this.soundboard = e} />
               </DragWindow>
               <DragWindow ref={e => this.windows.add(e)} icon={faWaveSquare} title="Audio Wave" style={{
                 width: '60%',

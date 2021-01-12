@@ -3,6 +3,7 @@
 import os
 import copy
 import json
+import collections
 from typing import List, Dict, Any
 
 from figaro import params, utils
@@ -62,4 +63,4 @@ def get_conf() -> Dict[str, Dict[str, Any]]:
     if deleted or missing:
         with open(cpath, 'w') as f:
             json.dump(conf, f)
-    return conf
+    return dict(sorted(conf.items(), key=lambda x: x[0].lower()))

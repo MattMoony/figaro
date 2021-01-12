@@ -20,16 +20,20 @@ export default class Soundboard extends React.Component<SoundboardProps, Soundbo
   }
 
   public componentDidMount (): void {
+    this.context.onLogin(() => this.refresh());
+  }
+
+  public refresh (): void {
     interface SoundsResponse extends Response {
       sounds: string[];
     }
-    this.context.onLogin(() => this.context.req<SoundsResponse>('sh sounds a', {})
-      .then(res => {
-        if (!res.success) return;
-        this.setState({
-          sounds: res.sounds,
-        });
-      }));
+    this.context.req<SoundsResponse>('sh sounds a', {})
+    .then(res => {
+      if (!res.success) return;
+      this.setState({
+        sounds: res.sounds,
+      });
+    });
   }
 
   private onPlaySound (sound: string): void {
