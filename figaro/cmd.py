@@ -110,7 +110,7 @@ def on_show_all_sounds(cmd: pcmd.Command, args: List[str], json: bool) -> None:
         print('\n - '.join(_sounds))
         return
     print(JSON.dumps({
-        'sounds': _sounds,
+        'sounds': list(_sounds),
     }))
 
 def on_show_sounds_conf(cmd: pcmd.Command, args: List[str], sound: str, json: bool) -> None:
