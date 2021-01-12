@@ -186,20 +186,21 @@ def on_start_sound(cmd: pcmd.Command, args: List[str], parameters: List[str], js
     for i, a in enumerate(parameters):
         if re.match(r'^[\d\.]*$', a):
             continue
+        p = a
         if not os.path.isfile(a):
-            a = os.path.join(params.BPATH, 'res', 'sounds', a)
-        if not os.path.isfile(a):
-            if not json:
-                utils.printerr(f'File "{a}" doesn\'t exist ... ')
-                continue
-            else:
-                print(JSON.dumps({ 'error': f'File "{a}" doesn\'t exist ... "', }))
-                return
+            if a not in sounds.get_conf().keys():
+                if not json:
+                    utils.printerr(f'Unknown sound "{p}" ... ')
+                    continue
+                else:
+                    print(JSON.dumps({ 'error': f'Unknown sound "{p}" ... "', }))
+                    return
+            p = sounds.get(a)['path']
         try:
             if i+1 < len(args) and re.match(r'^[\d\.]+$', args[i+1]):
-                ch.add_sound(Sound(a, float(args[i+1])))
+                ch.add_sound(Sound(p, float(args[i+1])))
                 continue
-            ch.add_sound(Sound(a))
+            ch.add_sound(Sound(p, sounds.get(a)['vol']))
         except Exception as e:
             if not json:
                 utils.printerr(str(e))
@@ -384,6 +385,27 @@ def on_stop(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     if json:
         print(JSON.dumps({}))
 
+def on_set_sound_amplify(cmd: pcmd.Command, args: List[str], sound: str, amplify: float, json: bool) -> None:
+    """Callback for `set sound amplify` - changes a sound's default amplification"""
+    try:
+        sounds.update(sound, { 'vol': amplify, })
+    except:
+        utils.printerr(f'Unknown sound "{sound}" ... ')
+
+def on_set_sound_color(cmd: pcmd.Command, args: List[str], sound: str, color: str, json: bool) -> None:
+    """Callback for `set sound color` - changes a sound's button's color"""
+    try:
+        sounds.update(sound, { 'color': color, })
+    except:
+        utils.printerr(f'Unknown sound "{sound}" ... ')
+
+def on_set_sound_path(cmd: pcmd.Command, args: List[str], sound: str, path: str, json: bool) -> None:
+    """Callback for `set sound path` - changes a sound's path / creates a new sound"""
+    try:
+        sounds.update(sound, { 'path': path, })
+    except:
+        sounds.add(sound, path)
+
 def _with_json(c: pcmd.Command) -> pcmd.Command:
     c.add_arg('--json', action='store_true')
     return c
@@ -451,5 +473,22 @@ def start() -> None:
         stop_interpreter,
         stop_filter,
     ], callback=on_stop, hint='Stop channeling audio / other things ... ')))
+    # ---------------------------------------------------------------------------------------------------------------------- #
+    set_sound_amp = pcmd.Command('amplify', 'amp', callback=on_set_sound_amplify, hint='Change a sound effect\'s amplification ... ')
+    set_sound_amp.add_arg('sound', type=str, help='Specify the sound effect ... ')
+    set_sound_amp.add_arg('amplify', type=float, help='How much the volume should be amplified ... ')
+    set_sound_color = pcmd.Command('color', 'col', callback=on_set_sound_color, hint='Change a sound effect\'s button\'s color ... ')
+    set_sound_color.add_arg('sound', type=str, help='Specify the sound effect ... ')
+    set_sound_color.add_arg('color', type=str, help='The color ... ')
+    set_sound_path = pcmd.Command('path', callback=on_set_sound_path, hint='Change a sound\'s path / Add a sound effect ... ')
+    set_sound_path.add_arg('sound', type=str, help='Specify the sound effect name ... ')
+    set_sound_path.add_arg('path', type=str, help='The path to the sound effect ... ')
+    sh.add_cmd(pcmd.CascCommand('set', cmds=[
+        pcmd.CascCommand('sound', cmds=[
+            _with_json(set_sound_amp),
+            _with_json(set_sound_color),
+            _with_json(set_sound_path),
+        ], hint='Configure sound settings ... '),
+    ], hint='Configure settings ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     sh.prompt_until_exit()

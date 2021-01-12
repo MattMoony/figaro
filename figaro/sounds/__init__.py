@@ -45,6 +45,22 @@ def get(sname: str) -> Dict[str, Any]:
     """Returns config for the given sound file"""
     return get_conf()[sname]
 
+def add(sname: str, path: str) -> None:
+    """Adds a new sound to the config"""
+    conf = get_conf()
+    if not os.path.isfile(path):
+        raise FileNotFoundError()
+    conf[sname] = { 'vol': DEFAULT_VOLUME, 'color': DEFAULT_COLOR, 'path': path, }
+    with open(os.path.join(SPATH, 'conf.json'), 'w') as f:
+        json.dump(conf, f)
+
+def update(sname: str, upd: Dict[str, Any]) -> None:
+    """Update all or parts of a sound's config"""
+    conf = get_conf()
+    conf[sname] = { **conf[sname], **upd, }
+    with open(os.path.join(SPATH, 'conf.json'), 'w') as f:
+        json.dump(conf, f)
+
 def get_all() -> List[str]:
     """Returns a list of all playable sound files (in known locations)"""
     return get_conf().keys()
