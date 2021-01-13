@@ -6,6 +6,7 @@ interface FancyInputProps {
   hint?: string;
   value?: string;
   onClick?: React.MouseEventHandler;
+  onKeyUp?: React.KeyboardEventHandler;
 };
 
 interface FancyInputState {
@@ -23,6 +24,6 @@ export default class FancyInput extends React.Component<FancyInputProps, FancyIn
   }
   
   public render () {
-    return <input className={style.root} ref={e => this.element = e} type={this.props.type} placeholder={this.props.hint} value={this.props.value} onClick={this.props.onClick} />;
+    return <input className={style.root} ref={e => this.element = e} type={this.props.type} placeholder={this.props.hint} value={this.props.value} onClick={this.props.onClick} onKeyUp={this.props.onKeyUp} />;
   }
 };
