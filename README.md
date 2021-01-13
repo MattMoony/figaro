@@ -19,6 +19,9 @@ Real-time open-source voice modification program. Can be useful for many things,
 - [About](#about)
 - [Table of Contents](#table-of-contents)
 - [Setup](#setup)
+  - [Linux](#linux)
+  - [Mac](#mac)
+  - [Windows](#windows)
   - [Manual Setup](#manual-setup)
     - [Advanced setup](#advanced-setup)
 - [Usage](#usage)
@@ -37,20 +40,36 @@ Real-time open-source voice modification program. Can be useful for many things,
 
 If you're on `Linux` or `Windows`, setup is much easier now! Simply run the appropriate setup script and it will guide you through the whole process.
 
-- **Linux**: `./setup.sh`
-- **Windows**: `.\setup.ps1`
+### Linux
 
-After the script has successfully finished, you're done! You can simply start _Figaro_ now:
+Make `./setup.sh` executable ... (or run it with an appropriate interpreter) ...
 
 ```bash
-python figaro.py
+chmod 755 ./setup.sh
 ```
+
+... execute it: `./setup.sh` ... and have fun with `python figaro.py`!
+
+### Mac
+
+The same as the [Linux Setup](#linux), just use `./setup-mac.sh` instead of `./setup.sh`.
+
+### Windows
+
+First, in order to allow the setup _powershell_ script to run, you need to execute the following command in an administrator powershell:
+
+```ps
+Set-ExecutionPolicy RemoteSigned
+```
+
+... afterwards, executing `.\setup.ps1` will guide you through the whole setup process! You can now execute `python figaro.py`.
 
 ### Manual Setup
 
 First of all, for `Figaro` to be able to work with audio files other than `wav`, you need to download and install `ffmpeg` (see [References](#References) for the link to the official download page).
 
 - **Linux**: `pip install -r requirements-unix.txt`
+- **Mac**: `pip install -r requirements-unix.txt`
 - **Windows**: `pip install -r requirements-windows.txt`
 
 ... if you're on **Windows** and you get an error when installing `PyAudio` try downloading a PIP wheel suitable for your Python version from the link provided in [References](#References).
