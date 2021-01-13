@@ -59,4 +59,13 @@ log "info" "Installing node requirements ... "
 cd figaro/gui/web/
 npm i
 
+log "warning" "If you want to use \"Figaro\" with programs such as Discord, you will have to install a loopback adapter."
+read -p "Do you want this setup script to download and install the https://vb-audio.com/Cable/ loopback device now? " yn
+yn=`echo -n $yn | tr '[:upper:]' '[:lower:]'`
+if [[ $yn == y* ]]; then
+    curl "https://download.vb-audio.com/Download_MAC/VBCable_MACDriver_Pack107.dmg" > "$HOME/Downloads/VBCABLE_MACDriver_Pack.dmg"
+    open "$HOME/Downloads"
+    log "warning" "Simply install the loopback cable from \"VBCABLE_MACDriver_Pack.dmg\" now ... "
+fi
+
 log "success" "Finished setting up \"Figaro\""
