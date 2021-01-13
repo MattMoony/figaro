@@ -72,7 +72,7 @@ class Channel(Thread):
             self._ist_mut.acquire()
             self.buff = np.zeros(params.BUF)
             for i in self.ist:
-                self.buff += np.asarray(struct.unpack('f'*params.BUF, i.read(params.BUF)))
+                self.buff += np.asarray(struct.unpack('f'*params.BUF, i.read(params.BUF, exception_on_overflow=False)))
             self.buff /= len(self.ist)
             self._ist_mut.release()
             self.buff = self.transf.apply_all(self.buff)
