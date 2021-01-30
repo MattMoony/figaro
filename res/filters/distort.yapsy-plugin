@@ -1,0 +1,9 @@
+[Core]
+Name = Distort
+Module = distort
+
+[Documentation]
+Author = Matthias Monschein
+Version = 0.1
+Website = https://mattmoony.github.io
+Description = Distorts the speaker's voice.
