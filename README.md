@@ -182,15 +182,15 @@ Just a small preview of what is about to come. It's very likely that this roadma
   * [x] I/O device selection
   * [x] Live sound wave graph
   * [ ] Filter control
-  * [x] Soundboard
-* [ ] Filters
+  * [x] Soundboard 
+* [x] Filters
   * [x] Volume
   * [x] Pitch-Shift
   * [x] "Trippy"-Filter
   * [x] Echo
   * [x] Noise
   * [x] Crackle
-  * [ ] Randomized
+  * [x] Randomized
 * [ ] [Figaro-Script](#figaro-script)
   * [x] Using CLI commands
   * [x] Hotkeys
