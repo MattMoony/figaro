@@ -2,6 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import serve from 'electron-serve';
+import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 
 const loadURL = serve({ directory: path.resolve(__dirname, '..', 'web', 'public'), });
 let win: BrowserWindow;
@@ -18,6 +19,9 @@ function createWindow (): void {
     },
     show: false,
   });
+  const figaro: ChildProcessWithoutNullStreams = spawn('python', [ path.resolve(__dirname, '..', '..', '..', 'figaro.py'), '-s', ]);
+  figaro.stdout.on('data', (data) => console.log(data.toString()));
+  figaro.stderr.on('data', (data) => console.log(data.toString()));
 
   // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
   // win.webContents.openDevTools();

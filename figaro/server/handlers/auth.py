@@ -34,7 +34,7 @@ async def auth(ws: websockets.server.WebSocketServerProtocol, req: Dict[str, Any
         await sutils.success(ws, None, rid, tkn=jwt.encode({
                                 'uname': u.uname, 
                                 'exp': datetime.datetime.utcnow() + datetime.timedelta(days=30),
-                            }, conf['secret'], algorithm='HS256').decode())
+                            }, conf['secret'], algorithm='HS256'))
     else:
         await sutils.error(ws, 'Wrong password provided!', rid)
 

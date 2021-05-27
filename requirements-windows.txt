@@ -10,7 +10,7 @@ PyAudio==0.2.11
 pycparser==2.20
 pydub==0.24.1
 pyfiglet==0.8.post1
-PyJWT==1.7.1
+PyJWT==2.1.0
 pynput==1.6.8
 pypiwin32==223
 pywin32==228
