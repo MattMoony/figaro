@@ -85,6 +85,11 @@ Set-Location figaro/gui/web/
 npm i
 Set-Location ..\..\..\
 
+log "info" "Building the GUI (web/gatsby part)"
+Set-Location figaro/gui/web
+npm run build
+Set-Location ..\..\..\
+
 log "warning" "If you want to use `"Figaro`" with programs such as Discord, you will have to install a loopback adapter."
 $yn = (Read-Host -Prompt "Do you want this setup script to download and install the https://vb-audio.com/Cable/ loopback device now?")
 if ($yN.StartsWith("y")) {
@@ -95,3 +100,8 @@ if ($yN.StartsWith("y")) {
 }
 
 log "success" 'Finished setting up "Figaro"'
+
+log "info" "If you want to use the GUI, you should now run"
+log "info" "python .\figaro.py -s"
+log "info" "enter some user credentials when prompted to do so (this is so in future versions you can also use Figaro accross the network), then quit and run"
+log "info" ".\gui.ps1"

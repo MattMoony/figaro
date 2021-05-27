@@ -58,6 +58,12 @@ log "info" "Installing python requirements ... "
 log "info" "Installing node requirements ... "
 cd figaro/gui/web/
 npm i
+cd ../../../
+
+log "info" "Building the GUI (web/gatsby part)"
+cd figaro/gui/web/
+npm run build
+cd ../../../
 
 log "warning" "If you want to use \"Figaro\" with programs such as Discord, you will have to install a loopback adapter."
 read -p "Do you want this setup script to download and install the https://vb-audio.com/Cable/ loopback device now? " yn
@@ -69,3 +75,8 @@ if [[ $yn == y* ]]; then
 fi
 
 log "success" "Finished setting up \"Figaro\""
+
+log "info" "If you want to use the GUI, you should now run"
+log "info" "python3 .\figaro.py -s"
+log "info" "enter some user credentials when prompted to do so (this is so in future versions you can also use Figaro accross the network), then quit and run"
+log "info" "./gui.sh"
