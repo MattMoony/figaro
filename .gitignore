@@ -15,3 +15,6 @@ res/sounds/*
 
 figaro/server/conf.json
 figaro/gui/.tkn
+
+build/
+figaro.spec

@@ -27,9 +27,12 @@
     "@types/electron": "^1.6.10",
     "@types/react": "^16.9.41",
     "cross-env": "^7.0.2",
-    "electron": "^9.4.0",
+    "electron": "^9.4.4",
+    "nodemon": "^2.0.7",
     "tsc": "^1.20150623.0",
     "typescript": "^3.9.5"
   },
-  "dependencies": {}
+  "dependencies": {
+    "electron-serve": "^1.1.0"
+  }
 }
