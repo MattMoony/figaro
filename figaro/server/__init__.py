@@ -106,7 +106,7 @@ def create_conf_prompt() -> None:
         f.write(json.dumps(dict(secret=base64.b64encode(secret).decode())))
         with open(os.path.join(params.BPATH, 'figaro', 'gui', '.tkn'), 'w') as o:
             root = User.load_root()
-            o.write(jwt.encode({ 'uname': root.uname, }, secret, algorithm='HS256').decode())
+            o.write(jwt.encode({ 'uname': root.uname, }, secret, algorithm='HS256'))
 
 def load_conf() -> None:
     """

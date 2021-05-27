@@ -27,7 +27,7 @@ function createWindow (): void {
   // win.webContents.openDevTools();
   win.removeMenu();
   // win.loadURL(`http://${conf.host}:${conf.port}`);
-  // win.loadURL(`http://localhost:5000/`);
+  // win.loadURL(`http://localhost:8000/`);
   loadURL(win);
   win.webContents.executeJavaScript(`localStorage.setItem('no-logout', true);`);
   win.webContents.executeJavaScript(`localStorage.setItem('tkn', '${fs.readFileSync(path.resolve(__dirname, '..', '.tkn'))}');`);

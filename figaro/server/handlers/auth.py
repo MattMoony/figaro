@@ -3,7 +3,7 @@
 import jwt
 import datetime
 import websockets
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from figaro.server import sutils
 from figaro.server.models.user import User
@@ -16,7 +16,8 @@ def verify_tkn(req: Dict[str, Any]) -> bool:
     Checks the JWT of the given request for validity.
     """
     try:
-        tkn = jwt.decode(req['tkn'], conf['secret'], algorithms=['HS256'], options={'require': ['exp', 'uname',]})
+        # tkn = jwt.decode(req['tkn'], conf['secret'], algorithms=['HS256'], options={'require': ['exp', 'uname',]})
+        tkn = jwt.decode(req['tkn'], conf['secret'], algorithms=['HS256'], options={'require': ['uname',]})
         return bool(User.load(tkn['uname']))
     # except (jwt.ExpiredSignatureError, jwt.InvalidAlgorithmError, jwt.InvalidSignatureError, KeyError) as e:
     except Exception:
