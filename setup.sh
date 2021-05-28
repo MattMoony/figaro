@@ -55,13 +55,15 @@ log "success" "Functioning npm setup found!"
 log "info" "Installing python requirements ... "
 /usr/bin/env python3 -m pip install -r ./requirements-unix.txt
 
-log "info" "Installing node requirements ... "
-cd figaro/gui/web/
+log "info" "Installing node requirements (electron part) ... "
+cd figaro/gui/
 npm i
-cd ../../../
+
+log "info" "Installing node requirements (web/gatsby part) ... "
+cd web/
+npm i
 
 log "info" "Building the GUI (web/gatsby part)"
-cd figaro/gui/web/
 npm run build
 cd ../../../
 

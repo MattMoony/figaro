@@ -80,13 +80,15 @@ if ($yN.StartsWith("y")) {
 log "info" "Installing requirements via pip ... "
 python -m pip install -r .\requirements-windows.txt
 
-log "info" "Installing node requirements ... "
-Set-Location figaro/gui/web/
+log "info" "Installing node requirements (electron part) ... "
+Set-Location figaro/gui/
 npm i
-Set-Location ..\..\..\
+
+log "info" "Installing node requirements (web/gatsby part) ... "
+Set-Location web/
+npm i
 
 log "info" "Building the GUI (web/gatsby part)"
-Set-Location figaro/gui/web
 npm run build
 Set-Location ..\..\..\
 
