@@ -29,8 +29,7 @@
     "cross-env": "^7.0.2",
     "electron": "^9.4.4",
     "nodemon": "^2.0.7",
-    "tsc": "^1.20150623.0",
-    "typescript": "^3.9.5"
+    "typescript": "^3.9.9"
   },
   "dependencies": {
     "electron-serve": "^1.1.0"

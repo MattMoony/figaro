@@ -20,19 +20,20 @@ function createWindow (): void {
     show: false,
   });
   const figaro: ChildProcessWithoutNullStreams = spawn('python', [ path.resolve(__dirname, '..', '..', '..', 'figaro.py'), '-s', ]);
-  figaro.stdout.on('data', (data) => console.log(data.toString()));
-  figaro.stderr.on('data', (data) => console.log(data.toString()));
+  figaro.stdout.once('data', () => {
+    console.log('Got data ... ');
 
-  // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-  // win.webContents.openDevTools();
-  win.removeMenu();
-  // win.loadURL(`http://${conf.host}:${conf.port}`);
-  // win.loadURL(`http://localhost:8000/`);
-  loadURL(win);
-  win.webContents.executeJavaScript(`localStorage.setItem('no-logout', true);`);
-  win.webContents.executeJavaScript(`localStorage.setItem('tkn', '${fs.readFileSync(path.resolve(__dirname, '..', '.tkn'))}');`);
+    process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+    win.webContents.openDevTools();
+    win.removeMenu();
+    // win.loadURL(`http://${conf.host}:${conf.port}`);
+    // win.loadURL(`http://localhost:8000/`);
 
-  win.once('ready-to-show', () => win.show());
+    loadURL(win);
+    win.webContents.executeJavaScript(`localStorage.setItem('no-logout', true);`);
+    win.webContents.executeJavaScript(`localStorage.setItem('tkn', '${fs.readFileSync(path.resolve(__dirname, '..', '.tkn'))}');`);
+    win.once('ready-to-show', () => win.show());
+  });
 }
 
 app.on('ready', createWindow);
