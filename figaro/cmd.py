@@ -181,6 +181,10 @@ def on_show_all_filters(cmd: pcmd.Command, args: List[str], json: bool) -> None:
         } for p in plugins],
     }))
 
+def on_show_server_key(cmd: pcmd.Command, args: List[str]) -> None:
+    """Callback for `show server key` - shows the server's connection key"""
+    server.show_key()
+
 def on_start_sound(cmd: pcmd.Command, args: List[str], parameters: List[str], json: bool) -> None:
     """Callback for `start sound` - adds a sound effect"""
     for i, a in enumerate(parameters):
@@ -260,13 +264,13 @@ def on_start_filter(cmd: pcmd.Command, args: List[str], name: str, cargs: List[s
 
 def on_start_server(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `start server` - starts the websocket server"""
-    if not os.path.isfile(params.DB_PATH):
-        db.setup()
-        print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
-        User.create_prompt()
-        pash.cmds.clear(None, [])
-        print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
-        server.create_conf_prompt()
+    # if not os.path.isfile(params.DB_PATH):
+    #     db.setup()
+    #     print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
+    #     User.create_prompt()
+    #     pash.cmds.clear(None, [])
+    #     print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
+    #     server.create_conf_prompt()
     server.start(sh, ch)
 
 def on_stop_sound(cmd: pcmd.Command, args: List[str], ind: str, json: bool) -> None:
@@ -434,6 +438,9 @@ def start() -> None:
         _with_json(pcmd.CascCommand('filters', 'fil', cmds=[
             _with_json(pcmd.Command('all', 'a', callback=on_show_all_filters, hint='List all available voice filters ... ')),
         ], callback=on_show_running_filters, hint='List all running/available voice filters ... ')),
+        pcmd.CascCommand('server', 'srv', cmds=[
+            pcmd.Command('key', callback=on_show_server_key, hint='Show the server\'s connection key ... '),
+        ], hint='Show server info ... '),
     ], hint='Show info ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     start_sound = pcmd.Command('sound', callback=on_start_sound, hint='Play a soundeffect ... ')

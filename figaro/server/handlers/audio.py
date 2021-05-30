@@ -32,16 +32,16 @@ async def send_sounds(ws: websockets.server.WebSocketServerProtocol, ch: Channel
             return
         await asyncio.sleep(0.1)
 
-async def get_audio(ws: websockets.server.WebSocketServerProtocol, req: Dict[str, Any], rid: str, ch: Channel) -> None:
+async def get_audio(ws: websockets.server.WebSocketServerProtocol, key: bytes, req: Dict[str, Any], rid: str, ch: Channel) -> None:
     """
     Handles a request to send periodical audio info coming from a websocket.
     """
     if 'scale' not in req.keys():
-        await sutils.error(ws, 'Missing parameter `scale`!')
+        await sutils.error(ws, key, 'Missing parameter `scale`!')
         return
     asyncio.ensure_future(send_audio(ws, ch, req['scale']))
 
-async def get_sounds(ws: websockets.server.WebSocketServerProtocol, req: Dict[str, Any], rid: str, ch: Channel) -> None:
+async def get_sounds(ws: websockets.server.WebSocketServerProtocol, key: bytes, req: Dict[str, Any], rid: str, ch: Channel) -> None:
     """
     Handles a request to send periodical sound info coming from a websocket.
     """

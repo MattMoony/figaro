@@ -1,10 +1,11 @@
 """The entry point for the websocket server"""
 
-import jwt, asyncio, websockets, threading, json, os, hashlib, sys, time, secrets, base64
+import jwt, asyncio, websockets, threading, json, os, hashlib, sys, time, secrets, base64, qrcode
 import numpy as np
 import pash.shell
 from io import StringIO
 from getpass import getpass
+from Crypto.Cipher import AES
 from typing import Dict, Any, Callable
 
 from figaro import params, utils
@@ -13,14 +14,16 @@ from figaro.channel import Channel
 from figaro.server.handlers import auth, audio, config
 from figaro.server.models.user import User
 
-"""The configuration of the websocket server"""
+"""30.05.2021 - Deprecating: The configuration of the websocket server"""
 conf: Dict[str, Any] = dict()
+"""The encryption key used for communications"""
+key: bytes = None
 """The main CLI shell"""
 sh: pash.shell.Shell = None
 """The main audio channel"""
 ch: Channel = None
 
-"""Special unauthenticated websockets commands"""
+"""30.05.2021 - Deprecating: Special unauthenticated websockets commands"""
 noauth_cmds: Dict[str, Callable[[websockets.server.WebSocketServerProtocol, Dict[str, Any], str, Dict[str, Any]], None]] = {
     'auth': auth.auth,
     'auth-status': auth.auth_status,
@@ -40,6 +43,13 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
     try:
         async for req in ws:
             try:
+                req = base64.b64decode(req)
+                n, t, c = req[:12], req[12:28], req[28:]
+                cipher: AES = AES.new(key, AES.MODE_GCM, nonce=n)
+                req = cipher.decrypt_and_verify(c, t).decode()
+            except ValueError:
+                continue
+            try:
                 req = json.loads(req)
             except json.decoder.JSONDecodeError:
                 continue
@@ -47,12 +57,12 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
                 rid = ''
                 if 'timestamp' in req.keys():
                     rid = base64.b64encode((req['cmd'] + str(req['timestamp'])).encode()).decode()
-                if req['cmd'] in noauth_cmds.keys():
-                    await noauth_cmds[req['cmd']](ws, req, rid)
-                    continue
-                if not auth.verify_tkn(req):
-                    await sutils.error(ws, 'Authentication failed!', rid)
-                    continue
+                # if req['cmd'] in noauth_cmds.keys():
+                #     await noauth_cmds[req['cmd']](ws, req, rid)
+                #     continue
+                # if not auth.verify_tkn(req):
+                #     await sutils.error(ws, 'Authentication failed!', rid)
+                #     continue
                 if req['cmd'] in auth_cmds.keys():
                     await auth_cmds[req['cmd']](ws, req, rid, ch)
                     continue
@@ -66,12 +76,13 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
                     await sutils.error(ws, 'Internal Server Error!', rid)
                     continue
                 await sutils.send(ws,
+                                  key,
                                   'error' not in out.keys(), 
                                   out['error'] if 'error' in out.keys() else None, 
                                   rid, 
                                   **{k: v for k, v in out.items() if k != 'error'})
             except KeyError as e:
-                await sutils.error(ws, 'Internal Server Error!', rid)
+                await sutils.error(ws, key, 'Internal Server Error!', rid)
     except websockets.exceptions.ConnectionClosed:
         return
 
@@ -110,7 +121,7 @@ def create_conf_prompt() -> None:
 
 def load_conf() -> None:
     """
-    Loads the config and decodes values where needed.
+    30.05.2021 - Deprecating: Loads the config and decodes values where needed.
     """
     global conf
     with open(os.path.join(params.BPATH, 'figaro', 'server', 'conf.json')) as f:
@@ -118,14 +129,38 @@ def load_conf() -> None:
         conf['secret'] = base64.b64decode(conf['secret'])
         auth.init(conf)
 
+def show_key() -> None:
+    """
+    Show the generated AES key in QR code format.
+    """
+    if not key:
+        utils.printerr('ERROR: Server is not running ... ')
+        return
+    print('Use this QR code to connect your devices:')
+    qr: qrcode.QRCode = qrcode.QRCode()
+    qr.add_data(base64.b64encode(key))
+    qr.make()
+    qr.print_ascii(invert=True)
+
 def start(shell: pash.shell.Shell, channel: Channel) -> None:
     """
     Starts the server; starts listening for websocket connections
     """
-    global sh, ch
-    load_conf()
+    global sh, ch, key
+    # load_conf()
+    key = secrets.token_bytes(32)
+    with open(os.path.join(params.BPATH, 'figaro', 'gui', '.key'), 'w') as f:
+        f.write(base64.b64encode(key).decode())
+    show_key()
     sh = shell
     ch = channel
     loop = asyncio.new_event_loop()
     t = threading.Thread(target=__start, args=(loop,), daemon=True)
     t.start()
+    # if not os.path.isfile(params.DB_PATH):
+    #     db.setup()
+    #     print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
+    #     User.create_prompt()
+    #     pash.cmds.clear(None, [])
+    #     print('== SETUP ' + '='*(shutil.get_terminal_size().columns-len('== SETUP ')-1))
+    #     server.create_conf_prompt()
