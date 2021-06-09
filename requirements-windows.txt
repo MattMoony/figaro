@@ -5,7 +5,7 @@ colorama==0.4.4
 future==0.18.2
 numpy==1.19.0
 pash-cmd==0.0.7
-Pillow==8.1.1
+Pillow==8.2.0
 PyAudio==0.2.11
 pycparser==2.20
 pydub==0.24.1
