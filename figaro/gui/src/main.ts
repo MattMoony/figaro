@@ -23,16 +23,18 @@ function createWindow (): void {
   figaro.stdout.once('data', () => {
     console.log('Got data ... ');
 
-    // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-    // win.webContents.openDevTools();
+    process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+    win.webContents.openDevTools();
     win.removeMenu();
-    // win.loadURL(`http://${conf.host}:${conf.port}`);
-    // win.loadURL(`http://localhost:8000/`);
-
+    
     // win.loadURL('about:blank');
     win.webContents.executeJavaScript(`localStorage.setItem('no-logout', true);`);
-    win.webContents.executeJavaScript(`localStorage.setItem('tkn', '${fs.readFileSync(path.resolve(__dirname, '..', '.tkn'))}');`);
-    loadURL(win);
+    // win.webContents.executeJavaScript(`localStorage.setItem('tkn', '${fs.readFileSync(path.resolve(__dirname, '..', '.tkn'))}');`);
+    win.webContents.executeJavaScript(`localStorage.setItem('key', '${fs.readFileSync(path.resolve(__dirname, '..', '.key'))}');`);
+    
+    // loadURL(win);
+    // win.loadURL(`http://${conf.host}:${conf.port}`);
+    win.loadURL(`http://localhost:8000/`);
     win.once('ready-to-show', () => win.show());
   });
   figaro.stdout.on('data', (data) => console.log(data.toString()));

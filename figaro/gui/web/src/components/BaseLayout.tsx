@@ -3,8 +3,9 @@ import '../style/global.scss';
 import style from './BaseLayout.module.scss';
 import Popup from '../components/Popup';
 import FancyInput from '../components/FancyInput';
+import QrCode from 'react-qr-code';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBiohazard, faQrcode, faUser } from '@fortawesome/free-solid-svg-icons';
 import { AppProvider, AppConsumer, AppContextProps } from './AppContext';
 
 interface BaseLayoutProps {
@@ -20,6 +21,7 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
   private loginUname: FancyInput;
   private loginPassw: FancyInput;
   private logoutPopup: Popup;
+  private qrPopup: Popup;
 
   public context: AppContextProps;
 
@@ -73,10 +75,10 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
               <>
                 <header className={style.header}>
                   <h1>Figaro</h1>
-                  <div className={style.loginBut} onClick={this.onShowLogin.bind(this)}>
+                  <div className={style.loginBut} onClick={() => this.qrPopup.show()}>
                     { this.context.authenticated
-                      ? <>{ this.context.uname() } <i><FontAwesomeIcon icon={faUser} /></i></> 
-                      : 'Login' 
+                      ? <i><FontAwesomeIcon icon={faQrcode} /></i>
+                      : <i><FontAwesomeIcon icon={faBiohazard} /></i>
                     }
                   </div>
                   <Popup ref={e => this.loginPopup = e}>
@@ -100,6 +102,29 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
                     }}>
                       { this.state.loginError }
                     </div>
+                  </Popup>
+                  <Popup ref={e => this.qrPopup = e}>
+                    <h1 style={{
+                      paddingBottom: '10px',
+                      borderBottom: '3px solid #072435',
+                      marginBottom: '15px',
+                    }}>Auth-Key</h1>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: '7px',
+                        backgroundColor: '#eef1ff',
+                      }}>
+                        <QrCode value={btoa(this.context.key)} fgColor='#0B3954' bgColor='#eef1ff' />
+                      </div>
+                    </div>
+                    <p>Scan the QR-Code above with your <i>Figaro</i> app to connect this PC to your phone.</p>
                   </Popup>
                   <Popup ref={e => this.logoutPopup = e}>
                     <p style={{

@@ -31,6 +31,7 @@ noauth_cmds: Dict[str, Callable[[websockets.server.WebSocketServerProtocol, Dict
 
 """Special authenticated websockets commands"""
 auth_cmds: Dict[str, Callable[[websockets.server.WebSocketServerProtocol, Dict[str, Any], str, Channel], None]] = {
+    'auth-status': auth.auth_status,
     'get-conf': config.get_conf,
     'get-audio': audio.get_audio,
     'get-sounds': audio.get_sounds,
@@ -47,7 +48,7 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
                 n, t, c = req[:12], req[12:28], req[28:]
                 cipher: AES = AES.new(key, AES.MODE_GCM, nonce=n)
                 req = cipher.decrypt_and_verify(c, t).decode()
-            except ValueError:
+            except ValueError as e:
                 continue
             try:
                 req = json.loads(req)
@@ -64,7 +65,7 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
                 #     await sutils.error(ws, 'Authentication failed!', rid)
                 #     continue
                 if req['cmd'] in auth_cmds.keys():
-                    await auth_cmds[req['cmd']](ws, req, rid, ch)
+                    await auth_cmds[req['cmd']](ws, key, req, rid, ch)
                     continue
                 stdout = sys.stdout
                 sys.stdout = cmdout = StringIO()
@@ -136,7 +137,7 @@ def show_key() -> None:
     if not key:
         utils.printerr('ERROR: Server is not running ... ')
         return
-    print('Use this QR code to connect your devices:')
+    print(f'Use this QR code to connect your devices: {base64.b64encode(key).decode()}\n')
     qr: qrcode.QRCode = qrcode.QRCode()
     qr.add_data(base64.b64encode(key))
     qr.make()

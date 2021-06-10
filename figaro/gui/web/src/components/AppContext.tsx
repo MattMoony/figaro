@@ -1,8 +1,10 @@
 import React from 'react';
+import forge from 'node-forge';
 
 export interface AppContextProps {
   authenticated: boolean;
   tkn?: string;
+  key?: string;
   status: FigaroStatus;
   error?: Error;
   login: (uname: string, pwd: string) => Promise<void>;
@@ -20,6 +22,7 @@ export interface AppContextProps {
 
 const AppContext: React.Context<AppContextProps> = React.createContext<AppContextProps>({
   authenticated: false,
+  key: '',
   status: { input: [], output: [], running: false, },
   login: (uname: string, pwd: string) => new Promise((resolve, reject) => resolve()),
   logout: () => {},
@@ -78,6 +81,7 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
     super(props);
     this.state = {
       authenticated: false,
+      key: '',
       status: { input: [], output: [], running: false, },
       login: this.login.bind(this),
       logout: this.logout.bind(this),
@@ -94,12 +98,14 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
   }
 
   public componentDidMount (): void {
-    this.setState({
-      tkn: localStorage.getItem('tkn'),
-    }, () => {
-      this.isLoggedIn().then(b => b && this.setState({ authenticated: true, })).catch(e => this.setState({ error: e, }));
-      this.status();
-    });
+    setTimeout(() => {
+      this.setState({
+        key: forge.util.decode64(localStorage.getItem('key')),
+      }, () => {
+        this.isLoggedIn().then(b => b && this.setState({ authenticated: true, })).catch(e => this.setState({ error: e, }));
+        this.status();
+      });
+    }, 500);
   }
 
   private waitUntilOpen (sock: WebSocket): Promise<void> {
@@ -116,18 +122,39 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
   private req<T extends Response> (cmd: string, body: object): Promise<T> {
     if (!this.sock) {
       this.sock = new WebSocket(AppProvider.dURL);
-      this.sock.onmessage = (e: MessageEvent) => {
-        const rid: string = JSON.parse(e.data).rid;
-        if (!Object.keys(this.resolvers).includes(rid)) return;
-        this.resolvers[rid](JSON.parse(e.data));
-        delete this.resolvers[rid];
+      this.sock.onmessage = async (e: MessageEvent) => {
+        const msg: string = forge.util.decode64(await e.data.text());
+        const nonce: string = msg.substr(0, 12);
+        const tag: string = msg.substr(12, 16);
+        const enc: string = msg.substr(28);
+        const decipher: forge.cipher.BlockCipher = forge.cipher.createDecipher('AES-GCM', this.state.key);
+        decipher.start({
+          iv: nonce,
+          tag,
+        });
+        decipher.update(forge.util.createBuffer(enc));
+        if (decipher.finish()) {
+          const body: string = decipher.output.data;
+          const rid: string = JSON.parse(body).rid;
+          console.log(`[*] BODY: ${body}`);
+          if (!Object.keys(this.resolvers).includes(rid)) return;
+          this.resolvers[rid](JSON.parse(body));
+          delete this.resolvers[rid];
+        }
       };
     }
     return new Promise((resolve, reject) => {
       this.waitUntilOpen(this.sock).then(() => {
+        const nonce: string = forge.random.getBytesSync(12);
+        const cipher: forge.cipher.BlockCipher = forge.cipher.createCipher('AES-GCM', this.state.key);
+        cipher.start({
+          iv: nonce,
+        });
         const tmstmp: number = Date.now();
         this.resolvers[btoa(cmd + tmstmp)] = (res: object) => resolve(res as T);
-        this.sock.send(JSON.stringify({ cmd, id: AppProvider.id, tkn: this.state.tkn, timestamp: tmstmp, ...body, }));
+        cipher.update(forge.util.createBuffer(JSON.stringify({ cmd, id: AppProvider.id, tkn: this.state.tkn, timestamp: tmstmp, ...body, })));
+        cipher.finish();
+        this.sock.send(forge.util.encode64(nonce + cipher.mode.tag.data + cipher.output.data));
       }).catch(reject);
     });
   }
@@ -137,7 +164,8 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
       logged_in: boolean;
     };
     return new Promise((resolve, reject) => {
-      if (!this.state.tkn) return resolve(false);
+      // if (!this.state.tkn) return resolve(false);
+      if (!this.state.key) return resolve(false);
       this.req<IsLoggedInResponse>('auth-status', {}).then(res => {
         if (!res.logged_in) {
           this.logout();

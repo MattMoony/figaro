@@ -22,7 +22,8 @@
     "react": "^17.0.1",
     "react-chartjs-2": "^2.11.1",
     "react-dom": "^17.0.1",
-    "react-helmet": "^6.1.0"
+    "react-helmet": "^6.1.0",
+    "react-qr-code": "^1.1.1"
   },
   "devDependencies": {
     "prettier": "2.2.1"
