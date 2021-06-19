@@ -6,8 +6,9 @@ import FancyInput from '../components/FancyInput';
 import QrCode from 'react-qr-code';
 import forge from 'node-forge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBiohazard, faQrcode, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBiohazard, faQrcode } from '@fortawesome/free-solid-svg-icons';
 import { AppProvider, AppConsumer, AppContextProps } from './AppContext';
+import TitleBar from './TitleBar';
 
 interface BaseLayoutProps {
   children: React.ReactElement|React.ReactElement[];
@@ -74,6 +75,7 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
             this.context = ctx;
             return (
               <>
+                <TitleBar />
                 <header className={style.header}>
                   <h1>Figaro</h1>
                   <div className={style.loginBut} onClick={() => this.qrPopup.show()}>

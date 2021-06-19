@@ -1,0 +1,50 @@
+.titlebar {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background-color: #061b29;
+  padding: 5px;
+
+  i {
+    -webkit-app-region: no-drag;
+    background-color: #0B3954;
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    font-size: 10px;
+    color: #2E6F97;
+    margin: 0 1px;
+    transition: .2s ease;
+
+    &:hover {
+      cursor: pointer;
+      color: #eef1ff;
+      // transform: scale(1.01);
+    }
+  }
+
+  .close {
+    &:hover {
+      background-color: #d14047;
+    }
+  }
+
+  .maximize {
+    &:hover {
+      background-color: #40d140;
+    }
+  }
+
+  .minimize {
+    &:hover {
+      background-color: #d1b640;
+    }
+  }
+}
