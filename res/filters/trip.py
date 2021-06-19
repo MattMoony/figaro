@@ -28,6 +28,16 @@ class Trip(figaro.filters.filter.Filter):
             self.scale: float = scale
             self._prev: np.ndarray = None
 
+        @classmethod
+        def parse_args(cls, args: List[str]) -> List[Any]:
+            args = [a.strip() for a in args if a.strip()]
+            if not args:
+                raise Exception('Missing parameter <scale> ... ')
+            return [parse_perc(args[0].strip()),]
+
+        def update(self, *args: List[Any]) -> None:
+            self.scale = args[0]
+
         def apply(self, data: np.ndarray) -> np.ndarray:
             if self._prev is None:
                 self._prev = np.zeros(data.shape)
@@ -35,7 +45,7 @@ class Trip(figaro.filters.filter.Filter):
             return data
 
         def toJSON(self) -> Dict[str, Any]:
-            return dict(name='trip', scale=self.scale)
+            return dict(name='Trip', scale=self.scale)
 
         def __call__(self, data: np.ndarray) -> np.ndarray:
             return self.apply(data)
@@ -43,16 +53,12 @@ class Trip(figaro.filters.filter.Filter):
         def __str__(self) -> str:
             return f'Trip({self.scale*100:.2f}% damping)'
 
-    @classmethod
-    def start(cls, args: List[str]) -> "Trip.Filter":
-        args = [a.strip() for a in args if a.strip()]
-        if not args:
-            raise Exception('Missing parameter <scale> ... ')
-        n = args[0].strip()
-        return Trip.Filter(parse_perc(n))
+    desc: str = 'Makes you sound rather trippy!'
 
     @classmethod
-    def html(cls) -> str:
-        return '''
-            <input type="range" min="0" max="1" value=".4" step="0.01" name="scale" />
-        '''
+    def start(cls, args: List[str]) -> "Trip.Filter":
+        return Trip.Filter(*Trip.Filter.parse_args(args))
+
+    @classmethod
+    def props(cls) -> List[Dict[str, Any]]:
+        return [dict(name='scale', min=0, max=1, step=.01, value=.4),]

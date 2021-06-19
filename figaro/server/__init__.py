@@ -64,10 +64,11 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
                 sys.stdout = cmdout = StringIO()
                 sh.parse(req['cmd'].strip() + ' --json')
                 sys.stdout = stdout
+                raw: str = cmdout.getvalue()
                 try:
-                    out = json.loads(cmdout.getvalue())
+                    out = json.loads(raw) if raw else {}
                 except json.decoder.JSONDecodeError:
-                    await sutils.error(ws, 'Internal Server Error!', rid)
+                    await sutils.error(ws, key, 'Internal Server Error!', rid)
                     continue
                 await sutils.send(ws,
                                   key,

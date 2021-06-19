@@ -21,6 +21,13 @@ class Distort(figaro.filters.filter.Filter):
     
         def __init__(self):
             self.gen = secrets.SystemRandom()
+
+        @classmethod
+        def parse_args(cls, args: List[str]) -> List[Any]:
+            return []
+
+        def update(self, *args: List[Any]) -> None:
+            pass
     
         def apply(self, data: np.ndarray) -> np.ndarray:
             freq = np.fft.rfft(data)
@@ -35,7 +42,7 @@ class Distort(figaro.filters.filter.Filter):
             return sh_chunk.astype(data.dtype)
     
         def toJSON(self) -> Dict[str, Any]:
-            return dict(name='distort')
+            return dict(name='Distort')
     
         def __call__(self, data: np.ndarray) -> np.ndarray:
             return self.apply(data)
@@ -43,10 +50,12 @@ class Distort(figaro.filters.filter.Filter):
         def __str__(self) -> str:
             return f'Distort()'
 
+    desc: str = 'Distorts your voice!'
+
     @classmethod
     def start(cls, args: List[str]) -> "Distort.Filter":
         return Distort.Filter()
 
     @classmethod
-    def html(cls) -> str:
-        return ''''''
+    def props(cls) -> List[Dict[str, Any]]:
+        return []

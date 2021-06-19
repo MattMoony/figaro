@@ -32,6 +32,19 @@ class Echo(figaro.filters.filter.Filter):
             self.pause: float = pause
             self._q: List[Tuple[float, np.ndarray]] = []
 
+        @classmethod
+        def parse_args(cls, args: List[str]) -> List[Any]:
+            args = [a.strip() for a in args if a.strip()]
+            if len(args) < 2:
+                raise Exception('Missing parameters <scale> <pause> ... ')
+            scale = parse_perc(args[0])
+            pause = float(args[1])
+            return [scale, pause,]
+
+        def update(self, *args: List[Any]) -> None:
+            self.scale = args[0]
+            self.pause = args[1]
+
         def apply(self, data: np.ndarray) -> np.ndarray:
             c = np.zeros(data.shape)
             now = datetime.now().timestamp()
@@ -44,7 +57,7 @@ class Echo(figaro.filters.filter.Filter):
             return data
 
         def toJSON(self) -> Dict[str, Any]:
-            return dict(name='echo', scale=self.scale, pause=self.pause)
+            return dict(name='Echo', scale=self.scale, pause=self.pause)
 
         def __call__(self, data: np.ndarray) -> np.ndarray:
             return self.apply(data)
@@ -52,18 +65,15 @@ class Echo(figaro.filters.filter.Filter):
         def __str__(self) -> str:
             return f'Echo({self.pause}s delay, {self.scale*100:.2f}% damping)'
 
-    @classmethod
-    def start(cls, args: List[str]) -> "Echo.Filter":
-        args = [a.strip() for a in args if a.strip()]
-        if len(args) < 2:
-            raise Exception('Missing parameters <scale> <pause> ... ')
-        scale = parse_perc(args[0])
-        pause = float(args[1])
-        return Echo.Filter(scale, pause)
+    desc: str = 'Adds an echo to your voice!'
 
     @classmethod
-    def html(cls) -> str:
-        return '''
-            <input type="range" min="0" max="1" step="0.01" value="0.5" name="scale" />
-            <input type="range" min="0" max="10" step="0.1" value="0.5" name="pause" />
-        '''
+    def start(cls, args: List[str]) -> "Echo.Filter":
+        return Echo.Filter(*Echo.Filter.parse_args(args))
+
+    @classmethod
+    def props(cls) -> List[Dict[str, Any]]:
+        return [
+            dict(name='scale', min=0, max=1, step=.01, value=.5),
+            dict(name='pause', min=0, max=10, step=.1, value=.5),
+        ]

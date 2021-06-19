@@ -176,7 +176,8 @@ def on_show_all_filters(cmd: pcmd.Command, args: List[str], json: bool) -> None:
     print(JSON.dumps({
         'filters': [{
             'name': p,
-            'html': filters.get(p).plugin_object.html().strip(),
+            'desc': filters.get(p).plugin_object.desc.strip(),
+            'props': filters.get(p).plugin_object.props(),
         } for p in plugins],
     }))
 
@@ -244,22 +245,31 @@ def on_start_interpreter(cmd: pcmd.Command, args: List[str], fname: str) -> None
     except Exception as e:
         utils.printerr(str(e))
 
-def on_start_filter(cmd: pcmd.Command, args: List[str], name: str, cargs: List[str]) -> None:
-    """Callback for `start interpreter` - interprets a .fig file"""
+def on_start_filter(cmd: pcmd.Command, args: List[str], name: str, cargs: List[str], json: bool) -> None:
+    """Callback for `start filter` - adds a filter to the audio stream"""
     name = name.lower()
     plugins = filters.get_names()
     if name not in map(lambda p: p.lower(), plugins):
-        utils.printerr(f'Error: Unknown filter "{name}" ... ')
+        if not json:
+            utils.printerr(f'Error: Unknown filter "{name}" ... ')
+        else:
+            print(JSON.dumps({ 'error': f'Unknown filter "{name}" ... "', }))
         return
     p = filters.get(plugins[[p.lower() for p in plugins].index(name)])
     try:
         ch.add_filter(p.plugin_object.start(cargs))
     except NameError as e:
-        utils.printerr('Error: Invalid/incomplete filter definition ... ')
-        utils.printerr(str(e))
+        if not json:
+            utils.printerr('Error: Invalid/incomplete filter definition ... ')
+            utils.printerr(str(e))
+        else:
+            print(JSON.dumps({ 'error': f'Error: Invalid/incomplete filter definition ({str(e)}) ... ' }))
     except Exception as e:
-        utils.printerr('Error: Filter init error ... ')
-        utils.printerr(str(e))
+        if not json:
+            utils.printerr('Error: Filter init error ... ')
+            utils.printerr(str(e))
+        else:
+            print(JSON.dumps({ 'error': f'Error: Filter init error ({str(e)}) ... ' }))
 
 def on_start_server(cmd: pcmd.Command, args: List[str]) -> None:
     """Callback for `start server` - starts the websocket server"""
@@ -339,7 +349,7 @@ def on_stop_interpreter(cmd: pcmd.Command, args: List[str], ind: str) -> None:
     interpreters[ind].kill()
     del interpreters[ind]
 
-def on_stop_filter(cmd: pcmd.Command, args: List[str], ind: str) -> None:
+def on_stop_filter(cmd: pcmd.Command, args: List[str], ind: str, json: bool) -> None:
     """Callback for `stop filter` - stops a running filter"""
     if ind.lower() in ('a', 'all'):
         ch.del_all_filters()
@@ -347,11 +357,17 @@ def on_stop_filter(cmd: pcmd.Command, args: List[str], ind: str) -> None:
     try:
         ind = int(ind)
     except ValueError:
-        utils.printerr('"{}" is not a valid index!'.format(ind))
+        if not json:
+            utils.printerr(f'"{ind}" is not a valid index!')
+        else:
+            print(JSON.dumps({ 'error': f'"{ind}" is not a valid index!', }))
         return
     filters = ch.get_filters()
     if ind >= len(filters):
-        utils.printerr('Index {} is out of bounds (max: {})!'.format(ind, len(filters)-1))
+        if not json:
+            utils.printerr(f'Index {ind} is out of bounds (max: {len(filters)-1})!')
+        else:
+            print(JSON.dumps({ 'error': f'Index {ind} is out of bounds (max: {len(filters)-1})!', }))
         return
     ch.del_filter(ind)
 
@@ -409,6 +425,24 @@ def on_set_sound_path(cmd: pcmd.Command, args: List[str], sound: str, path: str,
     except:
         sounds.add(sound, path)
 
+def on_set_filter(cmd: pcmd.Command, args: List[str], ind: int, cargs: List[str], json: bool) -> None:
+    """Callback for `set filter` - modifies a running filter's settings"""
+    filters: List[Filter.Filter] = ch.get_filters()
+    if ind >= len(filters):
+        if not json:
+            utils.printerr(f'Index {ind} is out of bounds (max: {len(filters)-1})!')
+        else:
+            print(JSON.dumps({ 'error': f'Index {ind} is out of bounds (max: {len(filters)-1})!', }))
+        return
+    try:
+        filters[ind].update(*filters[ind].__class__.parse_args(cargs))
+    except Exception as e:
+        if not json:
+            utils.printerr('Error: Filter update error ... ')
+            utils.printerr(str(e))
+        else:
+            print(JSON.dumps({ 'error': f'Error: Filter update error ({str(e)}) ... ' }))
+
 def _with_json(c: pcmd.Command) -> pcmd.Command:
     c.add_arg('--json', action='store_true')
     return c
@@ -458,7 +492,7 @@ def start() -> None:
         _with_json(start_output),
         _with_json(start_input),
         start_interpreter,
-        start_filter,
+        _with_json(start_filter),
         pcmd.Command('server', 'srv', callback=on_start_server, hint='Start the websocket server ... ')
     ], callback=on_start, hint='Start channeling audio / other things ... ')))
     # ---------------------------------------------------------------------------------------------------------------------- #
@@ -477,7 +511,7 @@ def start() -> None:
         _with_json(stop_output),
         _with_json(stop_input),
         stop_interpreter,
-        stop_filter,
+        _with_json(stop_filter),
     ], callback=on_stop, hint='Stop channeling audio / other things ... ')))
     # ---------------------------------------------------------------------------------------------------------------------- #
     set_sound_amp = pcmd.Command('amplify', 'amp', callback=on_set_sound_amplify, hint='Change a sound effect\'s amplification ... ')
@@ -489,12 +523,16 @@ def start() -> None:
     set_sound_path = pcmd.Command('path', callback=on_set_sound_path, hint='Change a sound\'s path / Add a sound effect ... ')
     set_sound_path.add_arg('sound', type=str, help='Specify the sound effect name ... ')
     set_sound_path.add_arg('path', type=str, help='The path to the sound effect ... ')
+    set_filter = pcmd.Command('filter', 'fil', callback=on_set_filter, hint='Modify a currently running filter\'s options ... ')
+    set_filter.add_arg('ind', type=int, help='Specify the filter\'s index ... ')
+    set_filter.add_arg('cargs', nargs='*', help='Specify the filter\'s arguments ... ')
     sh.add_cmd(pcmd.CascCommand('set', cmds=[
         pcmd.CascCommand('sound', cmds=[
             _with_json(set_sound_amp),
             _with_json(set_sound_color),
             _with_json(set_sound_path),
         ], hint='Configure sound settings ... '),
+        _with_json(set_filter),
     ], hint='Configure settings ... '))
     # ---------------------------------------------------------------------------------------------------------------------- #
     sh.prompt_until_exit()

@@ -25,12 +25,22 @@ class Crackle(figaro.filters.filter.Filter):
         def __init__(self, fac: float):
             self.fac: float = fac
 
+        @classmethod
+        def parse_args(cls, args: List[str]) -> List[Any]:
+            args = [a.strip() for a in args if a.strip()]
+            if not args:
+                raise Exception('Missing parameter <factor> ... ')
+            return [parse_perc(args[0].strip()),]
+
+        def update(self, *args: List[Any]) -> None:
+            self.fac = args[0]
+
         def apply(self, data: np.ndarray) -> np.ndarray:
             ifac = 1 - .9 * self.fac
             return data.clip(data.min() * ifac, data.max() * ifac) * (.5 / ifac)
 
         def toJSON(self) -> Dict[str, Any]:
-            return dict(name='crackle', fac=self.fac)
+            return dict(name='Crackle', fac=self.fac)
 
         def __call__(self, data: np.ndarray) -> np.ndarray:
             return self.apply(data)
@@ -38,15 +48,12 @@ class Crackle(figaro.filters.filter.Filter):
         def __str__(self) -> str:
             return f'Crackle({self.fac*100:.2f}%)'
 
-    @classmethod
-    def start(cls, args: List[str]) -> "Crackle.Filter":
-        args = [a.strip() for a in args if a.strip()]
-        if not args:
-            raise Exception('Missing parameter <factor> ... ')
-        return Crackle.Filter(parse_perc(args[0]))
+    desc: str = 'Adds a crackling effect to your audio!'
 
     @classmethod
-    def html(cls) -> str:
-        return '''
-            <input type="range" min="0" max="1" step="0.01" name="fac" />
-        '''
+    def start(cls, args: List[str]) -> "Crackle.Filter":
+        return Crackle.Filter(*Crackle.Filter.parse_args(args))
+
+    @classmethod
+    def props(cls) -> List[Dict[str, Any]]:
+        return [dict(name='fac', min=0, max=1, step=.01),]

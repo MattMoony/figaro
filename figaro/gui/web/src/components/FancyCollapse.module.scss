@@ -1,0 +1,34 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  -webkit-user-select: none;
+  background-color: #0a3147;
+  padding: 5px 7.5px;
+
+  & > div {
+    width: 100%;
+    box-sizing: border-box;
+
+    &:first-child {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.1em;
+
+      & > div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        & > * {
+          margin: 0 2.5px;
+        }
+      }
+    }
+
+    &:last-child {
+      padding: 5px;
+    }
+  }
+}

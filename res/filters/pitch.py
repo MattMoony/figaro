@@ -26,6 +26,16 @@ class Pitch(figaro.filters.filter.Filter):
     
         def __init__(self, fac: float):
             self.fac: float = fac
+
+        @classmethod
+        def parse_args(cls, args: List[str]) -> List[Any]:
+            args = [a.strip() for a in args if a.strip()]
+            if not args:
+                raise Exception('Missing parameter <factor> ... ')
+            return [parse_perc(args[0].strip()),]
+
+        def update(self, *args: List[Any]) -> None:
+            self.fac = args[0]
     
         def apply(self, data: np.ndarray) -> np.ndarray:
             freq = np.fft.rfft(data)
@@ -39,7 +49,7 @@ class Pitch(figaro.filters.filter.Filter):
             return sh_chunk.astype(data.dtype)
     
         def toJSON(self) -> Dict[str, Any]:
-            return dict(name='pitch', fac=self.fac)
+            return dict(name='Pitch', fac=self.fac)
     
         def __call__(self, data: np.ndarray) -> np.ndarray:
             return self.apply(data)
@@ -47,16 +57,12 @@ class Pitch(figaro.filters.filter.Filter):
         def __str__(self) -> str:
             return f'Pitch({self.fac*100:.2f}%)'
 
-    @classmethod
-    def start(cls, args: List[str]) -> "Pitch.Filter":
-        args = [a.strip() for a in args if a.strip()]
-        if not args:
-            raise Exception('Missing parameter <factor> ... ')
-        n = args[0].strip()
-        return Pitch.Filter(parse_perc(n))
+    desc: str = 'Changes your voice\'s pitch!'
 
     @classmethod
-    def html(cls) -> str:
-        return '''
-            <input type="range" min="-30" max="30" value="0" name="fac" />
-        '''
+    def start(cls, args: List[str]) -> "Pitch.Filter":
+        return Pitch.Filter(*Pitch.Filter.parse_args(args))
+
+    @classmethod
+    def props(cls) -> List[Dict[str, Any]]:
+        return [dict(name='fac', min=-30, max=30, step=1, value=0),]
