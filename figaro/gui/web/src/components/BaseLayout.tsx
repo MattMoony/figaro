@@ -4,6 +4,7 @@ import style from './BaseLayout.module.scss';
 import Popup from '../components/Popup';
 import FancyInput from '../components/FancyInput';
 import QrCode from 'react-qr-code';
+import forge from 'node-forge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBiohazard, faQrcode, faUser } from '@fortawesome/free-solid-svg-icons';
 import { AppProvider, AppConsumer, AppContextProps } from './AppContext';
@@ -121,7 +122,7 @@ export default class BaseLayout extends React.Component<BaseLayoutProps, BaseLay
                         padding: '7px',
                         backgroundColor: '#eef1ff',
                       }}>
-                        <QrCode value={btoa(this.context.key)} fgColor='#0B3954' bgColor='#eef1ff' />
+                        <QrCode value={forge.util.encode64(this.context.key)} fgColor='#0B3954' bgColor='#eef1ff' />
                       </div>
                     </div>
                     <p>Scan the QR-Code above with your <i>Figaro</i> app to connect this PC to your phone.</p>

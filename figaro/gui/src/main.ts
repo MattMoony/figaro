@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import serve from 'electron-serve';
@@ -23,14 +23,19 @@ function createWindow (): void {
   figaro.stdout.once('data', () => {
     console.log('Got data ... ');
 
-    process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-    win.webContents.openDevTools();
+    // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+    // win.webContents.openDevTools();
     win.removeMenu();
     
     // win.loadURL('about:blank');
-    win.webContents.executeJavaScript(`localStorage.setItem('no-logout', true);`);
+    // win.webContents.executeJavaScript(`localStorage.setItem('no-logout', true);`);
     // win.webContents.executeJavaScript(`localStorage.setItem('tkn', '${fs.readFileSync(path.resolve(__dirname, '..', '.tkn'))}');`);
-    win.webContents.executeJavaScript(`localStorage.setItem('key', '${fs.readFileSync(path.resolve(__dirname, '..', '.key'))}');`);
+    // win.webContents.executeJavaScript(`localStorage.setItem('key', '${fs.readFileSync(path.resolve(__dirname, '..', '.key'))}');`);
+
+    ipcMain.on('comms', (e: IpcMainEvent, action: string) => {
+      if (action === 'get-key') e.returnValue = fs.readFileSync(path.resolve(__dirname, '..', '.key')).toString();
+      else e.returnValue = '';
+    });
     
     // loadURL(win);
     // win.loadURL(`http://${conf.host}:${conf.port}`);

@@ -33,16 +33,15 @@ export default class SoundsStatus extends React.Component<SoundsStatusProps, Sou
 
   private getSoundsUpdates (): void {
     const sock: WebSocket = new WebSocket(AppProvider.dURL);
-    this.context.waitUntilOpen(sock).then(() => {
-      sock.onmessage = (e: MessageEvent) => {
-        const sounds: object = JSON.parse(e.data);
-        if (!(sounds instanceof Array)) return;
-        this.setState({
-          sounds: (sounds as FigaroSound[]),
-        });
-      };
-      sock.send(JSON.stringify({ cmd: 'get-sounds', id: AppProvider.id, tkn: this.context.tkn!, }));
-    });
+    sock.onmessage = (e: MessageEvent) => {
+      // console.log(e.data);
+      const sounds: object = JSON.parse(e.data);
+      if (!(sounds instanceof Array)) return;
+      this.setState({
+        sounds: (sounds as FigaroSound[]),
+      });
+    };
+    this.context.send(sock, 'get-sounds', {});
   }
 
   private onStop (id?: number): void {

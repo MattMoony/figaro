@@ -57,16 +57,15 @@ export default class AudioWave extends React.Component<AudioWaveProps, AudioWave
 
   private getAudioUpdates (): void {
     const sock: WebSocket = new WebSocket(AppProvider.dURL);
-    this.context.waitUntilOpen(sock).then(() => {
-      sock.onmessage = (e: MessageEvent) => {
-        (e.data as Blob).arrayBuffer().then(b => {
-          if (!this.update(Array.from(new Float32Array(b)))) {
-            sock.close(1000);
-          }
-        });
-      };
-      sock.send(JSON.stringify({ cmd: 'get-audio', id: AppProvider.id, tkn: this.context.tkn!, scale: AudioWave.graphScale, }));
-    }).catch(() => this.setState({ errorMsg: 'Failed to retrieve updates ... ', }))
+    sock.onmessage = (e: MessageEvent) => {
+      (e.data as Blob).arrayBuffer().then(b => {
+        if (!this.update(Array.from(new Float32Array(b)))) {
+          sock.close(1000);
+        }
+      });
+    };
+    this.context.send(sock, 'get-audio', { scale: AudioWave.graphScale, })
+                .catch(() => this.setState({ errorMsg: 'Failed to retrieve updates ... ', }));
   }
 
   public update (data: Array<number>): boolean {

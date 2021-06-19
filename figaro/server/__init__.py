@@ -141,7 +141,11 @@ def show_key() -> None:
     qr: qrcode.QRCode = qrcode.QRCode()
     qr.add_data(base64.b64encode(key))
     qr.make()
-    qr.print_ascii(invert=True)
+    try:
+        qr.print_ascii(invert=True)
+    except:
+        utils.printerr('Sorry, your terminal doesn\'t seem to support printing the qr code ... ')
+        pass
 
 def start(shell: pash.shell.Shell, channel: Channel) -> None:
     """

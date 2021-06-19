@@ -11,6 +11,7 @@ export interface AppContextProps {
   logout: () => void;
   onLogin: (cb: ()=>void)=>void;
   waitUntilOpen: (sock: WebSocket) => Promise<void>;
+  send: (sock: WebSocket, cmd: string, body: object, arg0?: string|number, arg1?: number) => Promise<void>;
   req: <T extends Response>(cmd: string, body: object) => Promise<T>;
   uname?: () => string;
   conf: () => Promise<FigaroConf>;
@@ -28,6 +29,7 @@ const AppContext: React.Context<AppContextProps> = React.createContext<AppContex
   logout: () => {},
   onLogin: (cb: ()=>void)=>{},
   waitUntilOpen: () => new Promise((resolve, reject) => resolve()),
+  send: (sock: WebSocket, cmd: string, body: object, arg0?: string|number, arg1?: number) => new Promise((resolve, reject) => resolve()),
   req: <T extends Response>(cmd: string, body: object) => new Promise((resolve, reject) => resolve(null)),
   conf: () => new Promise((resolve, reject) => resolve(null)),
   start: () => new Promise((resolve, reject) => resolve()),
@@ -73,6 +75,7 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
   public static id: string = Date.now() + Math.random().toString(36).substr(1,8);
   public static dURL: string = 'ws://localhost:51966';
 
+  private electron: any;
   private sock: WebSocket;
   private resolvers: { [key: string]: (res: object)=>void } = {};
   private cbs: (()=>void)[] = [];
@@ -87,6 +90,7 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
       logout: this.logout.bind(this),
       onLogin: this.onLogin.bind(this),
       waitUntilOpen: this.waitUntilOpen.bind(this),
+      send: this.send.bind(this),
       req: this.req.bind(this),
       uname: this.uname.bind(this),
       conf: this.conf.bind(this),
@@ -98,14 +102,13 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
   }
 
   public componentDidMount (): void {
-    setTimeout(() => {
-      this.setState({
-        key: forge.util.decode64(localStorage.getItem('key')),
-      }, () => {
-        this.isLoggedIn().then(b => b && this.setState({ authenticated: true, })).catch(e => this.setState({ error: e, }));
-        this.status();
-      });
-    }, 500);
+    this.electron = window.require('electron');
+    this.setState({
+      key: forge.util.decode64(this.electron.ipcRenderer.sendSync('comms', 'get-key')),
+    }, () => {
+      this.isLoggedIn().then(b => b && this.setState({ authenticated: true, })).catch(e => this.setState({ error: e, }));
+      this.status();
+    });
   }
 
   private waitUntilOpen (sock: WebSocket): Promise<void> {
@@ -116,6 +119,29 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
         return;
       }
       resolve();
+    });
+  }
+
+  private send (sock: WebSocket, cmd: string, body: object);
+  private send (sock: WebSocket, cmd: string, body: object, key: string);
+  private send (sock: WebSocket, cmd: string, body: object, tmpstmp: number);
+  private send (sock: WebSocket, cmd: string, body: object, key: string, tmpstmp: number);
+
+  private send (sock: WebSocket, cmd: string, body: object, arg0?: string|number, arg1?: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.waitUntilOpen(sock).then(() => {
+        const key: string = typeof arg0 === 'string' ? arg0 : this.state.key;
+        const nonce: string = forge.random.getBytesSync(12);
+        const cipher: forge.cipher.BlockCipher = forge.cipher.createCipher('AES-GCM', key);
+        cipher.start({
+          iv: nonce,
+        });
+        const tmstmp: number = typeof arg0 === 'number' ? arg0 : typeof arg1 === 'number' ? arg1 : Date.now();
+        cipher.update(forge.util.createBuffer(forge.util.encodeUtf8(JSON.stringify({ cmd, id: AppProvider.id, timestamp: tmstmp, ...body, }))));
+        cipher.finish();
+        sock.send(forge.util.encode64(nonce + cipher.mode.tag.data + cipher.output.data));
+        resolve();
+      }).catch(reject);
     });
   }
 
@@ -134,9 +160,9 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
         });
         decipher.update(forge.util.createBuffer(enc));
         if (decipher.finish()) {
-          const body: string = decipher.output.data;
+          const body: string = forge.util.decodeUtf8(decipher.output.data);
           const rid: string = JSON.parse(body).rid;
-          console.log(`[*] BODY: ${body}`);
+          // console.log(`[*] BODY: ${body}`);
           if (!Object.keys(this.resolvers).includes(rid)) return;
           this.resolvers[rid](JSON.parse(body));
           delete this.resolvers[rid];
@@ -144,18 +170,9 @@ export class AppProvider extends React.Component<AppProviderProps, AppProviderSt
       };
     }
     return new Promise((resolve, reject) => {
-      this.waitUntilOpen(this.sock).then(() => {
-        const nonce: string = forge.random.getBytesSync(12);
-        const cipher: forge.cipher.BlockCipher = forge.cipher.createCipher('AES-GCM', this.state.key);
-        cipher.start({
-          iv: nonce,
-        });
-        const tmstmp: number = Date.now();
-        this.resolvers[btoa(cmd + tmstmp)] = (res: object) => resolve(res as T);
-        cipher.update(forge.util.createBuffer(JSON.stringify({ cmd, id: AppProvider.id, tkn: this.state.tkn, timestamp: tmstmp, ...body, })));
-        cipher.finish();
-        this.sock.send(forge.util.encode64(nonce + cipher.mode.tag.data + cipher.output.data));
-      }).catch(reject);
+      const tmstmp: number = Date.now();
+      this.resolvers[btoa(cmd + tmstmp)] = (res: object) => resolve(res as T);
+      this.send(this.sock, cmd, body, tmstmp).catch(reject);
     });
   }
 
