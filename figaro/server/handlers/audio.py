@@ -3,7 +3,7 @@
 import json
 import struct
 import asyncio
-import websockets
+import websockets, websockets.server
 from typing import Dict, Any
 
 from figaro.server import sutils

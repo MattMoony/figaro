@@ -2,7 +2,7 @@
 
 import jwt
 import datetime
-import websockets
+import websockets, websockets.server
 from typing import Dict, Any, List
 
 from figaro.server import sutils

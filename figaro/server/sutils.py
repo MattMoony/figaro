@@ -2,7 +2,7 @@
 
 import json
 import secrets
-import websockets
+import websockets, websockets.server
 from base64 import b64encode
 from Crypto.Cipher import AES
 from typing import Optional

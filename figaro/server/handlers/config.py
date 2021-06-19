@@ -1,7 +1,7 @@
 """Handles configuration requests from websockets"""
 
 import json
-import websockets
+import websockets, websockets.server
 from typing import Dict, Any
 
 from figaro import params

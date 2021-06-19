@@ -1,6 +1,6 @@
 """The entry point for the websocket server"""
 
-import jwt, asyncio, websockets, threading, json, os, hashlib, sys, time, secrets, base64, qrcode
+import jwt, asyncio, websockets, websockets.server, threading, json, os, hashlib, sys, time, secrets, base64, qrcode
 import numpy as np
 import pash.shell
 from io import StringIO
