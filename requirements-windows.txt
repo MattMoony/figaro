@@ -1,5 +1,4 @@
-﻿argon2-cffi==20.1.0
-asciimatics==1.11.0
+﻿asciimatics==1.11.0
 cffi==1.14.0
 colorama==0.4.4
 future==0.18.2

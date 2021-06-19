@@ -13,7 +13,6 @@ from figaro.sounds.sound import Sound
 from figaro.filters.filter import Filter
 from figaro.interpreter import Interpreter
 from figaro.server import db
-from figaro.server.models.user import User
 
 """The basic prompt for the figaro shell"""
 BPROMPT: str = cr.Fore.LIGHTBLUE_EX + 'figaro' + cr.Fore.LIGHTBLACK_EX + '$ ' + cr.Fore.RESET

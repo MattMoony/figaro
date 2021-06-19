@@ -12,7 +12,6 @@ from figaro import params, utils
 from figaro.server import sutils
 from figaro.channel import Channel
 from figaro.server.handlers import auth, audio, config
-from figaro.server.models.user import User
 
 """30.05.2021 - Deprecating: The configuration of the websocket server"""
 conf: Dict[str, Any] = dict()
@@ -22,12 +21,6 @@ key: bytes = None
 sh: pash.shell.Shell = None
 """The main audio channel"""
 ch: Channel = None
-
-"""30.05.2021 - Deprecating: Special unauthenticated websockets commands"""
-noauth_cmds: Dict[str, Callable[[websockets.server.WebSocketServerProtocol, Dict[str, Any], str, Dict[str, Any]], None]] = {
-    'auth': auth.auth,
-    'auth-status': auth.auth_status,
-}
 
 """Special authenticated websockets commands"""
 auth_cmds: Dict[str, Callable[[websockets.server.WebSocketServerProtocol, Dict[str, Any], str, Channel], None]] = {
