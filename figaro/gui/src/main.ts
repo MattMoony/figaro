@@ -22,7 +22,7 @@ function createWindow (): void {
     resizable: true,
     backgroundColor: '#0B3954',
     title: 'Figaro',
-    icon: process.platform === 'win32' ? path.resolve(__dirname, '..', '..', '..', 'media', 'figaro.ico') : path.resolve(__dirname, '..', '..', '..', 'media', 'figaro.icns'),
+    icon: path.resolve(__dirname, '..', '..', '..', 'media', process.platform === 'win32' ? 'figaro.ico' : process.platform === 'darwin' ? 'figaro.icns' : 'figaro-256x256.png'),
   });
   const figaro: ChildProcessWithoutNullStreams = spawn(process.platform === 'win32' ? 'python' : '/usr/bin/env python3', [ path.resolve(__dirname, '..', '..', '..', 'figaro.py'), '-s', ]);
   figaro.stdout.once('data', () => {
