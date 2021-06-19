@@ -84,7 +84,7 @@ log "info" "Installing requirements via pip ... "
 python -m pip install -r .\requirements-windows.txt
 
 log "info" "Installing node requirements (electron part) ... "
-Set-Location figaro/gui/
+Set-Location lib/gui/
 npm i
 
 log "info" "Installing node requirements (web/gatsby part) ... "

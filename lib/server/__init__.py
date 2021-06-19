@@ -8,10 +8,10 @@ from getpass import getpass
 from Crypto.Cipher import AES
 from typing import Dict, Any, Callable
 
-from figaro import params, utils
-from figaro.server import sutils
-from figaro.channel import Channel
-from figaro.server.handlers import auth, audio, config
+from lib import params, utils
+from lib.server import sutils
+from lib.channel import Channel
+from lib.server.handlers import auth, audio, config
 
 """30.05.2021 - Deprecating: The configuration of the websocket server"""
 conf: Dict[str, Any] = dict()
@@ -93,7 +93,7 @@ def create_conf_prompt() -> None:
     """
     Prompt the user to create a config file.
     """
-    with open(os.path.join(params.BPATH, 'figaro', 'server', 'conf.json'), 'w') as f:
+    with open(os.path.join(params.BPATH, 'lib', 'server', 'conf.json'), 'w') as f:
         while True:
             secret_len = input('Enter secret length [default 512 (bits)]: ')
             if not secret_len.strip():
@@ -110,7 +110,7 @@ def create_conf_prompt() -> None:
             break
         secret = secrets.token_bytes(secret_len//8)
         f.write(json.dumps(dict(secret=base64.b64encode(secret).decode())))
-        with open(os.path.join(params.BPATH, 'figaro', 'gui', '.tkn'), 'w') as o:
+        with open(os.path.join(params.BPATH, 'lib', 'gui', '.tkn'), 'w') as o:
             root = User.load_root()
             o.write(jwt.encode({ 'uname': root.uname, }, secret, algorithm='HS256'))
 
@@ -119,7 +119,7 @@ def load_conf() -> None:
     30.05.2021 - Deprecating: Loads the config and decodes values where needed.
     """
     global conf
-    with open(os.path.join(params.BPATH, 'figaro', 'server', 'conf.json')) as f:
+    with open(os.path.join(params.BPATH, 'lib', 'server', 'conf.json')) as f:
         conf = json.load(f)
         conf['secret'] = base64.b64decode(conf['secret'])
         auth.init(conf)
@@ -148,7 +148,7 @@ def start(shell: pash.shell.Shell, channel: Channel) -> None:
     global sh, ch, key
     # load_conf()
     key = secrets.token_bytes(32)
-    with open(os.path.join(params.BPATH, 'figaro', 'gui', '.key'), 'w') as f:
+    with open(os.path.join(params.BPATH, 'lib', 'gui', '.key'), 'w') as f:
         f.write(base64.b64encode(key).decode())
     show_key()
     sh = shell

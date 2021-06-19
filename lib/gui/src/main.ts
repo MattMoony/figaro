@@ -34,8 +34,8 @@ function createWindow (): void {
   figaro.stdout.once('data', () => {
     console.log('Got data ... ');
 
-    process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-    win.webContents.openDevTools();
+    // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+    // win.webContents.openDevTools();
     win.removeMenu();
     
     // win.loadURL('about:blank');
@@ -48,9 +48,9 @@ function createWindow (): void {
       else e.returnValue = '';
     });
     
-    // loadURL(win);
+    loadURL(win);
     // win.loadURL(`http://${conf.host}:${conf.port}`);
-    win.loadURL(`http://localhost:8000/`);
+    // win.loadURL(`http://localhost:8000/`);
     win.once('ready-to-show', () => win.show());
   });
   figaro.stdout.on('data', (data) => console.log(data.toString()));

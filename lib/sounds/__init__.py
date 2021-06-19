@@ -6,7 +6,7 @@ import json
 import collections
 from typing import List, Dict, Any
 
-from figaro import params, utils
+from lib import params, utils
 
 """The path to the default sound-file directory"""
 SPATH: str = os.path.join(params.BPATH, 'res', 'sounds')

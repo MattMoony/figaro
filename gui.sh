@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cd figaro/gui
+cd lib/gui
 npm run dev:nodemon
 cd ../../

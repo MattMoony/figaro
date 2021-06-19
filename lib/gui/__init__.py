@@ -3,12 +3,12 @@
 import http.server, socketserver, threading, os, json
 from typing import Tuple, Optional
 
-from figaro import utils, params
+from lib import utils, params
 
 """The actual HTTP daemon"""
 httpd: socketserver.TCPServer = None
 """The path to the GUI package directory"""
-bpath: str = os.path.join(params.BPATH, 'figaro', 'gui')
+bpath: str = os.path.join(params.BPATH, 'lib', 'gui')
 """The config for the HTTP server"""
 conf: object = {}
 

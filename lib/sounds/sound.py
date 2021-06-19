@@ -3,7 +3,7 @@
 import os, pydub as pyd
 from typing import Optional, Dict, Any
 
-from figaro import params
+from lib import params
 
 class Sound(object):
     """
