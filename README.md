@@ -3,9 +3,9 @@
 </p>
 <h1 align="center">Figaro</h1>
 <p align="center">
-  <img alt="License" src="https://img.shields.io/github/license/MattMoony/figaro">
-  <img alt="Top Language" src="https://img.shields.io/github/languages/top/MattMoony/figaro">
-  <img alt="GitHub stars" src="https://img.shields.io/github/stars/MattMoony/figaro?style=social">
+  <img alt="GitHub" src="https://img.shields.io/github/license/MattMoony/figaro?style=for-the-badge">
+  <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/MattMoony/figaro?style=for-the-badge">
+  <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/MattMoony/figaro?style=for-the-badge&color=cecece">
 </p>
 
 ---
@@ -196,11 +196,8 @@ Just a small preview of what is about to come. It's very likely that this roadma
   * [x] Hotkeys
   * [ ] Advanced builtins
 * [ ] Security
-  * [ ] Remote ...
-    * [x] Authentication
-    * [ ] Authorization
-    * [ ] Accounting
-  * [ ] Encrypted sockets
+  * [x] Remote Authentication
+  * [x] Encrypted sockets
   * [ ] Fine-grained settings
 
 ## References
@@ -213,4 +210,4 @@ Just a small preview of what is about to come. It's very likely that this roadma
 
 ---
 
-... MattMoony (June 2020)
+... MattMoony (June 2021)

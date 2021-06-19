@@ -1,46 +1,13 @@
 # GUI - Usage
 
-To be able to use Figaro's GUI, you first need to start the Figaro CLI and its websocket server ...
+At the moment, to run Figaro's GUI, depending on the platform you're on, run the appropriate script from the project's root directory.
 
-```bash
-$ python figaro.py -s
-```
-
-... if doing this for the first time, you will be entering into the initial setup and configuration process ...
-
-## Setup and Configuration
-
-First, you will be asked to create an admin account by providing both username and password ... 
-
-<p align="center">
-  <img src="../media/gui/setup-1.JPG">
-</p>
-
-... after that you will be asked how long the JWT-secret key should be - the default option being `512 bits`. Although it is your choice remember that a key length of `< 256 bits` [is not recommended](https://tools.ietf.org/html/rfc7518#section-3.2) and a key length of `>= 512 bits` [is preferrable](https://auth0.com/blog/brute-forcing-hs256-is-possible-the-importance-of-using-strong-keys-to-sign-jwts/) ...
-
-<p align="center">
-  <img src="../media/gui/setup-2.JPG">
-</p>
-
-... and that's it. After completing these dialogs, you will be taken to the regular Figaro CLI prompt. So... time to switch to the actual GUI part.
+* Linux & macOS: `./gui.sh`
+* Windows: `.\gui.ps1`
 
 ## Basic GUI Usage
 
-When first opening the Figaro GUI, you will very politely be asked to login to verify your identity ...
-
-<p align="center">
-  <img src="../media/gui/basic-1.JPG">
-</p>
-
-... you can open the login dialog by simply pressing the noticeably pink button in the top right corner (_what a surprise_) ...
-
-<p align="center">
-  <img src="../media/gui/basic-2.JPG">
-</p>
-
-... simply fill the inputs with the information from one of the accounts you have created and, _et voilà_, you are presented with the Figaro GUI in all its glory! ... Except... not really 😄. 
-
-When first signing in, the GUI will, in fact, look astonishingly empty: 
+When first opening Figaro, the GUI will, in fact, look astonishingly empty:
 
 <p align="center">
   <img src="../media/gui/basic-3.JPG">
@@ -63,16 +30,6 @@ The general structure of the Figaro GUI is the following:
 Despite the general _Figaro_ heading, the most important thing that can be found here, is the button to open the login/logout prompts. The individual dialogs shouldn't be too difficult to interact with, so feel free to skip this part.
 
 Since you are reading this, I think I can rightfully assume that you're interested in a detailed description of how to interact with this button and the subsequent dialogs. Since the process of logging in has already been covered in the [setup and configuration](#setup-and-configuration) section of this usage guide, I'll only cover the logout dialog here.
-
-#### Logout
-
-Once you are logged in (you can easily check if this is true by looking at the button in the top right corner of your screen, if it contains a username + a user icon, you have, in fact, successfully been authenticated) you can choose to logout by simply pressing the same button you used to log in again.
-
-This will present you with the following dialog, where all you have to do is confirm your choice:
-
-<p align="center">
-  <img src="../media/gui/logout.JPG">
-</p>
 
 ### Workspace
 

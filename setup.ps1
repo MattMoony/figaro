@@ -106,9 +106,7 @@ if ($yN.StartsWith("y")) {
 
 log "success" 'Finished setting up "Figaro"'
 
-log "info" "If you want to use the GUI, you should now run"
-log "info" "python .\figaro.py -s"
-log "info" "enter some user credentials when prompted to do so (this is so in future versions you can also use Figaro accross the network), then quit and run"
+log "info" "If you want to use the GUI, just run"
 log "info" ".\gui.ps1"
 
 Set-Location $OriginalPath
