@@ -8,10 +8,13 @@ pash-cmd==0.0.7
 Pillow==8.2.0
 PyAudio==0.2.11
 pycparser==2.20
+pycryptodome==3.10.1
 pydub==0.24.1
 pyfiglet==0.8.post1
 PyJWT==2.1.0
 pynput==1.6.8
+python-xlib==0.29
+qrcode==6.1
 six==1.15.0
 wcwidth==0.2.5
 websockets==9.1

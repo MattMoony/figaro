@@ -39,11 +39,11 @@ async def auth(ws: websockets.server.WebSocketServerProtocol, req: Dict[str, Any
     else:
         await sutils.error(ws, 'Wrong password provided!', rid)
 
-async def auth_status(ws: websockets.server.WebSocketServerProtocol, req: Dict[str, Any], rid: str) -> None:
+async def auth_status(ws: websockets.server.WebSocketServerProtocol, key: bytes, req: Dict[str, Any], rid: str, *args) -> None:
     """
     Informs about the client about its current authentication status.
     """
-    await sutils.success(ws, None, rid, logged_in=verify_tkn(req))
+    await sutils.success(ws, key, None, rid, logged_in=True)
 
 def init(_conf: Dict[str, Any]) -> None:
     """
