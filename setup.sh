@@ -24,6 +24,10 @@ log() {
 
 log "success" "Setting up \"Figaro\""
 
+ORIGINAL_PATH=`pwd`
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+cd $SCRIPT_DIR
+
 log "info" "Checking requirements ... "
 log "info" "Checking python/pip installation ... "
 /usr/bin/env python3 --version >/dev/null
@@ -73,3 +77,5 @@ log "info" "If you want to use the GUI, you should now run"
 log "info" "python3 .\figaro.py -s"
 log "info" "enter some user credentials when prompted to do so (this is so in future versions you can also use Figaro accross the network), then quit and run"
 log "info" "./gui.sh"
+
+cd $ORIGINAL_PATH

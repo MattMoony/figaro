@@ -15,6 +15,9 @@ function log {
 
 log "success" 'Setting up "Figaro"'
 
+$OriginalPath = Get-Location
+Set-Location $PSScriptRoot
+
 log "info" "Checking requirements ... "
 log "info" "Checking python/pip installation ... "
 $PyVersion = (python --version).Replace('.', '').Split(' ')[1].SubString(0,2)
@@ -58,7 +61,7 @@ if ($Arch -eq 64) {
     $Arch = "win32"
 }
 log "warning" "The Windows PyAudio build has to be downloaded manually!"
-$yN = (Read-Host -Prompt "Do you want to download it now? (If you don't now and installing the requirements fails, simply run this setup script again)")
+$yN = (Read-Host -Prompt "Do you want to download it now? (If you don't now and installing the requirements fails, simply run this setup script again)").ToLower()
 if ($yN.StartsWith("y")) {
     $WheelName = "PyAudio-0.2.11-cp${PyVersion}-cp${ExtPyVersion}-${Arch}.whl"
     log "warning" "Download the `"$WheelName`" wheel"
@@ -107,3 +110,5 @@ log "info" "If you want to use the GUI, you should now run"
 log "info" "python .\figaro.py -s"
 log "info" "enter some user credentials when prompted to do so (this is so in future versions you can also use Figaro accross the network), then quit and run"
 log "info" ".\gui.ps1"
+
+Set-Location $OriginalPath
