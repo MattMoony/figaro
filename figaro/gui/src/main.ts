@@ -24,7 +24,13 @@ function createWindow (): void {
     title: 'Figaro',
     icon: path.resolve(__dirname, '..', '..', '..', 'media', process.platform === 'win32' ? 'figaro.ico' : process.platform === 'darwin' ? 'figaro.icns' : 'figaro-256x256.png'),
   });
-  const figaro: ChildProcessWithoutNullStreams = spawn(process.platform === 'win32' ? 'python' : '/usr/bin/env python3', [ path.resolve(__dirname, '..', '..', '..', 'figaro.py'), '-s', ]);
+  let python: string = 'python';
+  const args: string[] = [ path.resolve(__dirname, '..', '..', '..', 'figaro.py'), '-s', ];
+  if (process.platform !== 'win32') {
+    python = '/usr/bin/env';
+    args.unshift('python3');
+  }
+  const figaro: ChildProcessWithoutNullStreams = spawn(python, args);
   figaro.stdout.once('data', () => {
     console.log('Got data ... ');
 
@@ -42,9 +48,9 @@ function createWindow (): void {
       else e.returnValue = '';
     });
     
-    // loadURL(win);
+    loadURL(win);
     // win.loadURL(`http://${conf.host}:${conf.port}`);
-    win.loadURL(`http://localhost:8000/`);
+    // win.loadURL(`http://localhost:8000/`);
     win.once('ready-to-show', () => win.show());
   });
   figaro.stdout.on('data', (data) => console.log(data.toString()));
