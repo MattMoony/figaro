@@ -15,6 +15,7 @@ class Index extends React.Component {
 
   private wave: AudioWave;
   private soundboard: Soundboard;
+  private filters: FiltersManager;
   public context: AppContextProps;
 
   public render () {
@@ -25,11 +26,10 @@ class Index extends React.Component {
             <DragWorkspace windows={this.windows} zMin={10}>
               <DragWindow ref={e => this.windows.add(e)} icon={faPlus} title="Filters" style={{
                 minWidth: '200px',
-                width: '15%',
                 maxWidth: '500px',
                 maxHeight: '350px',
-              }}>
-                <FiltersManager />
+              }} onShow={() => this.filters.refresh()}>
+                <FiltersManager ref={e => this.filters = e} />
               </DragWindow>
               <DragWindow ref={e => this.windows.add(e)} icon={faDrum} title="Sounds" style={{
                 maxWidth: '350px',

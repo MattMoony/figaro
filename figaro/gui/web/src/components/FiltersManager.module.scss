@@ -1,19 +1,127 @@
 .root {
     width: 100%;
+    user-select: none;
+    -webkit-user-select: none;
 
     & > div {
         width: 100%;
         padding: 5px;
         box-sizing: border-box;
 
+        &.currentFilters {
+            padding: 0;
+            margin-bottom: 10px;
+            
+            & > div {
+                margin: 5px 0;
+
+                &:first-child {
+                    margin-top: 0;
+                }
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                .closeFilter {
+                    transition: .2s ease;
+
+                    &:hover {
+                        cursor: pointer;
+                        color: #d14047;
+                        transform: scale(1.05);
+                    }
+                }
+
+                .filterForm {
+                    color: #6d92a8;
+    
+                    .formRow {
+                        width: 100%;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+    
+                        label {
+                            margin-right: 5px;
+                        }
+                    }
+                }
+            }
+        }
+
         &.add {
             display: flex;
             justify-content: center;
             font-weight: bold;
             background-color: #D14081;
+            transition: .2s ease;
+
+            &:hover {
+                cursor: pointer;
+                opacity: .9;
+            }
 
             & > i {
                 margin-right: 5px;
+            }
+        }
+    }
+
+    .selectPopup {
+        min-width: 300px;
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: normal;
+            font-size: 1.5em;
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #072435;
+            margin-bottom: 10px;
+        }
+
+        & > div {
+            box-sizing: border-box;
+            overflow-y: auto;
+            max-height: 300px;
+
+            &::-webkit-scrollbar {
+                width: 5px;
+            }
+    
+            &::-webkit-scrollbar-track {
+                background-color: rgba(0,0,0,.3);
+            }
+    
+            &::-webkit-scrollbar-thumb {
+                background-color: #1a6594;
+                border-radius: 5px;
+            }
+
+            & > div {
+                padding: 5px 7.5px;
+                transition: .2s ease;
+
+                &:nth-child(even) {
+                    background-color: #0a3147;
+                }
+
+                &:hover {
+                    cursor: pointer;
+                    opacity: .7;
+                }
+
+                & > h3 {
+                    font-size: 1.2em;
+                    font-weight: normal;
+                    margin: 0;
+                }
+
+                & > p {
+                    margin: 0;
+                    color: #6d92a8;
+                }
             }
         }
     }
