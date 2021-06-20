@@ -1,5 +1,5 @@
 import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
-import fs from 'fs';
+import open from 'open';
 import path from 'path';
 import serve from 'electron-serve';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
@@ -59,8 +59,9 @@ function createWindow (): void {
   figaro.stdout.on('data', (data) => {
     if (data.toString().includes('Use this QR code')) {
       const key: string = data.toString().split('devices: ')[1].split('\n')[0].trim();
-      ipcMain.on('comms', (e: IpcMainEvent, action: string) => {
-        if (action === 'get-key') e.returnValue = key; 
+      ipcMain.on('comms', (e: IpcMainEvent, action: string, ...args: string[]) => {
+        if (action === 'get-key') e.returnValue = key;
+        else if (action === 'open-sounds') open(path.resolve(__dirname, '..', '..', '..', 'res', 'sounds'));
         else e.returnValue = '';
       });
       // console.log(key);

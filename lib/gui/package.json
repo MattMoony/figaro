@@ -96,6 +96,7 @@
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^5.15.3",
-    "electron-serve": "^1.1.0"
+    "electron-serve": "^1.1.0",
+    "open": "^8.2.0"
   }
 }

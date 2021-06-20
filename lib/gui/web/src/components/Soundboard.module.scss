@@ -4,11 +4,30 @@
     align-items: stretch;
     flex-direction: column;
 
-    & > input {
+    & > .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 5px;
         margin-bottom: 15px;
+
+        & > input {
+            margin-right: 15px;
+        }
+
+        & > i {
+            color: #0B3954;
+            font-size: 2em;
+            transition: .2s ease;
+
+            &:hover {
+                cursor: pointer;
+                transform: scale(1.15);
+            }
+        }
     }
 
-    & > div {
+    & > .sounds {
         display: flex;
         justify-content: center;
         align-items: flex-start;

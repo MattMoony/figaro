@@ -2,6 +2,8 @@ import React from 'react';
 import style from './Soundboard.module.scss';
 import { AppConsumer, AppContextProps, Response } from './AppContext';
 import FancyInput from './FancyInput';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFolder } from '@fortawesome/free-solid-svg-icons';
 
 interface SoundboardProps {
 }
@@ -13,6 +15,7 @@ interface SoundboardState {
 
 export default class Soundboard extends React.Component<SoundboardProps, SoundboardState> {
   public context: AppContextProps;
+  private electron: any;
 
   constructor (props) {
     super(props);
@@ -24,6 +27,7 @@ export default class Soundboard extends React.Component<SoundboardProps, Soundbo
 
   public componentDidMount (): void {
     this.context.onLogin(() => this.refresh());
+    this.electron = window.require('electron');
   }
 
   public refresh (): void {
@@ -61,8 +65,11 @@ export default class Soundboard extends React.Component<SoundboardProps, Soundbo
           this.context = ctx;
           return (
             <div className={style.root}>
-              <FancyInput type="text" onKeyUp={this.onSearch.bind(this)} />
-              <div>
+              <div className={style.top}>
+                <FancyInput type="text" onKeyUp={this.onSearch.bind(this)} />
+                <i onClick={() => this.electron.ipcRenderer.send('comms', 'open-sounds')} title="Open sounds folder"><FontAwesomeIcon icon={faFolder} /></i>
+              </div>
+              <div className={style.sounds}>
               { 
                 this.state.filtered.length > 0
                 ? this.state.filtered.map(s => <button className={style.sound} key={s} title={s} onClick={() => this.onPlaySound(s)}>{s[0].toUpperCase()}</button>)
