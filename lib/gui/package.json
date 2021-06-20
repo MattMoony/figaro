@@ -2,16 +2,78 @@
   "name": "figaro-gui",
   "version": "1.0.0",
   "description": "The GUI for the Figaro App.",
-  "main": "dist/main.js",
+  "main": "build/main.js",
+  "build": {
+    "appId": "xyz.m4ttm00ny.figaro",
+    "productName": "Figaro",
+    "copyright": "Copyright © 2021 Matthias Monschein",
+    "mac": {
+      "icon": "../../media/figaro.icns"
+    },
+    "win": {
+      "icon": "../../media/figaro.ico"
+    },
+    "linux": {},
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "extraFiles": [
+      {
+        "from": "../../media/",
+        "to": "media/",
+        "filter": [
+          "figaro*"
+        ]
+      },
+      {
+        "from": "../../res/",
+        "to": "res/",
+        "filter": [
+          "filters/*"
+        ]
+      },
+      {
+        "from": "../../res/sounds/.gitkeep",
+        "to": "res/sounds/.gitkeep"
+      },
+      {
+        "from": "../../dist/figaro/",
+        "to": "bin/",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "web/public",
+        "to": "public/",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "extends": null
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
-    "dev:nodemon": "npm run build && electron .",
+    "dev:nodemon": "npm run build && cross-env NODE_ENV=dev electron .",
     "dev:web": "cd web && npm run dev",
     "build": "tsc",
     "build:web": "cd web && npm run build",
     "start": "cross-env NODE_ENV=production node dist/main.js",
-    "start:web": "cd web && npm start"
+    "start:web": "cd web && npm start",
+    "pack": "npm run build:web && npm run build && npm run pack:fin",
+    "pack:fin": "electron-builder --dir",
+    "dist": "npm run build:web && npm run build && npm run dist:fin",
+    "dist:fin": "electron-builder"
   },
   "repository": {
     "type": "git",
@@ -28,6 +90,7 @@
     "@types/react": "^16.9.41",
     "cross-env": "^7.0.2",
     "electron": "^9.4.4",
+    "electron-builder": "^22.11.7",
     "nodemon": "^2.0.7",
     "typescript": "^3.9.9"
   },

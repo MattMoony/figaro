@@ -4,18 +4,19 @@ import path from 'path';
 import serve from 'electron-serve';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 
-const loadURL = serve({ directory: path.resolve(__dirname, '..', 'web', 'public'), });
+const loadURL = serve({ directory: path.resolve(__dirname, process.env.NODE_ENV === 'dev' ? path.join('..', 'web') : path.join('..', '..', '..'), 'public'), });
 let win: BrowserWindow;
 
-import conf from './config/conf.json';
+// import conf from './config/conf.json';
 
 function createWindow (): void {
-  const sconf: string = path.resolve(__dirname, '..', '..', 'server', 'conf.json');
+  // const sconf: string = path.resolve(__dirname, '..', '..', 'server', 'conf.json');
   win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
     },
     show: false,
     frame: false,
@@ -24,36 +25,48 @@ function createWindow (): void {
     title: 'Figaro',
     icon: path.resolve(__dirname, '..', '..', '..', 'media', process.platform === 'win32' ? 'figaro.ico' : process.platform === 'darwin' ? 'figaro.icns' : 'figaro-256x256.png'),
   });
-  let python: string = 'python';
-  const args: string[] = [ path.resolve(__dirname, '..', '..', '..', 'figaro.py'), '-s', ];
-  if (process.platform !== 'win32') {
-    python = '/usr/bin/env';
-    args.unshift('python3');
+  let cmd: string;
+  let args: string[];
+  if (process.env.NODE_ENV === 'dev') {
+    cmd = 'python';
+    args = [ path.resolve(__dirname, '..', '..', '..', 'figaro.py'), '-s', ];
+    if (process.platform !== 'win32') {
+      cmd = '/usr/bin/env';
+      args.unshift('python3');
+    }
+  } else {
+    cmd = path.resolve(__dirname, '..', '..', '..', 'bin', 'figaro.exe');
+    args = [ '-s', ];
   }
-  const figaro: ChildProcessWithoutNullStreams = spawn(python, args);
+  const figaro: ChildProcessWithoutNullStreams = spawn(cmd, args);
   figaro.stdout.once('data', () => {
     console.log('Got data ... ');
 
-    // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-    // win.webContents.openDevTools();
+    if (process.env.NODE_ENV === 'dev') {
+      process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+      win.webContents.openDevTools();
+    }
     win.removeMenu();
     
-    // win.loadURL('about:blank');
-    // win.webContents.executeJavaScript(`localStorage.setItem('no-logout', true);`);
-    // win.webContents.executeJavaScript(`localStorage.setItem('tkn', '${fs.readFileSync(path.resolve(__dirname, '..', '.tkn'))}');`);
-    // win.webContents.executeJavaScript(`localStorage.setItem('key', '${fs.readFileSync(path.resolve(__dirname, '..', '.key'))}');`);
-
-    ipcMain.on('comms', (e: IpcMainEvent, action: string) => {
-      if (action === 'get-key') e.returnValue = fs.readFileSync(path.resolve(__dirname, '..', '.key')).toString();
-      else e.returnValue = '';
-    });
-    
-    loadURL(win);
-    // win.loadURL(`http://${conf.host}:${conf.port}`);
-    // win.loadURL(`http://localhost:8000/`);
+    if (process.env.NODE_ENV === 'dev' && !process.env.BUILT_WEB) {
+      win.loadURL(`http://localhost:8000/`);
+    } else {
+      console.log(path.resolve(__dirname, process.env.NODE_ENV === 'dev' ? path.join('..', 'web') : path.join('..', '..', '..'), 'public'));
+      loadURL(win);
+    }
     win.once('ready-to-show', () => win.show());
   });
-  figaro.stdout.on('data', (data) => console.log(data.toString()));
+  figaro.stdout.on('data', (data) => {
+    if (data.toString().includes('Use this QR code')) {
+      const key: string = data.toString().split('devices: ')[1].split('\n')[0].trim();
+      ipcMain.on('comms', (e: IpcMainEvent, action: string) => {
+        if (action === 'get-key') e.returnValue = key; 
+        else e.returnValue = '';
+      });
+      // console.log(key);
+    }
+    console.log(data.toString());
+  });
   figaro.stderr.on('data', (data) => console.log(data.toString()));
 }
 

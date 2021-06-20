@@ -148,8 +148,8 @@ def start(shell: pash.shell.Shell, channel: Channel) -> None:
     global sh, ch, key
     # load_conf()
     key = secrets.token_bytes(32)
-    with open(os.path.join(params.BPATH, 'lib', 'gui', '.key'), 'w') as f:
-        f.write(base64.b64encode(key).decode())
+    # with open(os.path.join(params.BPATH, 'res', '.key'), 'w') as f:
+    #     f.write(base64.b64encode(key).decode())
     show_key()
     sh = shell
     ch = channel
