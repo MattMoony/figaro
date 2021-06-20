@@ -35,7 +35,7 @@ function createWindow (): void {
       args.unshift('python3');
     }
   } else {
-    cmd = path.resolve(__dirname, '..', '..', '..', 'bin', 'figaro.exe');
+    cmd = path.resolve(__dirname, '..', '..', '..', 'bin', process.platform === 'win32' ? 'figaro.exe' : 'figaro');
     args = [ '-s', ];
   }
   const figaro: ChildProcessWithoutNullStreams = spawn(cmd, args);

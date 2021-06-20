@@ -8,12 +8,22 @@
     "productName": "Figaro",
     "copyright": "Copyright © 2021 Matthias Monschein",
     "mac": {
+      "category": "public.app-category.utilities",
       "icon": "../../media/figaro.icns"
     },
     "win": {
-      "icon": "../../media/figaro.ico"
+      "icon": "../../media/figaro.ico",
+      "target": [
+        "nsis",
+        "zip"
+      ]
     },
-    "linux": {},
+    "linux": {
+      "target": [
+        "tar.gz",
+        "snap"
+      ]
+    },
     "nsis": {
       "oneClick": false,
       "perMachine": false,
