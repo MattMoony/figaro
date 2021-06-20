@@ -13,9 +13,9 @@ res/sounds/*
 !res/sounds/.gitkeep
 !res/filters
 
-figaro/server/conf.json
-figaro/gui/.tkn
-figaro/gui/.key
+lib/server/conf.json
+lib/gui/.tkn
+lib/gui/.key
 
 build/
 figaro.spec

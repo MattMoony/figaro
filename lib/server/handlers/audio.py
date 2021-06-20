@@ -6,8 +6,8 @@ import asyncio
 import websockets, websockets.server
 from typing import Dict, Any
 
-from figaro.server import sutils
-from figaro.channel import Channel
+from lib.server import sutils
+from lib.channel import Channel
 
 async def send_audio(ws: websockets.server.WebSocketServerProtocol, ch: Channel, scale: float):
     """

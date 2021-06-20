@@ -4,9 +4,9 @@ import json
 import websockets, websockets.server
 from typing import Dict, Any
 
-from figaro import params
-from figaro.server import sutils
-from figaro.channel import Channel
+from lib import params
+from lib.server import sutils
+from lib.channel import Channel
 
 async def get_conf(ws: websockets.server.WebSocketServerProtocol, key: bytes, req: Dict[str, Any], rid: str, ch: Channel) -> None:
     """

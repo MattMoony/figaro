@@ -4,10 +4,10 @@ import secrets
 import numpy as np
 from typing import List, Dict, Any
 
-import figaro.filters.filter
+import lib.filters.filter
 
-class Distort(figaro.filters.filter.Filter):
-    class Filter(figaro.filters.filter.Filter.Filter):
+class Distort(lib.filters.filter.Filter):
+    class Filter(lib.filters.filter.Filter.Filter):
         """
         Distorts audio.
         

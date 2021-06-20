@@ -6,13 +6,13 @@ cr.init()
 from asciimatics.screen import Screen
 from typing import List
 
-from figaro import params, utils, server, gui, filters, sounds
-from figaro.device import Device
-from figaro.channel import Channel
-from figaro.sounds.sound import Sound
-from figaro.filters.filter import Filter
-from figaro.interpreter import Interpreter
-from figaro.server import db
+from lib import params, utils, server, gui, filters, sounds
+from lib.device import Device
+from lib.channel import Channel
+from lib.sounds.sound import Sound
+from lib.filters.filter import Filter
+from lib.interpreter import Interpreter
+from lib.server import db
 
 """The basic prompt for the figaro shell"""
 BPROMPT: str = cr.Fore.LIGHTBLUE_EX + 'figaro' + cr.Fore.LIGHTBLACK_EX + '$ ' + cr.Fore.RESET

@@ -60,7 +60,7 @@ log "info" "Installing python requirements ... "
 /usr/bin/env python3 -m pip install -r ./requirements-unix.txt
 
 log "info" "Installing node requirements (electron part) ... "
-cd figaro/gui/
+cd lib/gui/
 npm i
 
 log "info" "Installing node requirements (web/gatsby part) ... "

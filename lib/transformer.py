@@ -4,7 +4,7 @@ import numpy as np, json
 from threading import Lock
 from typing import List, Optional
 
-from figaro.filters.filter import Filter
+from lib.filters.filter import Filter
 
 class Transformer(object):
     """

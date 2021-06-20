@@ -3,7 +3,7 @@
 import pash.misc, pash.cmds, sys
 from argparse import ArgumentParser
 
-from figaro import cmd, params, gui
+from lib import cmd, params, gui
 
 def main():
     parser = ArgumentParser()
