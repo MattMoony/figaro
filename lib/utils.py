@@ -2,6 +2,7 @@
 
 import re
 import os
+import sys
 import colorama as cr
 cr.init()
 
@@ -34,3 +35,7 @@ def touch(path: str) -> None:
     """Create an empty file"""
     with open(path, 'w') as f:
         f.write('')
+
+def platform_ext(path: str) -> None:
+    """Appends the correct binary file extension, depending on the current platform"""
+    return f'{path}.exe' if sys.platform == 'win32' else path

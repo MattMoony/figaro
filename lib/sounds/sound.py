@@ -1,9 +1,17 @@
 """Wrapper class for a playable audio file"""
 
-import os, pydub as pyd
+import os
+from subprocess import Popen
 from typing import Optional, Dict, Any
 
-from lib import params
+from lib import params, utils
+
+try:
+    Popen(['ffmpeg',])
+except FileNotFoundError:
+    os.environ['PATH'] = os.environ['PATH'] + ';' + os.path.abspath(os.path.join(params.BPATH, 'static'))
+
+import pydub as pyd
 
 class Sound(object):
     """
@@ -42,7 +50,7 @@ class Sound(object):
 
     def __init__(self, fname: str, amp: float = 1.):
         with open(fname, 'rb') as f:
-            self.audio: pydub.AudioSegment = pyd.AudioSegment.from_file(f)
+            self.audio: pyd.AudioSegment = pyd.AudioSegment.from_file(f)
         self.audio = self.audio.set_frame_rate(params.SMPRATE).set_channels(params.CHNNLS)
         self.amp: float = amp
         self.f_size: int = self.audio.sample_width

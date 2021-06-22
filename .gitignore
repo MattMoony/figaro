@@ -19,3 +19,4 @@ lib/gui/.key
 
 build/
 figaro.spec
+static/
