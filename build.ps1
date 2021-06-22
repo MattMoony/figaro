@@ -41,7 +41,7 @@ log "success" "Pyinstaller found/installed!"
 
 log "info" 'Building "figaro-cli" w. pyinstaller'
 
-pyinstaller -ci ".\media\figaro.ico" .\figaro.py
+pyinstaller --noupx -ci ".\media\figaro.ico" .\figaro.py
 
 log "success" 'Finished building "figaro-cli"'
 
