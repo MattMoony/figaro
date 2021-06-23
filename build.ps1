@@ -46,7 +46,10 @@ pyinstaller --noupx -ci ".\media\figaro.ico" .\figaro.py
 log "success" 'Finished building "figaro-cli"'
 
 log "info" "Building the GUI"
+
 Set-Location lib/gui/
 npm run dist
+
+log "success" "Finished building the GUI"
 
 Set-Location $OriginalPath

@@ -1,6 +1,6 @@
 {
   "name": "figaro-gui",
-  "version": "1.0.0",
+  "version": "0.3.0-alpha",
   "description": "The GUI for the Figaro App.",
   "main": "build/main.js",
   "build": {
