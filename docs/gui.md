@@ -1,9 +1,22 @@
 # GUI - Usage
 
-At the moment, to run Figaro's GUI, depending on the platform you're on, run the appropriate script from the project's root directory.
+## Launching
+
+If you are using one of the releases available for download on the [release](https://github.com/MattMoony/figaro/releases) page, simply starting *Figaro* should already present you with its GUI.
+
+### Development
+
+At the moment, the easiest way to run Figaro's GUI in your development environment, depending on the platform you're on, is to simply run the appropriate script from the project's root directory.
 
 * Linux & macOS: `./gui.sh`
 * Windows: `.\gui.ps1`
+
+... bear in mind that for this to work, however, you should also launch the `gatsby` development environment for the web part of the GUI in a separate shell:
+
+```bash
+cd lib/gui/web
+npm run dev
+```
 
 ## Basic GUI Usage
 
@@ -25,11 +38,19 @@ The general structure of the Figaro GUI is the following:
 
 ## GUI Components
 
+### Title- / Controlbar
+
+Your classical window controlbar that grants you the controls you'd normally find on every window: *minimize*, *toggle maximize*, *close*.
+
+![controlbar](../media/gui/titlebar.JPG)
+
 ### Header
 
-Despite the general _Figaro_ heading, the most important thing that can be found here, is the button to open the login/logout prompts. The individual dialogs shouldn't be too difficult to interact with, so feel free to skip this part.
+<img align="right" src="../media/gui/auth-key.JPG" height="175px" />
 
-Since you are reading this, I think I can rightfully assume that you're interested in a detailed description of how to interact with this button and the subsequent dialogs. Since the process of logging in has already been covered in the [setup and configuration](#setup-and-configuration) section of this usage guide, I'll only cover the logout dialog here.
+Despite the general _Figaro_ heading, the most important thing that can be found here, is the button that will show you the QR code for authenticating mobile devices in future updates.
+
+Other than that, at the moment, there's not much more functionality in this header part of the program. _Stay tuned for Figaro's mobile app, however... ^^_
 
 ### Workspace
 
@@ -43,7 +64,16 @@ To open such a window, simply _right click_ anywhere on the workspace area in th
 
 #### Filters
 
-_soon to be implemented and documented_
+Upon opening the *Filters* workspace component, you won't see too much, apart from a big pink *"Add"* button - click on it and you'll be able to add any one of the filters you have installed to your current audio stream.
+
+Click on one or multiple to select them and then simply click outside the popup to hide it again. You'll now see all of the currently applied filters in the dragable filters window.
+
+To modify any of the running filters' settings / options, simply open the filters dropdown menu and adjust any one of their individual sliders.
+
+<div align="center">
+  <img src="../media/gui/filters.JPG" />
+  <img src="../media/gui/filters-2.JPG" />
+</div>
 
 #### Sounds
 

@@ -12,18 +12,23 @@
 
 ## About
 
-Real-time open-source voice modification program. Can be useful for many things, especially when used in combination with virtual sound i/o devices.
+Real-time open-source voice modification program & sound board. Can be useful for many things, especially when used in combination with virtual sound i/o devices.
+
+![figaro collage](media/figaro-collage.png)
+
+![figaro demo](media/figaro-demo.gif)
 
 ## Table of Contents
 
 - [About](#about)
 - [Table of Contents](#table-of-contents)
 - [Setup](#setup)
-  - [Linux](#linux)
-  - [Mac](#mac)
-  - [Windows](#windows)
-  - [Manual Setup](#manual-setup)
-    - [Advanced setup](#advanced-setup)
+  - [Development](#development)
+    - [Linux](#linux)
+    - [Mac](#mac)
+    - [Windows](#windows)
+    - [Manual Setup](#manual-setup)
+  - [Advanced setup](#advanced-setup)
 - [Usage](#usage)
   - [CLI](#cli)
   - [GUI](#gui)
@@ -38,9 +43,18 @@ Real-time open-source voice modification program. Can be useful for many things,
 
 ## Setup
 
-If you're on `Linux` or `Windows`, setup is much easier now! Simply run the appropriate setup script and it will guide you through the whole process.
+If you're just looking to use *Figaro* and not work on it, then there's no reason to set up the development environment like described below, simply download the appropriate release for your platform from the [releases](https://github.com/MattMoony/figaro/releases) page and you're good to go!
 
-### Linux
+<div align="center">
+  <a href="https://github.com/MattMoony/figaro/releases/download/v0.3-alpha/Figaro.Setup.0.3.0-alpha.exe"><img src="media/download-windows.png" height="75px" /></a>
+  <a href="https://github.com/MattMoony/figaro/releases/download/v0.3-alpha/figaro-gui-0.3.0-alpha.tar.gz"><img src="media/download-linux.png" height="75px" /></a>
+</div>
+
+### Development
+
+If you're on `Linux`, `Windows` or `Mac`, then setting up should be easy! Simply run the appropriate setup script and it will guide you through the whole process.
+
+#### Linux
 
 Make `./setup.sh` executable ... (or run it with an appropriate interpreter) ...
 
@@ -50,11 +64,11 @@ chmod 755 ./setup.sh
 
 ... execute it: `./setup.sh` ... and have fun with `python figaro.py`!
 
-### Mac
+#### Mac
 
 The same as the [Linux Setup](#linux), just use `./setup-mac.sh` instead of `./setup.sh`.
 
-### Windows
+#### Windows
 
 First, in order to allow the setup _powershell_ script to run, you need to execute the following command in an administrator powershell:
 
@@ -64,7 +78,7 @@ Set-ExecutionPolicy RemoteSigned
 
 ... afterwards, executing `.\setup.ps1` will guide you through the whole setup process! You can now execute `python figaro.py`.
 
-### Manual Setup
+#### Manual Setup
 
 First of all, for `Figaro` to be able to work with audio files other than `wav`, you need to download and install `ffmpeg` (see [References](#References) for the link to the official download page).
 
@@ -76,7 +90,7 @@ First of all, for `Figaro` to be able to work with audio files other than `wav`,
 
 If everything works out, you're good to go!
 
-#### Advanced setup
+### Advanced setup
 
 The following steps will explain how to use this program with the commonly used voice-chat application `Discord` on Windows:
 
@@ -181,8 +195,10 @@ Just a small preview of what is about to come. It's very likely that this roadma
 * [ ] [GUI](#gui)
   * [x] I/O device selection
   * [x] Live sound wave graph
-  * [ ] Filter control
-  * [x] Soundboard 
+  * [x] Filter control
+  * [ ] Soundboard
+    * [x] Functionality
+    * [ ] Advanced features
 * [x] Filters
   * [x] Volume
   * [x] Pitch-Shift
