@@ -14,7 +14,7 @@ PyJWT==2.1.0
 pynput==1.6.8
 pypiwin32==223
 python-xlib==0.29
-pywin32==228
+pywin32==301
 qrcode==6.1
 six==1.15.0
 wcwidth==0.2.5
