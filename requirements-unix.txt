@@ -4,7 +4,7 @@ colorama==0.4.4
 future==0.18.2
 numpy==1.21.0
 pash-cmd==0.0.7
-Pillow==8.3.2
+Pillow==9.0.1
 PyAudio==0.2.11
 pycparser==2.20
 pycryptodome==3.10.1
