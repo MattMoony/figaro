@@ -10,7 +10,7 @@ pycparser==2.20
 pycryptodome==3.10.1
 pydub==0.24.1
 pyfiglet==0.8.post1
-PyJWT==2.1.0
+PyJWT==2.4.0
 pynput==1.6.8
 pypiwin32==223
 python-xlib==0.29
