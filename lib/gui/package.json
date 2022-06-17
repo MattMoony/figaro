@@ -106,7 +106,7 @@
     "@types/electron": "^1.6.10",
     "@types/react": "^16.9.41",
     "cross-env": "^7.0.2",
-    "electron": "^9.4.4",
+    "electron": "^15.5.5",
     "electron-builder": "^22.11.7",
     "nodemon": "^2.0.7",
     "typescript": "^3.9.9"
