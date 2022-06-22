@@ -2,7 +2,7 @@
 cffi==1.14.0
 colorama==0.4.4
 future==0.18.2
-numpy==1.21.0
+numpy==1.22.0
 pash-cmd==0.0.7
 Pillow==9.0.1
 PyAudio==0.2.11
