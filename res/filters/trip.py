@@ -1,30 +1,30 @@
-"""Filter to add a trippy sound effect"""
+"""
+Filter to add a trippy sound effect.
+"""
 
-import numpy as np, re
-from typing import List, Dict, Any
+import re
+from typing import Any, Dict, List
 
-from figaro.utils import parse_perc
+import numpy as np
+
 import figaro.filters.filter
+from figaro.utils import parse_perc
+
 
 class Trip(figaro.filters.filter.Filter):
+    """
+    Filter plugin to add a trippy sound effect.
+    """
+
     class Filter(figaro.filters.filter.Filter.Filter):
         """
         Adds a trippy effect to audio.
-
-        ...
-
-        Attributes
-        ----------
-        scale : float
-            How much the echo gets damped on each iteration.
-
-        Methods
-        -------
-        apply(data: np.ndarray)
-            Applies the filter and returns the result.
         """
 
-        def __init__(self, scale: float):
+        scale: float
+        """How much the echo gets damped on each iteration."""
+
+        def __init__(self, scale: float) -> None:
             self.scale: float = scale
             self._prev: np.ndarray = None
 

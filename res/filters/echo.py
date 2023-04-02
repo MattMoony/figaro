@@ -1,33 +1,33 @@
-"""Filter to add an echo"""
+"""
+Filter to add an echo.
+"""
 
-import numpy as np, re
+import re
 from datetime import datetime
-from typing import List, Tuple, Dict, Any
+from typing import Any, Dict, List, Tuple
 
-from figaro.utils import parse_perc
+import numpy as np
+
 import figaro.filters.filter
+from figaro.utils import parse_perc
+
 
 class Echo(figaro.filters.filter.Filter):
+    """
+    Filter plugin to add an echo to audio.
+    """
+
     class Filter(figaro.filters.filter.Filter.Filter):
         """
         Adds an echo to audio.
-
-        ...
-
-        Attributes
-        ----------
-        scale : float
-            How much the echo gets damped on each iteration.
-        pause : float
-            How large the pause between the actual sound and the echo should be.
-
-        Methods
-        -------
-        apply(data: np.ndarray)
-            Applies the filter and returns the result.
         """
 
-        def __init__(self, scale: float, pause: float):
+        scale: float
+        """How much the echo gets damped on each iteration."""
+        pause: float
+        """How large the pause between the actual sound and the echo should be."""
+
+        def __init__(self, scale: float, pause: float) -> None:
             self.scale: float = scale
             self.pause: float = pause
             self._q: List[Tuple[float, np.ndarray]] = []

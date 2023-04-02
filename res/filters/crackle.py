@@ -1,28 +1,30 @@
-"""A crackling filter for audio"""
+"""
+A crackling filter for audio.
+"""
+
+from typing import Any, Dict, List
 
 import numpy as np
-from typing import List, Dict, Any
 
 import figaro.filters.filter
 from figaro.utils import parse_perc
 
+
 class Crackle(figaro.filters.filter.Filter):
+    """
+    Filter plugin for adding a crackling 
+    effect to audio.
+    """
+
     class Filter(figaro.filters.filter.Filter.Filter):
         """
         Adds a crackling effect to audio.
-
-        Attributes
-        ----------
-        fac : float
-            How much crackling should be applied.
-
-        Methods
-        -------
-        apply(data: np.ndarray)
-            Applies the filter and returns the result.
         """
 
-        def __init__(self, fac: float):
+        fac: float
+        """How much crackling should be applied."""
+
+        def __init__(self, fac: float) -> None:
             self.fac: float = fac
 
         @classmethod

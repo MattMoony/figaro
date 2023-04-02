@@ -1,28 +1,29 @@
-"""A noise filter for audio"""
+"""
+A noise filter for audio.
+"""
+
+from typing import Any, Dict, List
 
 import numpy as np
-from typing import List, Dict, Any
 
-from figaro.utils import parse_perc
 import figaro.filters.filter
+from figaro.utils import parse_perc
+
 
 class Noise(figaro.filters.filter.Filter):
+    """
+    Filter plugin for adding noise to audio.
+    """
+
     class Filter(figaro.filters.filter.Filter.Filter):
         """
         Adds noise to audio.
-
-        Attributes
-        ----------
-        amp : float 
-            The amplitude.
-
-        Methods
-        -------
-        apply(data: np.ndarray)
-            Applies the filter and returns the result.
         """
 
-        def __init__(self, amp: float):
+        amp: float
+        """The amplitude."""
+
+        def __init__(self, amp: float) -> None:
             self.amp: float = amp
 
         @classmethod

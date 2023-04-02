@@ -1,30 +1,29 @@
-"""Filter to change the voice's pitch"""
+"""
+Filter to change the voice's pitch.
+"""
+
+from typing import Any, Dict, List
 
 import numpy as np
-from typing import List, Dict, Any
 
-from figaro.utils import parse_perc
 import figaro.filters.filter
+from figaro.utils import parse_perc
+
 
 class Pitch(figaro.filters.filter.Filter):
+    """
+    Filter plugin to change the voice's pitch.
+    """
+
     class Filter(figaro.filters.filter.Filter.Filter):
         """
         Changes the pitch of raw voice data.
-        
-        ...
-    
-        Attributes
-        ----------
-        fac : float
-            The factor by which to change the pitch.
-    
-        Methods
-        -------
-        apply(data: np.ndarray)
-            Applies the filter and returns the result.
         """
+
+        fac: float
+        """The factor by which to change the pitch."""
     
-        def __init__(self, fac: float):
+        def __init__(self, fac: float) -> None:
             self.fac: float = fac
 
         @classmethod

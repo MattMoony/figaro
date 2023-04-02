@@ -1,28 +1,27 @@
-"""Filter to change the voice's volume"""
+"""
+Filter to change the voice's volume.
+"""
 
-import numpy as np, re
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+import numpy as np
 
 import figaro.filters.filter
 from figaro.utils import parse_perc
 
+
 class Volume(figaro.filters.filter.Filter):
+    """
+    Filter plugin to change the voice's volume.
+    """
+
     class Filter(figaro.filters.filter.Filter.Filter):
         """
         Changes the volume of raw voice data.
-
-        ...
-
-        Attributes
-        ----------
-        fac : float
-            The factor by which to change the volume.
-
-        Methods
-        -------
-        apply(data: np.ndarray)
-            Applies the filter and returns the result.
         """
+
+        fac: float
+        """The factor by which to change the volume."""
 
         def __init__(self, fac: float):
             self.fac: float = fac

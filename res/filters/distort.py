@@ -1,25 +1,26 @@
-"""Filter to change the voice's pitch"""
+"""
+Filter to change the voice's pitch.
+"""
 
 import secrets
+from typing import Any, Dict, List
+
 import numpy as np
-from typing import List, Dict, Any
 
 import figaro.filters.filter
 
+
 class Distort(figaro.filters.filter.Filter):
+    """
+    Filter plugin to distort audio.
+    """
+
     class Filter(figaro.filters.filter.Filter.Filter):
         """
         Distorts audio.
-        
-        ...
-    
-        Methods
-        -------
-        apply(data: np.ndarray)
-            Applies the filter and returns the result.
         """
     
-        def __init__(self):
+        def __init__(self) -> None:
             self.gen = secrets.SystemRandom()
 
         @classmethod
