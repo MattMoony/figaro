@@ -1,5 +1,5 @@
 import React from 'react';
-import style from './FancyInput.module.scss';
+import * as style from './FancyInput.module.scss';
 
 interface FancyInputProps {
   type: string;

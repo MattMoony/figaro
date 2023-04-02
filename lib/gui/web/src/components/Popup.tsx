@@ -1,5 +1,5 @@
 import React from 'react';
-import style from './Popup.module.scss';
+import * as style from './Popup.module.scss';
 
 interface PopupProps {
   style?: { [key: string]: any; };

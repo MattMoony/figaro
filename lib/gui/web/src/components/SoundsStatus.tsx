@@ -1,5 +1,5 @@
 import React from 'react';
-import style from './SoundsStatus.module.scss';
+import * as style from './SoundsStatus.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMusic, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AppConsumer, AppContextProps, AppProvider, Response } from './AppContext';

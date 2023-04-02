@@ -1,5 +1,5 @@
 import React from 'react';
-import style from './index.module.scss';
+import * as style from './index.module.scss'
 import { faWaveSquare, faPlus, faDrum } from '@fortawesome/free-solid-svg-icons';
 import DragWorkspace from '../components/DragWorkspace';
 import DragWindow from '../components/DragWindow';

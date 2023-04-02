@@ -1,5 +1,5 @@
 import React from 'react';
-import style from './Soundboard.module.scss';
+import * as style from './Soundboard.module.scss';
 import { AppConsumer, AppContextProps, Response } from './AppContext';
 import FancyInput from './FancyInput';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

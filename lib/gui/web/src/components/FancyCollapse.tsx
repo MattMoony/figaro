@@ -1,7 +1,7 @@
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import style from './FancyCollapse.module.scss';
+import * as style from './FancyCollapse.module.scss';
 
 interface FancyCollapseProps {
   title: string;

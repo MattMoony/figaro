@@ -1,5 +1,5 @@
 import React from "react";
-import style from './TitleBar.module.scss';
+import * as style from './TitleBar.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare } from '@fortawesome/free-regular-svg-icons';
 import { faMinus, faTimes } from "@fortawesome/free-solid-svg-icons";

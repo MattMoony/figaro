@@ -1,5 +1,5 @@
 import React from 'react';
-import style from './DragWorkspace.module.scss';
+import * as style from './DragWorkspace.module.scss';
 import DragWindow from './DragWindow';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';

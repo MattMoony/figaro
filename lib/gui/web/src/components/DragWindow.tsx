@@ -1,5 +1,5 @@
 import React, { MouseEvent } from 'react';
-import style from './DragWindow.module.scss';
+import * as style from './DragWindow.module.scss';
 import DragWorkspace from './DragWorkspace';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, IconDefinition } from '@fortawesome/free-solid-svg-icons';

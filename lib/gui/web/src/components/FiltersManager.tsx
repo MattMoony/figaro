@@ -1,5 +1,5 @@
 import React from 'react';
-import style from './FiltersManager.module.scss';
+import * as style from './FiltersManager.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { AppConsumer, AppContextProps, Response } from './AppContext';

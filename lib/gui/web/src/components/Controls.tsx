@@ -1,5 +1,5 @@
 import React from 'react';
-import style from './Controls.module.scss';
+import * as style from './Controls.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import { AppConsumer, AppContextProps, FigaroDevice, Response } from './AppContext';

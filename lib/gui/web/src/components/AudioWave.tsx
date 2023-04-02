@@ -1,5 +1,5 @@
 import React from 'react';
-import style from './AudioWave.module.scss';
+import * as style from './AudioWave.module.scss';
 import { Line } from 'react-chartjs-2';
 import { AppConsumer, AppContextProps, AppProvider } from './AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

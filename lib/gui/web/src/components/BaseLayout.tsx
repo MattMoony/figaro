@@ -1,6 +1,6 @@
 import React, { FormEvent } from 'react';
 import '../style/global.scss';
-import style from './BaseLayout.module.scss';
+import * as style from './BaseLayout.module.scss';
 import Popup from '../components/Popup';
 import FancyInput from '../components/FancyInput';
 import QrCode from 'react-qr-code';
