@@ -1,4 +1,7 @@
-"""Sets the most important constants for figaro"""
+"""
+Sets the most important constants for figaro.
+"""
+
 import os
 import sys
 from typing import List

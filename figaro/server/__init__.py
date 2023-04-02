@@ -1,38 +1,54 @@
-"""The entry point for the websocket server"""
+"""
+The entry point for the websocket server.
+"""
 
-import jwt, asyncio, websockets, websockets.server, threading, json, os, hashlib, sys, time, secrets, base64, qrcode
-import numpy as np
-import pash.shell
-from io import StringIO
+import asyncio
+import base64
+import json
+import os
+import secrets
+import sys
+import threading
 from getpass import getpass
+from io import StringIO
+from typing import Any, Callable, Dict
+
+import jwt
+import pash.shell
+import qrcode
+import websockets
+import websockets.server
 from Crypto.Cipher import AES
-from typing import Dict, Any, Callable
 
 from figaro import params, utils
-from figaro.server import sutils
 from figaro.channel import Channel
-from figaro.server.handlers import auth, audio, config
+from figaro.server import sutils
+from figaro.server.handlers import audio, auth, config
 
-"""30.05.2021 - Deprecating: The configuration of the websocket server"""
 conf: Dict[str, Any] = dict()
-"""The encryption key used for communications"""
+"""30.05.2021 - Deprecating: The configuration of the websocket server"""
 key: bytes = None
-"""The main CLI shell"""
+"""The encryption key used for communications"""
 sh: pash.shell.Shell = None
-"""The main audio channel"""
+"""The main CLI shell"""
 ch: Channel = None
+"""The main audio channel"""
 
-"""Special authenticated websockets commands"""
 auth_cmds: Dict[str, Callable[[websockets.server.WebSocketServerProtocol, Dict[str, Any], str, Channel], None]] = {
     'auth-status': auth.auth_status,
     'get-conf': config.get_conf,
     'get-audio': audio.get_audio,
     'get-sounds': audio.get_sounds,
 }
+"""Special authenticated websockets commands"""
 
 async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None:
     """
     Actually dispatch the websocket-requests.
+
+    Args:
+        ws (websockets.server.WebSocketServerProtocol): The websocket to send the data to.
+        path (str): The path of the websocket.
     """
     try:
         async for req in ws:
@@ -84,6 +100,9 @@ async def _srv(ws: websockets.server.WebSocketServerProtocol, path: str) -> None
 def __start(l: asyncio.AbstractEventLoop) -> None:
     """
     Start the websocket-request-polling on a separate thread.
+
+    Args:
+        l (asyncio.AbstractEventLoop): The event loop to run the server on.
     """
     asyncio.set_event_loop(l)
     l.run_until_complete(websockets.serve(_srv, params.HOST, params.PORT))
@@ -143,7 +162,11 @@ def show_key() -> None:
 
 def start(shell: pash.shell.Shell, channel: Channel) -> None:
     """
-    Starts the server; starts listening for websocket connections
+    Starts the server; starts listening for websocket connections.
+
+    Args:
+        shell (pash.shell.Shell): The shell instance to use.
+        channel (Channel): The channel instance to use.
     """
     global sh, ch, key
     # load_conf()

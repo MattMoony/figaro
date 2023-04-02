@@ -1,12 +1,23 @@
-"""The main entry point"""
+"""
+The main entry point - the CLI
+module of figaro.
+"""
 
-import pash.misc, pash.cmds, sys
+import sys
 from argparse import ArgumentParser
 
-from figaro import cmd, params, gui
+import pash.cmds
+import pash.misc
+
+from figaro import cmd, gui, params
+
 
 def main():
-    parser = ArgumentParser()
+    """
+    The main function - kicks off the CLI
+    interface the user interacts with.
+    """
+    parser: ArgumentParser = ArgumentParser()
     parser.add_argument('-f', '--file', type=str, help='A .fig file to be interpreted ... ')
     parser.add_argument('-i', '--ist', type=str, help='Index of the Input Stream ... ')
     parser.add_argument('-o', '--ost', type=str, help='Index of the Output Stream ... ')

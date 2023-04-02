@@ -1,51 +1,61 @@
-"""Channels the altered input data to the output devices"""
+"""
+Channels the altered input data to the output devices.
+"""
 
-import struct, time, numpy as np
-from threading import Thread, Lock
-from typing import Any, List, Dict, Optional
+import struct
+import time
+from threading import Lock, Thread
+from typing import Any, Dict, List, Optional
+
+import numpy as np
 
 from figaro import params
 from figaro.device import Device
+from figaro.filters.filter import Filter
 from figaro.sounds.sound import Sound
 from figaro.transformer import Transformer
-from figaro.filters.filter import Filter
+
 
 class Channel(Thread):
     """
     The channel between input and output.
-
-    ...
-
-    Attributes
-    ----------
-    transf : Transformer
-        The transformer applied to the input.
-    ist : List[Device]
-        The input devices.
-    ost : List[Device]
-        The output devices.
-    buff : np.ndarray
-        The current buffer.
-    filters : List[Filter]
-        Filters to be applied.
-    sounds : List[Sound]
-        Sounds to be played.
-    _running : bool
-        Is the channel active?
-    _ist_mut : Lock
-        Mutex for the input stream.
-    _ost_mut : Lock
-        Mutex for the output streams.
-    _sou_mut : Lock
-        Mutex for the sounds list.
-
-    Methods
-    -------
-    ...
     """
 
+    transf: Transformer
+    """The transformer applied to the input."""
+    ist: List[Device]
+    """The input devices."""
+    ost: List[Device]
+    """The output devices."""
+    buff: np.ndarray
+    """The current buffer."""
+    filters: List[Filter]
+    """Filters to be applied."""
+    sounds: List[Sound]
+    """Sounds to be played."""
+    _running: bool
+    """Is the channel active?"""
+    _ist_mut: Lock
+    """Mutex for the input stream."""
+    _ost_mut: Lock
+    """Mutex for the output streams."""
+    _fil_mut: Lock
+    """Mutex for the filters list."""
+    _sou_mut: Lock
+    """Mutex for the sounds list."""
+
     def __init__(self, transf: Optional[Transformer] = None, ist: List[Device] = [], ost: List[Device] = [], 
-                 filters: List[Filter] = [], sounds: List[Sound] = [], *args: List[Any], **kwargs: Dict[str, Any]):
+                 filters: List[Filter] = [], sounds: List[Sound] = [], *args: List[Any], **kwargs: Dict[str, Any]) -> None:
+        """
+        Initialize a new Channel object.
+
+        Args:
+            transf (Optional[Transformer]): The transformer to be applied to the input.
+            ist (List[Device]): The input devices. Default is [].
+            ost (List[Device]): The output devices. Default is [].
+            filters (List[Filter]): The filters to be applied. Default is [].
+            sounds (List[Sound]): The sounds to be played. Default is [].
+        """
         super(Channel, self).__init__(*args, **kwargs)
         self.transf: Transformer = transf or Transformer()
         self.ist: List[Device] = ist
@@ -59,14 +69,19 @@ class Channel(Thread):
         self._fil_mut: Lock = Lock()
         self._sou_mut: Lock = Lock()
 
-    def start(self):
-        """Start the audio channeling process"""
+    def start(self) -> NOne:
+        """
+        Start the audio channeling process.
+        """
         if not self.ist or not self.ost:
             raise IOError('Missing I/O devices!')
         return super().start()
 
     def run(self) -> None:
-        """Read audio from the input, run it through the transformer and write the result to the output streams"""
+        """
+        Read audio from the input, run it through the 
+        transformer and write the result to the output streams.
+        """
         self._running = True
         while self._running:
             self._ist_mut.acquire()
@@ -101,7 +116,12 @@ class Channel(Thread):
             self._ost_mut.release()
 
     def add_ist(self, i: Device) -> None:
-        """Add an input device"""
+        """
+        Add an input device.
+        
+        Args:
+            i (Device): The input device to be added.
+        """
         self._ist_mut.acquire()
         if i in self.ist:
             self._ist_mut.release()
@@ -110,14 +130,24 @@ class Channel(Thread):
         self._ist_mut.release()
 
     def get_ists(self) -> List[Device]:
-        """Get all input devices"""
+        """
+        Get all input devices.
+        
+        Returns:
+            List[Device]: The input devices.
+        """
         self._ist_mut.acquire()
         cp = list(self.ist)
         self._ist_mut.release()
         return cp
 
     def del_ist(self, dev_ind: int) -> None:
-        """Remove an input device"""
+        """
+        Remove an input device.
+        
+        Args:
+            dev_ind (int): The index of the device to be removed.
+        """
         self._ist_mut.acquire()
         if dev_ind not in map(lambda d: d.indi, self.ist):
             self._ist_mut.release()
@@ -128,7 +158,12 @@ class Channel(Thread):
         self._ist_mut.release()
 
     def add_ost(self, o: Device) -> None:
-        """Add an output device"""
+        """
+        Add an output device.
+        
+        Args:
+            o (Device): The output device to be added.
+        """
         self._ost_mut.acquire()
         if o in self.ost:
             self._ost_mut.release()
@@ -137,14 +172,24 @@ class Channel(Thread):
         self._ost_mut.release()
 
     def get_osts(self) -> List[Device]:
-        """Get all output devices"""
+        """
+        Get all output devices.
+        
+        Returns:
+            List[Device]: The list of output devices.
+        """
         self._ost_mut.acquire()
         cp = list(self.ost)
         self._ost_mut.release()
         return cp
 
     def del_ost(self, dev_ind: int) -> None:
-        """Remove an output device"""
+        """
+        Remove an output device.
+        
+        Args:
+            dev_ind (int): The index of the output device to be removed.
+        """
         self._ost_mut.acquire()
         if dev_ind not in map(lambda d: d.indo, self.ost):
             self._ost_mut.release()
@@ -155,14 +200,18 @@ class Channel(Thread):
         self._ost_mut.release()
 
     def kill(self) -> None:
-        """Stop channeling audio"""
+        """
+        Stop channeling audio.
+        """
         self._sou_mut.acquire()
         self.sounds = []
         self._sou_mut.release()
         self._running = False
 
     def kill_all(self) -> None:
-        """Stop all audio channels"""
+        """
+        Stop all audio channels.
+        """
         for i in self.ist:
             i.stop_stream()
             i.close()
@@ -171,26 +220,43 @@ class Channel(Thread):
             o.close()
 
     def add_filter(self, fil: Filter) -> None:
-        """Add a filter to the channel"""
+        """
+        Add a filter to the channel.
+        
+        Args:
+            fil (Filter): The filter to be added.
+        """
         self._fil_mut.acquire()
         self.filters.append(fil)
         self._fil_mut.release()
 
     def get_filters(self) -> List[Filter]:
-        """Get all currently applied filters"""
+        """
+        Get all currently applied filters.
+        
+        Returns:
+            List[Filter]: The list of filters.
+        """
         self._fil_mut.acquire()
         cp = list(self.filters)
         self._fil_mut.release()
         return cp
 
     def del_filter(self, i: int) -> None:
-        """Stop a filter that's currently applied"""
+        """
+        Stop a filter that's currently applied.
+        
+        Args:
+            i (int): The index of the filter to be removed.
+        """
         self._fil_mut.acquire()
         del self.filters[i]
         self._fil_mut.release()
 
     def del_all_filters(self) -> None:
-        """Stop all currently applied filters"""
+        """
+        Stop all currently applied filters.
+        """
         self._fil_mut.acquire()
         # self.filters = []
         for i in range(len(self.filters)-1, -1, -1):
@@ -198,26 +264,43 @@ class Channel(Thread):
         self._fil_mut.release()
 
     def add_sound(self, sound: Sound) -> None:
-        """Add a sound effect to the channel"""
+        """
+        Add a sound effect to the channel.
+        
+        Args:
+            sound (Sound): The sound effect to be added.
+        """
         self._sou_mut.acquire()
         self.sounds.append(sound)
         self._sou_mut.release()
 
     def get_sounds(self) -> List[Sound]:
-        """Get all currently playing soundeffects"""
+        """
+        Get all currently playing soundeffects.
+        
+        Returns:
+            List[Sound]: The list of sound effects.
+        """
         self._sou_mut.acquire()
         cp = list(self.sounds)
         self._sou_mut.release()
         return cp
 
     def del_sound(self, i: int) -> None:
-        """Stop a sound effect that's currently running"""
+        """
+        Stop a sound effect that's currently running.
+        
+        Args:
+            i (int): The index of the sound effect to be removed.
+        """
         self._sou_mut.acquire()
         del self.sounds[i]
         self._sou_mut.release()
 
     def del_all_sounds(self) -> None:
-        """Stop all currently running sound effects"""
+        """
+        Stop all currently running sound effects.
+        """
         self._sou_mut.acquire()
         # self.sounds = []
         for i in range(len(self.sounds)-1, -1, -1):
@@ -225,11 +308,21 @@ class Channel(Thread):
         self._sou_mut.release()
 
     def is_running(self) -> bool:
-        """Returns `True` if the channel is currently active"""
+        """
+        Returns `True` if the channel is currently active.
+        
+        Returns:
+            bool: Whether the channel is currently active or not.
+        """
         return self._running
 
     def __str__(self):
-        """Returns a string representation of the channel"""
+        """
+        Returns a string representation of the channel.
+        
+        Returns:
+            str: The string representation.
+        """
         return 'Channel: {{{}}} --> {{{}}} | {} ... '.format(
                 ', '.join(sorted([str(i.indi) for i in self.ist])) if self.ist else '-', 
                 ', '.join(sorted([str(o.indo) for o in self.ost])) if self.ost else '-', 

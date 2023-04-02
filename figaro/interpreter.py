@@ -1,41 +1,50 @@
-"""An interpreter for .fig files"""
+"""
+An interpreter for .fig files.
+"""
 
-import os, re, time, threading
+import os
+import re
+import threading
+import time
+from typing import Callable, List, Map, Optional, Set, Tuple, Union
+
 from pash.shell import Shell
 from pynput import keyboard as kb
-from typing import List, Dict, Union, Optional, Set, Callable
 
-from figaro import utils
 from figaro.channel import Channel
-from figaro.sounds.sound import Sound
 
-class Interpreter(object):
+
+class Interpreter:
     """
-    The interpreter for .fig files
-
-    ...
-
-    Attributes
-    ----------
-    fname : str
-        The filename of the file to be interpreted.
-    chnnl : Channel
-        A Figaro channel.
-    sh : Shell
-        The shell used for command interpretation.
-    keys : List[Set[Union[pynput.keyboard.Key, pynput.keyboard.KeyCode]]]
-        List of all mapped hotkeys.
-    cmds : List[Tuple[int, List[str]]]
-        List of all commands.
-    builtins : Map[str, Callable[[int, List[str]], None]]
-        Mapping of all builtin functions.
-    lstn : pynput.keyboard.Listener
-        The keystroke listener.
-    cu : Set[Union[kb.Key, kb.KeyCode]]
-        The currently pressed keys.
+    An interpreter for .fig files.
     """
+
+    fname: str
+    """The filename of the file to be interpreted."""
+    chnnl: Channel
+    """A Figaro channel."""
+    sh: Shell
+    """The shell used for command interpretation."""
+    keys: List[Set[Union[kb.Key, kb.KeyCode]]]
+    """List of all mapped hotkeys."""
+    cmds: List[Tuple[int, List[str]]]
+    """List of all commands."""
+    builtins: Map[str, Callable[[int, List[str]], None]]
+    """Mapping of all builtin functions."""
+    lstn: kb.Listener
+    """The keystroke listener."""
+    cu: Set[Union[kb.Key, kb.KeyCode]]
+    """The currently pressed keys."""
     
-    def __init__(self, fname: str, chnnl: Channel, sh: Shell):
+    def __init__(self, fname: str, chnnl: Channel, sh: Shell) -> None:
+        """
+        Initialize a new Interpreter object.
+
+        Args:
+            fname: The filename of the file to be interpreted.
+            chnnl: A Figaro channel.
+            sh: The shell used for command interpretation.
+        """
         self.fname: str = fname
         self.chnnl: Channel = chnnl
         self.sh: Shell = sh
@@ -43,14 +52,16 @@ class Interpreter(object):
             raise OSError('File "{}" doesn\'t exist!'.format(self.fname))
         self.keys: List[Set[Union[kb.Key, kb.KeyCode]]] = []
         self.cmds: List[Tuple[int, List[str]]] = []
-        self.builtins: Map[str, Callbale[[int, List[str]], None]] = {
+        self.builtins: Map[str, Callable[[int, List[str]], None]] = {
             'pause': self._cmd_pause,
         }
         self.lstn: kb.Listener = kb.Listener(on_press=self._on_press, on_release=self._on_release)
         self.cu: Set[Union[kb.Key, kb.KeyCode]] = set()
 
     def exec(self) -> None:
-        """Interpret the commands in the file, and start listening for keystrokes"""
+        """
+        Interpret the commands in the file, and start listening for keystrokes.
+        """
         with open(self.fname, 'r', encoding='utf-8') as f:
             lc = 0
             while True:
@@ -91,11 +102,19 @@ class Interpreter(object):
         self.lstn.start()
 
     def kill(self) -> None:
-        """Stop the Interpreter"""
+        """
+        Stop the Interpreter.
+        """
         self.lstn.stop()
 
     def _run(self, lc: int, lines: List[str]) -> None:
-        """Run a couple of .fig lines"""
+        """
+        Run a couple of .fig lines.
+
+        Args:
+            lc: The line number of the first line.
+            lines: The lines to be run.
+        """
         for i, l in enumerate(lines):
             l = l.strip()
             if not l or l.startswith('//') or l == 'return':
@@ -109,7 +128,15 @@ class Interpreter(object):
             self.builtins[args[0]](lc+i, args[1:])
 
     def _parse_key(self, key: Union[kb.Key, kb.KeyCode]) -> Union[kb.Key, kb.KeyCode]:
-        """Parses a given key/keycode"""
+        """
+        Parses a given key/keycode.
+
+        Args:
+            key: The key/keycode to be parsed.
+
+        Returns:
+            Union[kb.Key, kb.KeyCode]: The parsed key/keycode.
+        """
         if key in (kb.Key.shift_l, kb.Key.shift_r):
             key = kb.Key.shift
         elif key in (kb.Key.ctrl_l, kb.Key.ctrl_r):
@@ -123,7 +150,12 @@ class Interpreter(object):
         return key
         
     def _on_press(self, key: Optional[Union[kb.Key, kb.KeyCode]]) -> None:
-        """Callback for the key pressed event"""
+        """
+        Callback for the key pressed event.
+
+        Args:
+            key (Optional[Union[kb.Key, kb.KeyCode]]): The pressed key/keycode.
+        """
         if not key:
             return
         key = self._parse_key(key)
@@ -132,7 +164,12 @@ class Interpreter(object):
             threading.Thread(target=self._run, args=(*self.cmds[self.keys.index(self.cu)],)).start()
 
     def _on_release(self, key: Optional[Union[kb.Key, kb.KeyCode]]) -> None:
-        """Callback for the key released event"""
+        """
+        Callback for the key released event.
+
+        Args:
+            key (Optional[Union[kb.Key, kb.KeyCode]]): The released key/keycode.
+        """
         if not key:
             return
         key = self._parse_key(key)
@@ -142,7 +179,13 @@ class Interpreter(object):
             self.cu.clear()
 
     def _cmd_pause(self, lc: int, args: List[str]) -> None:
-        """Builtin `pause` - waits for the given amount of ms"""
+        """
+        Builtin `pause` - waits for the given amount of ms.
+
+        Args:
+            lc (int): The line number of the command.
+            args (List[str]): The arguments of the command.
+        """
         if not args:
             raise SyntaxError('{}:{} Semantic Error: Missing arguments '.format(self.fname, lc))
         if not re.match(r'\d+', args[0]):

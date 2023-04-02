@@ -1,9 +1,12 @@
-"""Home of the filter manager"""
+"""
+Home of the filter manager.
+"""
 
 import os
+from typing import List
+
 from yapsy.PluginInfo import PluginInfo
 from yapsy.PluginManager import PluginManager
-from typing import List
 
 from figaro import params
 from figaro.filters.filter import Filter
