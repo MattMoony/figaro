@@ -3,11 +3,11 @@
 import numpy as np, re
 from typing import List, Dict, Any
 
-from lib.utils import parse_perc
-import lib.filters.filter
+from figaro.utils import parse_perc
+import figaro.filters.filter
 
-class Trip(lib.filters.filter.Filter):
-    class Filter(lib.filters.filter.Filter.Filter):
+class Trip(figaro.filters.filter.Filter):
+    class Filter(figaro.filters.filter.Filter.Filter):
         """
         Adds a trippy effect to audio.
 

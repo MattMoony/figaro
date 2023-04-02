@@ -3,11 +3,11 @@
 import numpy as np
 from typing import List, Dict, Any
 
-from lib.utils import parse_perc
-import lib.filters.filter
+from figaro.utils import parse_perc
+import figaro.filters.filter
 
-class Noise(lib.filters.filter.Filter):
-    class Filter(lib.filters.filter.Filter.Filter):
+class Noise(figaro.filters.filter.Filter):
+    class Filter(figaro.filters.filter.Filter.Filter):
         """
         Adds noise to audio.
 

@@ -4,7 +4,7 @@ import os
 from subprocess import Popen
 from typing import Optional, Dict, Any
 
-from lib import params, utils
+from figaro import params, utils
 
 try:
     Popen(['ffmpeg',])

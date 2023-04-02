@@ -8,10 +8,10 @@ from getpass import getpass
 from Crypto.Cipher import AES
 from typing import Dict, Any, Callable
 
-from lib import params, utils
-from lib.server import sutils
-from lib.channel import Channel
-from lib.server.handlers import auth, audio, config
+from figaro import params, utils
+from figaro.server import sutils
+from figaro.channel import Channel
+from figaro.server.handlers import auth, audio, config
 
 """30.05.2021 - Deprecating: The configuration of the websocket server"""
 conf: Dict[str, Any] = dict()

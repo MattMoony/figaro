@@ -3,11 +3,11 @@
 import numpy as np
 from typing import List, Dict, Any
 
-import lib.filters.filter
-from lib.utils import parse_perc
+import figaro.filters.filter
+from figaro.utils import parse_perc
 
-class Crackle(lib.filters.filter.Filter):
-    class Filter(lib.filters.filter.Filter.Filter):
+class Crackle(figaro.filters.filter.Filter):
+    class Filter(figaro.filters.filter.Filter.Filter):
         """
         Adds a crackling effect to audio.
 

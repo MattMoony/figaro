@@ -3,11 +3,11 @@
 import numpy as np, re
 from typing import List, Dict, Any
 
-import lib.filters.filter
-from lib.utils import parse_perc
+import figaro.filters.filter
+from figaro.utils import parse_perc
 
-class Volume(lib.filters.filter.Filter):
-    class Filter(lib.filters.filter.Filter.Filter):
+class Volume(figaro.filters.filter.Filter):
+    class Filter(figaro.filters.filter.Filter.Filter):
         """
         Changes the volume of raw voice data.
 

@@ -4,11 +4,11 @@ import numpy as np, re
 from datetime import datetime
 from typing import List, Tuple, Dict, Any
 
-from lib.utils import parse_perc
-import lib.filters.filter
+from figaro.utils import parse_perc
+import figaro.filters.filter
 
-class Echo(lib.filters.filter.Filter):
-    class Filter(lib.filters.filter.Filter.Filter):
+class Echo(figaro.filters.filter.Filter):
+    class Filter(figaro.filters.filter.Filter.Filter):
         """
         Adds an echo to audio.
 

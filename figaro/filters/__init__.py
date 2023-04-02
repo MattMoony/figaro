@@ -5,8 +5,8 @@ from yapsy.PluginInfo import PluginInfo
 from yapsy.PluginManager import PluginManager
 from typing import List
 
-from lib import params
-from lib.filters.filter import Filter
+from figaro import params
+from figaro.filters.filter import Filter
 
 """The manager for all Figaro filters"""
 manager: PluginManager = PluginManager()

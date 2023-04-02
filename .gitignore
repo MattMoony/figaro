@@ -20,3 +20,4 @@ lib/gui/.key
 build/
 figaro.spec
 static/
+figaro.egg-info

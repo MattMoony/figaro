@@ -3,7 +3,7 @@
 import http.server, socketserver, threading, os, json
 from typing import Tuple, Optional
 
-from lib import utils, params
+from figaro import utils, params
 
 """The actual HTTP daemon"""
 httpd: socketserver.TCPServer = None

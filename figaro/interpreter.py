@@ -5,9 +5,9 @@ from pash.shell import Shell
 from pynput import keyboard as kb
 from typing import List, Dict, Union, Optional, Set, Callable
 
-from lib import utils
-from lib.channel import Channel
-from lib.sounds.sound import Sound
+from figaro import utils
+from figaro.channel import Channel
+from figaro.sounds.sound import Sound
 
 class Interpreter(object):
     """

@@ -5,7 +5,7 @@ import datetime
 import websockets, websockets.server
 from typing import Dict, Any, List
 
-from lib.server import sutils
+from figaro.server import sutils
 
 """The configuration needed for authentication"""
 conf: Dict[str, Any] = dict()
