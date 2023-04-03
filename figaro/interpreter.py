@@ -6,7 +6,7 @@ import os
 import re
 import threading
 import time
-from typing import Callable, List, Map, Optional, Set, Tuple, Union
+from typing import Callable, List, Mapping, Optional, Set, Tuple, Union
 
 from pash.shell import Shell
 from pynput import keyboard as kb
@@ -29,7 +29,7 @@ class Interpreter:
     """List of all mapped hotkeys."""
     cmds: List[Tuple[int, List[str]]]
     """List of all commands."""
-    builtins: Map[str, Callable[[int, List[str]], None]]
+    builtins: Mapping[str, Callable[[int, List[str]], None]]
     """Mapping of all builtin functions."""
     lstn: kb.Listener
     """The keystroke listener."""

@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 import pash.cmds
 import pash.misc
 
-from figaro import cmd, gui, params
+from figaro import cmd, gui
 
 
 def main():

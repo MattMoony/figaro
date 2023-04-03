@@ -69,7 +69,7 @@ class Channel(Thread):
         self._fil_mut: Lock = Lock()
         self._sou_mut: Lock = Lock()
 
-    def start(self) -> NOne:
+    def start(self) -> None:
         """
         Start the audio channeling process.
         """
