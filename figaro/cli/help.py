@@ -5,11 +5,11 @@ Module for the help command
 from typing import Any, Dict, List, Optional, Union
 
 from hans.cmd import Command
-from hans.state import CLISessionState
 from prompt_toolkit.completion.nested import NestedDict
 from rich import print  # pylint: disable=redefined-builtin
 from rich.tree import Tree
 
+from figaro.cli._helper.state import FigaroSessionState
 from figaro.utils import io
 
 
@@ -24,7 +24,7 @@ class Help(Command):
         """
         super().__init__('help', aliases=['?',], description='Shows this help message')
 
-    def __build_tree(self, cmds: Dict[str, Any], tree: Tree, state: CLISessionState) -> None:
+    def __build_tree(self, cmds: Dict[str, Any], tree: Tree, state: FigaroSessionState) -> None:
         """
         Builds a tree of commands from the specified dictionary
 
@@ -46,13 +46,13 @@ class Help(Command):
                 if t.children:
                     tree.add(t)
 
-    def completer(self, state: CLISessionState) -> Optional[NestedDict]:
+    def completer(self, state: FigaroSessionState) -> Optional[NestedDict]:
         """
         Custom completer behaviour.
         """
         return state.session.compl_dict
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: FigaroSessionState, *args, **kwargs) -> None:
         """
         Executes the help command
         """

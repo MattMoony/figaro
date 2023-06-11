@@ -5,7 +5,8 @@ Module for the exit command
 from typing import List
 
 from hans.cmd import Command
-from hans.state import CLISessionState
+
+from figaro.cli._helper.state import FigaroSessionState
 
 
 class Exit(Command):
@@ -19,8 +20,12 @@ class Exit(Command):
         """
         super().__init__('exit', aliases=['quit',], description='Exits the program')
 
-    def execute(self, raw_args: List[str], argv: List[str], state: CLISessionState, *args, **kwargs) -> None:
+    def execute(self, raw_args: List[str], argv: List[str], state: FigaroSessionState, *args, **kwargs) -> None:
         """
         Executes the exit command
         """
+        if state.channel.is_alive():
+            state.channel.kill()
+        state.channel.kill_all()
+        state.audio.terminate()
         state.session.exit(code=0)
