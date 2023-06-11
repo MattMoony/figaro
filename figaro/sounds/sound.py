@@ -3,13 +3,13 @@ Wrapper class for a playable audio file.
 """
 
 import os
-from subprocess import Popen
+from subprocess import Popen, PIPE
 from typing import Any, Dict
 
 from figaro import params
 
 try:
-    Popen(['ffmpeg',])
+    Popen(['ffmpeg',], stdout=PIPE, stderr=PIPE)
 except FileNotFoundError:
     os.environ['PATH'] = os.environ['PATH'] + ';' + os.path.abspath(os.path.join(params.BPATH, 'static'))
 
