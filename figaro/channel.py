@@ -26,13 +26,13 @@ class Channel:
     buf: np.ndarray
     """The current buffer."""
 
-    inputs: ListProxy[Device]
+    inputs: ListProxy
     """The input devices."""
-    outputs: ListProxy[Device]
+    outputs: ListProxy
     """The output devices."""
-    filters: ListProxy[Filter]
+    filters: ListProxy
     """Filters to be applied."""
-    sounds: ListProxy[Sound]
+    sounds: ListProxy
     """Sounds to be played."""
 
     __dead: Event
@@ -57,6 +57,7 @@ class Channel:
         """
         self.__mgr = Manager()
         self.__dead = self.__mgr.Event()
+        self.__dead.set()
 
         self.trf = trf or Transformer()
         self.buf = np.array([])
@@ -136,3 +137,12 @@ class Channel:
         raw = struct.pack('f'*len(self.buf), *self.buf)
         for out in self.outputs:
             out.write(raw)
+
+    def __str__(self) -> str:
+        return 'Channel: {{{}}} --> {{{}}} | {} ... '.format(
+                ', '.join(sorted([str(i.indi) for i in self.inputs])) if self.inputs else '-', 
+                ', '.join(sorted([str(o.indo) for o in self.outputs])) if self.outputs else '-', 
+                'running' if not self.__dead.is_set() else 'stopped')
+
+    def __repr__(self) -> str:
+        return f'<{self}>'

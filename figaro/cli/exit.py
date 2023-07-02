@@ -24,8 +24,9 @@ class Exit(Command):
         """
         Executes the exit command
         """
-        if state.channel.is_alive():
-            state.channel.kill()
-        state.channel.kill_all()
+        try:
+            state.channel.stop()
+        except:
+            pass
         state.audio.terminate()
         state.session.exit(code=0)
